@@ -19,6 +19,7 @@ import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authen
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
 import { Route as AuthenticatedDinamicaRouteImport } from './routes/_authenticated.dinamica'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
@@ -79,6 +80,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedClinicasIndexRoute =
   AuthenticatedClinicasIndexRouteImport.update({
     id: '/clinicas/',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dinamica': typeof AuthenticatedDinamicaRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
@@ -155,6 +163,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dinamica': typeof AuthenticatedDinamicaRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
@@ -177,6 +186,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/dinamica': typeof AuthenticatedDinamicaRoute
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/configuracoes'
     | '/dashboard'
     | '/dinamica'
     | '/exercicios'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/configuracoes'
     | '/dashboard'
     | '/dinamica'
     | '/exercicios'
@@ -240,6 +252,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/sitemap.xml'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/dinamica'
     | '/_authenticated/exercicios'
@@ -336,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/clinicas/': {
       id: '/_authenticated/clinicas/'
       path: '/clinicas'
@@ -403,6 +423,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDinamicaRoute: typeof AuthenticatedDinamicaRoute
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
@@ -421,6 +442,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDinamicaRoute: AuthenticatedDinamicaRoute,
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,

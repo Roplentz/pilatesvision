@@ -700,7 +700,7 @@ function RelatorioStep({
   movimento,
   exercises,
 }: {
-  aluno: { name: string; age: number } | undefined;
+  aluno: { name: string; age: number | null } | undefined;
   ficha: Ficha;
   movimento: string;
   exercises: string[];
@@ -719,7 +719,7 @@ function RelatorioStep({
             <p className="text-xs uppercase tracking-widest text-primary">Relatório clínico</p>
             <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">{aluno?.name ?? "Aluno"}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {aluno ? `${aluno.age} anos · ` : ""}{ficha.objetivo || "Objetivo a definir"} · {today}
+              {aluno?.age != null ? `${aluno.age} anos · ` : ""}{ficha.objetivo || "Objetivo a definir"} · {today}
             </p>
           </div>
           <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-primary shadow-glow">

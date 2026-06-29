@@ -14,7 +14,10 @@ import { Route as NovaAvaliacaoRouteImport } from './routes/nova-avaliacao'
 import { Route as ExerciciosRouteImport } from './routes/exercicios'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AvaliacoesIndexRouteImport } from './routes/avaliacoes.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
+import { Route as AvaliacoesNovaRouteImport } from './routes/avaliacoes.nova'
+import { Route as AvaliacoesIdRouteImport } from './routes/avaliacoes.$id'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
 
@@ -43,9 +46,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AvaliacoesIndexRoute = AvaliacoesIndexRouteImport.update({
+  id: '/avaliacoes/',
+  path: '/avaliacoes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AlunosIndexRoute = AlunosIndexRouteImport.update({
   id: '/alunos/',
   path: '/alunos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvaliacoesNovaRoute = AvaliacoesNovaRouteImport.update({
+  id: '/avaliacoes/nova',
+  path: '/avaliacoes/nova',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AvaliacoesIdRoute = AvaliacoesIdRouteImport.update({
+  id: '/avaliacoes/$id',
+  path: '/avaliacoes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AlunosNovoRoute = AlunosNovoRouteImport.update({
@@ -67,7 +85,10 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
+  '/avaliacoes/$id': typeof AvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AvaliacoesNovaRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/avaliacoes/': typeof AvaliacoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +98,10 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
+  '/avaliacoes/$id': typeof AvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AvaliacoesNovaRoute
   '/alunos': typeof AlunosIndexRoute
+  '/avaliacoes': typeof AvaliacoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +112,10 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
+  '/avaliacoes/$id': typeof AvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AvaliacoesNovaRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/avaliacoes/': typeof AvaliacoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +127,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/alunos/$id'
     | '/alunos/novo'
+    | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/alunos/'
+    | '/avaliacoes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,7 +140,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/alunos/$id'
     | '/alunos/novo'
+    | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/alunos'
+    | '/avaliacoes'
   id:
     | '__root__'
     | '/'
@@ -120,7 +153,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/alunos/$id'
     | '/alunos/novo'
+    | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/alunos/'
+    | '/avaliacoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,7 +167,10 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AlunosIdRoute: typeof AlunosIdRoute
   AlunosNovoRoute: typeof AlunosNovoRoute
+  AvaliacoesIdRoute: typeof AvaliacoesIdRoute
+  AvaliacoesNovaRoute: typeof AvaliacoesNovaRoute
   AlunosIndexRoute: typeof AlunosIndexRoute
+  AvaliacoesIndexRoute: typeof AvaliacoesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,11 +210,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/avaliacoes/': {
+      id: '/avaliacoes/'
+      path: '/avaliacoes'
+      fullPath: '/avaliacoes/'
+      preLoaderRoute: typeof AvaliacoesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/alunos/': {
       id: '/alunos/'
       path: '/alunos'
       fullPath: '/alunos/'
       preLoaderRoute: typeof AlunosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avaliacoes/nova': {
+      id: '/avaliacoes/nova'
+      path: '/avaliacoes/nova'
+      fullPath: '/avaliacoes/nova'
+      preLoaderRoute: typeof AvaliacoesNovaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avaliacoes/$id': {
+      id: '/avaliacoes/$id'
+      path: '/avaliacoes/$id'
+      fullPath: '/avaliacoes/$id'
+      preLoaderRoute: typeof AvaliacoesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alunos/novo': {
@@ -203,7 +263,10 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AlunosIdRoute: AlunosIdRoute,
   AlunosNovoRoute: AlunosNovoRoute,
+  AvaliacoesIdRoute: AvaliacoesIdRoute,
+  AvaliacoesNovaRoute: AvaliacoesNovaRoute,
   AlunosIndexRoute: AlunosIndexRoute,
+  AvaliacoesIndexRoute: AvaliacoesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

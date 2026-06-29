@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
@@ -31,6 +31,10 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
+import { useStudents, type StudentRow } from "@/lib/studentsStore";
+import { createAssessment } from "@/lib/assessmentsStore";
+import { useProfile } from "@/hooks/useProfile";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/nova-avaliacao")({
   head: () => ({
@@ -53,13 +57,6 @@ const STEPS: { id: StepId; label: string; icon: React.ComponentType<{ className?
   { id: "relatorio", label: "Relatório", icon: FileText },
 ];
 
-const ALUNOS = [
-  { id: "1", name: "Mariana Souza", age: 34 },
-  { id: "2", name: "Rafael Lima", age: 41 },
-  { id: "3", name: "Beatriz Castro", age: 28 },
-  { id: "4", name: "João Pedro Alves", age: 52 },
-];
-
 const OBJETIVOS = [
   "Melhora postural",
   "Reabilitação lombar",
@@ -68,6 +65,12 @@ const OBJETIVOS = [
   "Pós-parto",
   "Mobilidade geral",
 ];
+
+function ageFromBirth(iso: string | null): number | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Math.floor((Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000));
+}
 
 type Ficha = {
   alunoId: string;
@@ -119,7 +122,11 @@ const EXERCICIOS = [
 ];
 
 function NovaAvaliacao() {
+  const navigate = useNavigate();
+  const { clinicId } = useProfile();
+  const { students, loading: studentsLoading } = useStudents(clinicId);
   const [stepIdx, setStepIdx] = useState(0);
+  const [saving, setSaving] = useState(false);
   const step = STEPS[stepIdx];
 
   const [ficha, setFicha] = useState<Ficha>({
@@ -143,7 +150,11 @@ function NovaAvaliacao() {
 
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 
-  const aluno = ALUNOS.find((a) => a.id === ficha.alunoId);
+  const studentOptions = useMemo(
+    () => students.map((s) => ({ id: s.id, name: s.name, age: ageFromBirth(s.birth_date) })),
+    [students],
+  );
+  const aluno = studentOptions.find((a) => a.id === ficha.alunoId);
 
   const canAdvance = () => {
     if (step.id === "ficha") return !!ficha.alunoId && !!ficha.objetivo;
@@ -155,6 +166,35 @@ function NovaAvaliacao() {
 
   const next = () => setStepIdx((i) => Math.min(i + 1, STEPS.length - 1));
   const prev = () => setStepIdx((i) => Math.max(i - 1, 0));
+
+  const handleConcluir = async () => {
+    if (!clinicId) {
+      toast.error("Sua conta ainda não está vinculada a uma clínica.");
+      return;
+    }
+    if (!ficha.alunoId) {
+      toast.error("Selecione um aluno antes de concluir.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await createAssessment({
+        clinic_id: clinicId,
+        student_id: ficha.alunoId,
+        status: "completed",
+        current_stage: "relatorio",
+        pain_level: ficha.dor,
+        observations: ficha.observacoes || null,
+        goals: ficha.objetivo ? [ficha.objetivo] : [],
+      });
+      toast.success("Avaliação salva no prontuário do aluno.");
+      navigate({ to: "/alunos/$id", params: { id: ficha.alunoId } });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao salvar avaliação.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const simulatePostural = () => {
     setPosturalAnalyzing(true);
@@ -207,7 +247,12 @@ function NovaAvaliacao() {
               transition={{ duration: 0.25 }}
             >
               {step.id === "ficha" && (
-                <FichaStep ficha={ficha} setFicha={setFicha} />
+                <FichaStep
+                  ficha={ficha}
+                  setFicha={setFicha}
+                  students={studentOptions}
+                  loading={studentsLoading}
+                />
               )}
               {step.id === "postural" && (
                 <PosturalStep
@@ -254,8 +299,12 @@ function NovaAvaliacao() {
               Continuar avaliação <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           ) : (
-            <Button variant="hero">
-              <FileText className="mr-1 h-4 w-4" /> Exportar PDF
+            <Button variant="hero" onClick={handleConcluir} disabled={saving}>
+              {saving ? (
+                <><Loader2 className="mr-1 h-4 w-4 animate-spin" /> Salvando…</>
+              ) : (
+                <><Check className="mr-1 h-4 w-4" /> Concluir e salvar</>
+              )}
             </Button>
           )}
         </div>

@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedAvaliacaoPosturalRouteImport } from './routes/_authenticated.avaliacao-postural'
 import { Route as AuthenticatedAvaliacaoDinamicaRouteImport } from './routes/_authenticated.avaliacao-dinamica'
+import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
 import { Route as AuthenticatedClinicasNovaRouteImport } from './routes/_authenticated.clinicas.nova'
@@ -87,6 +88,12 @@ const AuthenticatedAvaliacaoDinamicaRoute =
     path: '/avaliacao-dinamica',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedClinicasIndexRoute =
+  AuthenticatedClinicasIndexRouteImport.update({
+    id: '/clinicas/',
+    path: '/clinicas/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAvaliacoesIndexRoute =
   AuthenticatedAvaliacoesIndexRouteImport.update({
     id: '/avaliacoes/',
@@ -152,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
   '/alunos/': typeof AuthenticatedAlunosIndexRoute
   '/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
+  '/clinicas/': typeof AuthenticatedClinicasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -172,6 +180,7 @@ export interface FileRoutesByTo {
   '/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
   '/alunos': typeof AuthenticatedAlunosIndexRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesIndexRoute
+  '/clinicas': typeof AuthenticatedClinicasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -194,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
   '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
   '/_authenticated/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
+  '/_authenticated/clinicas/': typeof AuthenticatedClinicasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/clinicas/nova'
     | '/alunos/'
     | '/avaliacoes/'
+    | '/clinicas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/clinicas/nova'
     | '/alunos'
     | '/avaliacoes'
+    | '/clinicas'
   id:
     | '__root__'
     | '/'
@@ -257,6 +269,7 @@ export interface FileRouteTypes {
     | '/_authenticated/clinicas/nova'
     | '/_authenticated/alunos/'
     | '/_authenticated/avaliacoes/'
+    | '/_authenticated/clinicas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAvaliacaoDinamicaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/clinicas/': {
+      id: '/_authenticated/clinicas/'
+      path: '/clinicas'
+      fullPath: '/clinicas/'
+      preLoaderRoute: typeof AuthenticatedClinicasIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/avaliacoes/': {
       id: '/_authenticated/avaliacoes/'
       path: '/avaliacoes'
@@ -420,6 +440,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedClinicasNovaRoute: typeof AuthenticatedClinicasNovaRoute
   AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
   AuthenticatedAvaliacoesIndexRoute: typeof AuthenticatedAvaliacoesIndexRoute
+  AuthenticatedClinicasIndexRoute: typeof AuthenticatedClinicasIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -438,6 +459,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClinicasNovaRoute: AuthenticatedClinicasNovaRoute,
   AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,
   AuthenticatedAvaliacoesIndexRoute: AuthenticatedAvaliacoesIndexRoute,
+  AuthenticatedClinicasIndexRoute: AuthenticatedClinicasIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

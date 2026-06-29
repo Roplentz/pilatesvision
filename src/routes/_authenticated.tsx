@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -93,7 +94,9 @@ function AppSidebar() {
 
 function AuthedLayout() {
   const { user, loading, signOut } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   // Redireciona se a sessão expirar / for revogada em tempo real.
   useEffect(() => {
@@ -102,16 +105,49 @@ function AuthedLayout() {
     }
   }, [loading, user, navigate]);
 
+  // Onboarding: usuário sem clínica vinculada é levado para /onboarding.
+  useEffect(() => {
+    if (loading || profileLoading || !user) return;
+    const needsOnboarding = profile && !profile.clinic_id;
+    if (needsOnboarding && pathname !== "/onboarding") {
+      navigate({ to: "/onboarding", replace: true });
+    }
+  }, [loading, profileLoading, user, profile, pathname, navigate]);
+
   const handleSignOut = async () => {
     await signOut();
     toast.success("Sessão encerrada");
     navigate({ to: "/auth", replace: true });
   };
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="grid min-h-screen w-full place-items-center bg-background text-foreground">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Em onboarding: esconde sidebar e header padrão para um fluxo focado.
+  if (pathname === "/onboarding") {
+    return (
+      <div className="min-h-screen w-full bg-background text-foreground">
+        <header className="flex h-12 items-center justify-end border-b border-border/60 bg-background/70 px-4 backdrop-blur-xl">
+          {user?.email && (
+            <span className="hidden sm:inline text-xs text-muted-foreground mr-3">
+              {user.email}
+            </span>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="h-8 gap-1.5"
+          >
+            <LogOut className="h-3.5 w-3.5" /> Sair
+          </Button>
+        </header>
+        <Outlet />
       </div>
     );
   }

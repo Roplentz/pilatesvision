@@ -91,10 +91,10 @@ function Nav() {
           <a href="#precos" className="transition hover:text-foreground">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link to="/auth">
+          <Link to="/dashboard">
             <Button variant="ghost" size="sm">Entrar</Button>
           </Link>
-          <Link to="/auth" search={{ mode: "signup" } as never}>
+          <Link to="/dashboard">
             <Button variant="hero" size="sm">
               Começar
               <ArrowRight className="ml-1 h-4 w-4" />
@@ -157,9 +157,9 @@ function Hero() {
             transition={{ duration: 0.6, delay: 0.25 }}
             className="mt-8 flex flex-wrap items-center gap-3"
           >
-            <Link to="/auth" search={{ mode: "signup" } as never}>
+            <Link to="/dashboard">
               <Button variant="hero" size="lg">
-                Criar conta grátis
+                Entrar no app
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>

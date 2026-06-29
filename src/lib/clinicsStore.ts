@@ -1,74 +1,83 @@
-import { useSyncExternalStore } from "react";
-import { mockClinic } from "@/lib/mockData";
-import type { Clinic } from "@/types/models";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+export type ClinicRow = Database["public"]["Tables"]["clinics"]["Row"];
+export type NewClinicInput = Omit<
+  Database["public"]["Tables"]["clinics"]["Insert"],
+  "id" | "created_at"
+>;
 
 /**
- * Store local de clínicas (in-memory) — inicializado a partir dos mocks.
- * Será substituído por queries Supabase quando a integração for ativada.
- * Persiste apenas durante a sessão do navegador.
+ * Busca a clínica do usuário logado: lê profiles.clinic_id e depois a clínica.
  */
+export function useClinic(userId: string | null | undefined) {
+  const [clinic, setClinic] = useState<ClinicRow | null>(null);
+  const [clinicId, setClinicId] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(Boolean(userId));
+  const [error, setError] = useState<Error | null>(null);
 
-const extraClinics: Clinic[] = [
-  {
-    id: "clinic-002",
-    name: "Pilates Vision Rio",
-    slug: "pv-rio",
-    email: "contato@pilatesvision.rio",
-    phone: "+55 21 98888-2020",
-    plan: "starter",
-    address: {
-      street: "Av. Ataulfo de Paiva, 800",
-      city: "Rio de Janeiro",
-      state: "RJ",
-      zip: "22440-035",
-      country: "BR",
-    },
-    createdAt: "2025-03-10T10:00:00.000Z",
-  },
-  {
-    id: "clinic-003",
-    name: "Núcleo Movimento BH",
-    slug: "nucleo-bh",
-    email: "ola@nucleomovimento.com.br",
-    phone: "+55 31 99777-3030",
-    plan: "enterprise",
-    address: {
-      street: "Rua Pernambuco, 1500",
-      city: "Belo Horizonte",
-      state: "MG",
-      zip: "30130-152",
-      country: "BR",
-    },
-    createdAt: "2025-05-22T10:00:00.000Z",
-  },
-];
+  useEffect(() => {
+    if (!userId) {
+      setClinic(null);
+      setClinicId(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-let clinics: Clinic[] = [mockClinic, ...extraClinics];
-const listeners = new Set<() => void>();
+    (async () => {
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("clinic_id")
+        .eq("id", userId)
+        .maybeSingle();
 
-const emit = () => listeners.forEach((l) => l());
-const subscribe = (cb: () => void) => {
-  listeners.add(cb);
-  return () => void listeners.delete(cb);
-};
+      if (cancelled) return;
+      if (profileError) {
+        setError(new Error(profileError.message));
+        setLoading(false);
+        return;
+      }
 
-export function useClinics(): Clinic[] {
-  return useSyncExternalStore(subscribe, () => clinics, () => clinics);
+      const cid = (profile?.clinic_id as string | null | undefined) ?? null;
+      setClinicId(cid);
+
+      if (!cid) {
+        setClinic(null);
+        setLoading(false);
+        return;
+      }
+
+      const { data: clinicData, error: clinicError } = await supabase
+        .from("clinics")
+        .select("*")
+        .eq("id", cid)
+        .maybeSingle();
+
+      if (cancelled) return;
+      if (clinicError) setError(new Error(clinicError.message));
+      else setClinic((clinicData as ClinicRow | null) ?? null);
+      setLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  return { clinic, clinicId, loading, error };
 }
 
-export function getClinic(id: string): Clinic | undefined {
-  return clinics.find((c) => c.id === id);
-}
-
-export type NewClinicInput = Omit<Clinic, "id" | "createdAt">;
-
-export function addClinic(input: NewClinicInput): Clinic {
-  const created: Clinic = {
-    ...input,
-    id: `clinic-${Date.now().toString(36)}`,
-    createdAt: new Date().toISOString(),
-  };
-  clinics = [created, ...clinics];
-  emit();
-  return created;
+/** Cria a clínica do primeiro acesso. */
+export async function createClinic(input: NewClinicInput): Promise<ClinicRow> {
+  const { data, error } = await supabase
+    .from("clinics")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as ClinicRow;
 }

@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedPosturalRouteImport } from './routes/_authenticated.postural'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
@@ -44,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPosturalRoute = AuthenticatedPosturalRouteImport.update({
+  id: '/postural',
+  path: '/postural',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedNovaAvaliacaoRoute =
   AuthenticatedNovaAvaliacaoRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
+  '/postural': typeof AuthenticatedPosturalRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
+  '/postural': typeof AuthenticatedPosturalRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
+  '/_authenticated/postural': typeof AuthenticatedPosturalRoute
   '/_authenticated/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/_authenticated/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/_authenticated/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exercicios'
     | '/nova-avaliacao'
+    | '/postural'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exercicios'
     | '/nova-avaliacao'
+    | '/postural'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/exercicios'
     | '/_authenticated/nova-avaliacao'
+    | '/_authenticated/postural'
     | '/_authenticated/alunos/$id'
     | '/_authenticated/alunos/novo'
     | '/_authenticated/avaliacoes/$id'
@@ -257,6 +269,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/postural': {
+      id: '/_authenticated/postural'
+      path: '/postural'
+      fullPath: '/postural'
+      preLoaderRoute: typeof AuthenticatedPosturalRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/nova-avaliacao': {
       id: '/_authenticated/nova-avaliacao'
@@ -349,6 +368,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
+  AuthenticatedPosturalRoute: typeof AuthenticatedPosturalRoute
   AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
   AuthenticatedAlunosNovoRoute: typeof AuthenticatedAlunosNovoRoute
   AuthenticatedAvaliacoesIdRoute: typeof AuthenticatedAvaliacoesIdRoute
@@ -364,6 +384,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
+  AuthenticatedPosturalRoute: AuthenticatedPosturalRoute,
   AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,
   AuthenticatedAlunosNovoRoute: AuthenticatedAlunosNovoRoute,
   AuthenticatedAvaliacoesIdRoute: AuthenticatedAvaliacoesIdRoute,

@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedAvaliacaoPosturalRouteImport } from './routes/_authenticated.avaliacao-postural'
 import { Route as AuthenticatedAvaliacaoDinamicaRouteImport } from './routes/_authenticated.avaliacao-dinamica'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
@@ -94,6 +95,11 @@ const AuthenticatedAvaliacaoDinamicaRoute =
     path: '/avaliacao-dinamica',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedClinicasIndexRoute =
   AuthenticatedClinicasIndexRouteImport.update({
     id: '/clinicas/',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/_authenticated/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/admin'
     | '/avaliacao-dinamica'
     | '/avaliacao-postural'
     | '/configuracoes'
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/admin'
     | '/avaliacao-dinamica'
     | '/avaliacao-postural'
     | '/configuracoes'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/sitemap.xml'
+    | '/_authenticated/admin'
     | '/_authenticated/avaliacao-dinamica'
     | '/_authenticated/avaliacao-postural'
     | '/_authenticated/configuracoes'
@@ -377,6 +389,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAvaliacaoDinamicaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/clinicas/': {
       id: '/_authenticated/clinicas/'
       path: '/clinicas'
@@ -444,6 +463,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAvaliacaoDinamicaRoute: typeof AuthenticatedAvaliacaoDinamicaRoute
   AuthenticatedAvaliacaoPosturalRoute: typeof AuthenticatedAvaliacaoPosturalRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
@@ -464,6 +484,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAvaliacaoDinamicaRoute: AuthenticatedAvaliacaoDinamicaRoute,
   AuthenticatedAvaliacaoPosturalRoute: AuthenticatedAvaliacaoPosturalRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
@@ -496,13 +517,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

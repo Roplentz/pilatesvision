@@ -251,7 +251,7 @@ function NovaAvaliacao() {
           </Button>
           {stepIdx < STEPS.length - 1 ? (
             <Button variant="hero" onClick={next} disabled={!canAdvance()}>
-              Próximo <ArrowRight className="ml-1 h-4 w-4" />
+              Continuar avaliação <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           ) : (
             <Button variant="hero">

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   createFileRoute,
   Outlet,
@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { createClinic, setProfileClinic } from "@/lib/clinicsStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -112,7 +113,7 @@ function AuthedLayout() {
   const { profile, loading: profileLoading } = useProfile();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const ensuringRef = useRef(false);
 
   // Redireciona se a sessão expirar / for revogada em tempo real.
   useEffect(() => {
@@ -121,16 +122,33 @@ function AuthedLayout() {
     }
   }, [loading, user, navigate]);
 
-  // Onboarding: usuário sem clínica vinculada é levado para /onboarding.
+  // Provisionamento silencioso de "clínica pessoal" para qualquer usuário
+  // recém-criado que ainda não tenha clinic_id no perfil. Sem onboarding manual.
   useEffect(() => {
-    if (loading || profileLoading || adminLoading || !user) return;
-    // Admins não precisam de clínica vinculada.
+    if (loading || profileLoading || adminLoading || !user || !profile) return;
     if (isAdmin) return;
-    const needsOnboarding = profile && !profile.clinic_id;
-    if (needsOnboarding && pathname !== "/onboarding") {
-      navigate({ to: "/onboarding", replace: true });
-    }
-  }, [loading, profileLoading, adminLoading, isAdmin, user, profile, pathname, navigate]);
+    if (profile.clinic_id) return;
+    if (ensuringRef.current) return;
+    ensuringRef.current = true;
+    (async () => {
+      try {
+        const base = (user.email?.split("@")[0] || "Studio").replace(/[^a-zA-Z0-9-]/g, "");
+        const slug = `${base.toLowerCase().slice(0, 24) || "studio"}-${user.id.slice(0, 6)}`;
+        const clinic = await createClinic({
+          name: profile.full_name ? `${profile.full_name} Studio` : `${base || "Meu"} Studio`,
+          slug,
+          email: user.email ?? null,
+          plan: "starter",
+        });
+        await setProfileClinic(user.id, clinic.id);
+        // Recarrega para que useProfile e os hooks dependentes reabsorvam o clinic_id.
+        window.location.reload();
+      } catch (err) {
+        ensuringRef.current = false;
+        toast.error(err instanceof Error ? err.message : "Falha ao inicializar sua conta");
+      }
+    })();
+  }, [loading, profileLoading, adminLoading, isAdmin, user, profile]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -146,26 +164,14 @@ function AuthedLayout() {
     );
   }
 
-  // Em onboarding: esconde sidebar e header padrão para um fluxo focado.
-  if (pathname === "/onboarding") {
+  // Enquanto provisiona a clínica pessoal, mostra um loader curto.
+  if (!isAdmin && profile && !profile.clinic_id) {
     return (
-      <div className="min-h-screen w-full bg-background text-foreground">
-        <header className="flex h-12 items-center justify-end border-b border-border/60 bg-background/70 px-4 backdrop-blur-xl">
-          {user?.email && (
-            <span className="hidden sm:inline text-xs text-muted-foreground mr-3">
-              {user.email}
-            </span>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSignOut}
-            className="h-8 gap-1.5"
-          >
-            <LogOut className="h-3.5 w-3.5" /> Sair
-          </Button>
-        </header>
-        <Outlet />
+      <div className="grid min-h-screen w-full place-items-center bg-background text-foreground">
+        <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          Preparando seu espaço…
+        </div>
       </div>
     );
   }

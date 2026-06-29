@@ -52,7 +52,7 @@ function AlunosListPage() {
       <header className="border-b border-border/60 bg-card/30 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <Link
-            to="/"
+            to="/dashboard"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" /> Voltar

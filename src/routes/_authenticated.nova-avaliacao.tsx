@@ -185,7 +185,7 @@ function NovaAvaliacao() {
       <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between">
           <Link
-            to="/"
+            to="/dashboard"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" /> Voltar
@@ -268,7 +268,7 @@ function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/dashboard" className="flex items-center gap-2">
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary shadow-glow">
             <Activity className="h-4 w-4 text-primary-foreground" />
           </div>

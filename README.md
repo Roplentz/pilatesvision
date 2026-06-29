@@ -1,53 +1,77 @@
 # PilatesVision SaaS
 
-SaaS premium para clínicas de Pilates com avaliação postural, análise de movimento e relatório evolutivo.
+SaaS premium para clinicas de Pilates com avaliacao postural, analise de movimento, prescricao orientada e relatorio evolutivo.
 
-## Stack
+## Estado atual
 
-- **Framework:** TanStack Start v1 (React 19 + Vite 7)
-- **Linguagem:** TypeScript (strict)
-- **Estilização:** Tailwind CSS v4 + tokens semânticos (tema "Clinical Dark")
-- **UI:** shadcn/ui (Radix), lucide-react, sonner
-- **Animação:** Framer Motion
-- **Roteamento:** TanStack Router (file-based em `src/routes/`)
-- **Validação:** Zod
-- **Gerenciador de pacotes / runtime:** Bun
+O projeto agora funciona como a camada SaaS do PilatesVision: interface premium, autenticacao, rotas internas, Supabase, alunos, avaliacoes, relatorios e painel administrativo.
 
-## Estrutura
+O motor clinico Python do MVP anterior continua sendo a melhor base para MediaPipe, OpenCV, analise postural, analise de video, metricas por frame e relatorio tecnico.
 
-```
+Diretriz: Lovable/React e a camada de produto. Python/FastAPI sera a camada biomecanica. Supabase e a fonte unica de dados.
+
+## Stack principal
+
+- TanStack Start, React, Vite e TypeScript strict.
+- Tailwind CSS v4, shadcn/ui, Radix, lucide-react e Framer Motion.
+- TanStack Router para rotas.
+- Zod para validacao.
+- Supabase para autenticacao, banco e RLS por clinica.
+- Bun para instalacao, desenvolvimento e build.
+
+## Estrutura atual
+
+```txt
 src/
-  routes/            # Páginas (index, auth, nova-avaliacao, exercicios, ...)
-  components/ui/     # Componentes shadcn
-  lib/mockData.ts    # Dados fictícios + helpers `mockApi`
-  types/models.ts    # Contratos (Clinic, Student, Assessment, ...)
-  styles.css         # Design tokens OKLCH + Tailwind v4
+  routes/                         # Landing, auth, app autenticado, admin, avaliacoes, alunos etc.
+  components/ui/                  # Componentes shadcn
+  hooks/                          # Auth, profile, admin
+  integrations/supabase/          # Client e tipos Supabase
+  lib/                            # Stores Supabase e helpers
+  types/models.ts                 # Contratos de dominio
+  styles.css                      # Design tokens
+
+docs/
+  01_ROADMAP.md                   # Roadmap por fases
+  02_INTEGRATION_ARCHITECTURE.md  # Arquitetura SaaS + API Python + Supabase
+  03_LOVABLE_PROMPT_CONEXOES.md   # Prompt operacional para Lovable
+  04_FASTAPI_CONTRACT.md          # Contrato tecnico da API Python
+
+backend/
+  README.md                       # Diretriz para extrair o motor Python do MVP antigo
 ```
 
 ## Rodando localmente
 
-Pré-requisitos: [Bun](https://bun.sh) >= 1.1 (ou Node 20+ com npm).
-
 ```bash
-bun install      # instalar dependências
-bun run dev      # dev server em http://localhost:8080
-bun run build    # build de produção
-bun run start    # preview do build
+bun install
+bun run dev
+bun run typecheck
+bun run lint
+bun run build
+bun run ci
 ```
 
-## Observação
+## Banco de dados esperado
 
-> A versão atual usa **dados mockados** (`src/lib/mockData.ts`). Nenhuma chamada
-> de backend, autenticação real ou modelo de IA está ativo. Toda a UI consome
-> as helpers `mockApi.*`, que serão substituídas por queries reais quando a
-> integração com Lovable Cloud (Supabase) for habilitada.
+A tipagem atual contempla clinics, profiles, students, assessments, postural_results, movement_results, prescribed_exercises, reports e user_roles.
 
-## Próximos passos
+Regra essencial: toda informacao clinica deve pertencer a uma clinica, com RLS impedindo acesso cruzado entre clinicas.
 
-- [ ] Corrigir e finalizar a página **Alunos** (lista, detalhe e formulário).
-- [ ] Habilitar **Supabase Auth** (login, signup, recuperação de senha).
-- [ ] Criar tabela `students` com RLS por clínica.
-- [ ] Persistir **avaliações** (ficha, postural, dinâmica, prescrição).
-- [ ] Persistir e versionar **relatórios** evolutivos.
-- [ ] Integrar a futura **API Python** (visão computacional / análise clínica)
-      para alimentar resultados posturais e de movimento.
+## Regra clinica e etica
+
+O PilatesVision nao substitui avaliacao profissional. Ele gera indicadores visuais, metricas e alertas de apoio a decisao. Toda tela de resultado deve manter linguagem prudente: indicadores de apoio, sugestoes e confirmacao clinica.
+
+## Proximos passos de execucao
+
+1. Validar login e cadastro no Lovable.
+2. Validar se cada novo usuario recebe perfil e clinica.
+3. Validar CRUD de alunos e avaliacoes com Supabase.
+4. Conectar resultados posturais, dinamicos, prescricoes e relatorios as tabelas reais.
+5. Criar API Python/FastAPI usando o motor do MVP antigo.
+6. Trocar a analise textual isolada por retorno estruturado: scores, metricas, alertas, achados e imagens/videos anotados.
+7. Gerar PDF evolutivo e salvar referencia no registro de relatorio.
+
+## Decisao arquitetural
+
+Nao reconstruir tudo no Lovable. O Lovable deve organizar interface, fluxo, Supabase e chamadas de API. A biomecanica pesada deve ficar em Python/FastAPI.

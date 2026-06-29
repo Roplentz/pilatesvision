@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiAnalyzeImageRouteImport } from './routes/api/analyze-image'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
@@ -49,6 +50,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAnalyzeImageRoute = ApiAnalyzeImageRouteImport.update({
+  id: '/api/analyze-image',
+  path: '/api/analyze-image',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/_authenticated/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/_authenticated/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/_authenticated/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
+    | '/api/analyze-image'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
@@ -261,6 +271,7 @@ export interface FileRouteTypes {
     | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
+    | '/api/analyze-image'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/_authenticated/nova-avaliacao'
     | '/_authenticated/onboarding'
     | '/_authenticated/relatorios'
+    | '/api/analyze-image'
     | '/_authenticated/alunos/$id'
     | '/_authenticated/alunos/novo'
     | '/_authenticated/avaliacoes/$id'
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiAnalyzeImageRoute: typeof ApiAnalyzeImageRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/analyze-image': {
+      id: '/api/analyze-image'
+      path: '/api/analyze-image'
+      fullPath: '/api/analyze-image'
+      preLoaderRoute: typeof ApiAnalyzeImageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/relatorios': {
@@ -513,6 +533,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiAnalyzeImageRoute: ApiAnalyzeImageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

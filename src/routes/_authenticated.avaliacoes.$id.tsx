@@ -74,6 +74,10 @@ function AvaliacaoDetailPage() {
   const findings: Finding[] = Array.isArray(postural?.findings)
     ? (postural!.findings as Finding[])
     : [];
+  const posturalAnalysisText =
+    postural?.findings && !Array.isArray(postural.findings)
+      ? (postural.findings as { analysis?: string }).analysis ?? null
+      : null;
 
   const movementMetrics = movement
     ? [
@@ -85,7 +89,15 @@ function AvaliacaoDetailPage() {
     : [];
 
   const reportContent =
-    (report?.content as { summary?: string; recommendations?: string[] } | null) ?? null;
+    (report?.content as
+      | {
+          summary?: string;
+          recommendations?: string[];
+          postural?: string;
+          dinamica?: string;
+          exercicio?: string;
+        }
+      | null) ?? null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -195,6 +207,11 @@ function AvaliacaoDetailPage() {
                 ))}
               </ul>
             )}
+            {posturalAnalysisText && (
+              <div className="mt-5 whitespace-pre-wrap rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed">
+                {posturalAnalysisText}
+              </div>
+            )}
           </section>
         )}
 
@@ -271,6 +288,34 @@ function AvaliacaoDetailPage() {
                   </li>
                 ))}
               </ul>
+            )}
+            {(reportContent.postural || reportContent.dinamica || reportContent.exercicio) && (
+              <div className="mt-4 space-y-4">
+                {reportContent.postural && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-primary">Parecer postural</div>
+                    <div className="mt-1 whitespace-pre-wrap rounded-lg border border-border/40 bg-background/40 p-4 text-sm leading-relaxed">
+                      {reportContent.postural}
+                    </div>
+                  </div>
+                )}
+                {reportContent.dinamica && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-primary">Parecer dinâmico</div>
+                    <div className="mt-1 whitespace-pre-wrap rounded-lg border border-border/40 bg-background/40 p-4 text-sm leading-relaxed">
+                      {reportContent.dinamica}
+                    </div>
+                  </div>
+                )}
+                {reportContent.exercicio && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-primary">Parecer do exercício</div>
+                    <div className="mt-1 whitespace-pre-wrap rounded-lg border border-border/40 bg-background/40 p-4 text-sm leading-relaxed">
+                      {reportContent.exercicio}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </section>
         )}

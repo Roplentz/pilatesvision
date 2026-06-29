@@ -25,6 +25,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { ImageAnalyzer } from "@/components/ImageAnalyzer";
 
 export const Route = createFileRoute("/_authenticated/exercicios")({
   component: ExerciciosPage,
@@ -637,6 +638,18 @@ function ExerciciosPage() {
                       </div>
                     ))}
                   </div>
+                </DetailBlock>
+
+                <DetailBlock
+                  icon={<Sparkles className="h-4 w-4 text-primary" />}
+                  title="Análise por imagem"
+                >
+                  <ImageAnalyzer
+                    mode="exercicio"
+                    context={`Exercício: ${selected.nome} (${selected.categoria}, vista ${selected.vista}). Critérios: ${selected.criterios.join("; ")}.`}
+                    label={`Execução · ${selected.nome}`}
+                    compact
+                  />
                 </DetailBlock>
 
                 <div className="flex items-center gap-3 pt-4 border-t border-border/60">

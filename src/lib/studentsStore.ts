@@ -1,40 +1,88 @@
-import { useSyncExternalStore } from "react";
-import { mockStudents } from "@/lib/mockData";
-import type { Student } from "@/types/models";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
-/**
- * Store local de alunos (in-memory) — inicializado a partir dos mocks.
- * Será substituído por queries Supabase quando a integração for ativada.
- * Persiste apenas durante a sessão do navegador.
- */
+export type StudentRow = Database["public"]["Tables"]["students"]["Row"];
+export type NewStudentInput = Omit<
+  Database["public"]["Tables"]["students"]["Insert"],
+  "id" | "created_at"
+>;
 
-let students: Student[] = [...mockStudents];
-const listeners = new Set<() => void>();
+/** Lista alunos de uma clínica. Não dispara até clinicId existir. */
+export function useStudents(clinicId: string | null | undefined) {
+  const [students, setStudents] = useState<StudentRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(Boolean(clinicId));
+  const [error, setError] = useState<Error | null>(null);
 
-const emit = () => listeners.forEach((l) => l());
-const subscribe = (cb: () => void) => {
-  listeners.add(cb);
-  return () => void listeners.delete(cb);
-};
+  useEffect(() => {
+    if (!clinicId) {
+      setStudents([]);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    supabase
+      .from("students")
+      .select("*")
+      .eq("clinic_id", clinicId)
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) setError(new Error(error.message));
+        else setStudents((data ?? []) as StudentRow[]);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [clinicId]);
 
-export function useStudents(): Student[] {
-  return useSyncExternalStore(subscribe, () => students, () => students);
+  return { students, loading, error };
 }
 
-export function getStudent(id: string): Student | undefined {
-  return students.find((s) => s.id === id);
+/** Busca um único aluno pelo id. */
+export function useStudent(id: string | null | undefined) {
+  const [student, setStudent] = useState<StudentRow | null>(null);
+  const [loading, setLoading] = useState<boolean>(Boolean(id));
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setStudent(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    supabase
+      .from("students")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) setError(new Error(error.message));
+        else setStudent((data as StudentRow | null) ?? null);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  return { student, loading, error };
 }
 
-export type NewStudentInput = Omit<Student, "id" | "clinicId" | "createdAt">;
-
-export function addStudent(input: NewStudentInput): Student {
-  const created: Student = {
-    ...input,
-    id: `stu-${Date.now().toString(36)}`,
-    clinicId: "clinic-001",
-    createdAt: new Date().toISOString(),
-  };
-  students = [created, ...students];
-  emit();
-  return created;
+/** Insere um novo aluno. clinic_id deve vir do perfil do usuário logado. */
+export async function createStudent(input: NewStudentInput): Promise<StudentRow> {
+  const { data, error } = await supabase
+    .from("students")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as StudentRow;
 }

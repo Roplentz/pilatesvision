@@ -4,13 +4,6 @@ import { Building2, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { createClinic, setProfileClinic } from "@/lib/clinicsStore";
@@ -20,25 +13,12 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
   component: OnboardingPage,
 });
 
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 60);
-}
-
 function OnboardingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
   const [stateUf, setStateUf] = useState("");
-  const [plan, setPlan] = useState<"starter" | "pro" | "enterprise">("starter");
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
@@ -52,18 +32,8 @@ function OnboardingPage() {
     try {
       const created = await createClinic({
         name: name.trim(),
-        slug: slugify(name.trim()) || `clinic-${Date.now()}`,
-        email: email.trim() || null,
-        phone: phone.trim() || null,
-        plan,
-        address:
-          city || stateUf
-            ? {
-                city: city.trim(),
-                state: stateUf.trim(),
-                country: "BR",
-              }
-            : null,
+        city: city.trim() || null,
+        state: stateUf.trim() || null,
       });
       await setProfileClinic(user.id, created.id);
       toast.success("Clínica criada. Bem-vindo!");
@@ -116,28 +86,11 @@ function OnboardingPage() {
               required
               autoFocus
               className="mt-1.5"
+              placeholder="Ex: Studio PilatesVision"
             />
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label htmlFor="cemail">E-mail</Label>
-              <Input
-                id="cemail"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="cphone">Telefone</Label>
-              <Input
-                id="cphone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="city">Cidade</Label>
               <Input
@@ -145,44 +98,33 @@ function OnboardingPage() {
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="mt-1.5"
+                placeholder="Porto Alegre"
               />
             </div>
             <div>
-              <Label htmlFor="uf">UF</Label>
+              <Label htmlFor="state">UF</Label>
               <Input
-                id="uf"
+                id="state"
                 value={stateUf}
                 onChange={(e) => setStateUf(e.target.value)}
-                maxLength={2}
                 className="mt-1.5"
+                placeholder="RS"
+                maxLength={2}
               />
             </div>
-          </div>
-          <div>
-            <Label>Plano</Label>
-            <Select
-              value={plan}
-              onValueChange={(v) => setPlan(v as "starter" | "pro" | "enterprise")}
-            >
-              <SelectTrigger className="mt-1.5">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="starter">Starter</SelectItem>
-                <SelectItem value="pro">Pro</SelectItem>
-                <SelectItem value="enterprise">Enterprise</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <Button
             type="submit"
-            variant="hero"
-            disabled={submitting}
+            disabled={submitting || !name.trim()}
             className="w-full"
+            variant="hero"
           >
-            {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Criar clínica e continuar
+            {submitting ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando...</>
+            ) : (
+              "Criar clínica e continuar"
+            )}
           </Button>
         </form>
       </div>

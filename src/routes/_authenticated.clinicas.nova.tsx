@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Building2 } from "lucide-react";
+import { ArrowLeft, Building2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addClinic } from "@/lib/clinicsStore.mock";
+import { createClinic, setProfileClinic } from "@/lib/clinicsStore";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/clinicas/nova")({
@@ -32,6 +33,7 @@ function slugify(s: string) {
 
 function NovaClinicaPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -40,31 +42,43 @@ function NovaClinicaPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) {
       toast.error("Nome e e-mail são obrigatórios.");
       return;
     }
-    const created = addClinic({
-      name: name.trim(),
-      slug: slugify(name.trim()),
-      email: email.trim(),
-      phone: phone.trim() || undefined,
-      plan,
-      address: city || street
-        ? {
-            street: street.trim(),
-            city: city.trim(),
-            state: state.trim(),
-            zip: zip.trim(),
-            country: "BR",
-          }
-        : undefined,
-    });
-    toast.success("Clínica cadastrada com sucesso.");
-    navigate({ to: "/clinicas/$id", params: { id: created.id } });
+    setSubmitting(true);
+    try {
+      const created = await createClinic({
+        name: name.trim(),
+        slug: slugify(name.trim()),
+        email: email.trim() || null,
+        phone: phone.trim() || null,
+        plan,
+        address:
+          city || street
+            ? {
+                street: street.trim(),
+                city: city.trim(),
+                state: state.trim(),
+                zip: zip.trim(),
+                country: "BR",
+              }
+            : null,
+      });
+      if (user?.id) {
+        await setProfileClinic(user.id, created.id);
+      }
+      toast.success("Clínica cadastrada com sucesso.");
+      navigate({ to: "/clinicas/$id", params: { id: created.id } });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao cadastrar clínica.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -89,7 +103,7 @@ function NovaClinicaPage() {
             Cadastrar clínica
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Os dados ficam salvos apenas nesta sessão (mock local).
+            A clínica é vinculada automaticamente ao seu perfil após o cadastro.
           </p>
         </div>
 
@@ -188,7 +202,8 @@ function NovaClinicaPage() {
                 Cancelar
               </Button>
             </Link>
-            <Button type="submit" variant="hero">
+            <Button type="submit" variant="hero" disabled={submitting}>
+              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               Cadastrar clínica
             </Button>
           </div>

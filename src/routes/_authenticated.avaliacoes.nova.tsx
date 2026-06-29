@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
-import { ArrowLeft, ClipboardPlus } from "lucide-react";
+import { ArrowLeft, ClipboardPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,14 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStudents } from "@/lib/studentsStore.mock";
-import { mockApi } from "@/lib/mockData";
-import { addAssessment } from "@/lib/assessmentsStore.mock";
+import { useStudents } from "@/lib/studentsStore";
+import { createAssessment } from "@/lib/assessmentsStore";
+import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
 
-const searchSchema = z.object({
-  studentId: z.string().optional(),
-});
+const searchSchema = z.object({ studentId: z.string().optional() });
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
   component: NovaAvaliacaoPage,
@@ -32,35 +30,46 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
 function NovaAvaliacaoPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const students = useStudents();
-  const professionals = mockApi.listProfessionals();
+  const { clinicId, loading: profileLoading } = useProfile();
+  const { students, loading: studentsLoading } = useStudents(clinicId);
 
   const [studentId, setStudentId] = useState(search.studentId ?? "");
-  const [professionalId, setProfessionalId] = useState(professionals[0]?.id ?? "");
   const [painLevel, setPainLevel] = useState(0);
   const [mainComplaint, setMainComplaint] = useState("");
   const [observations, setObservations] = useState("");
   const [goals, setGoals] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!studentId || !professionalId) {
-      toast.error("Selecione aluno e profissional.");
+    if (!clinicId) {
+      toast.error("Perfil sem clínica vinculada.");
       return;
     }
-    const created = addAssessment({
-      studentId,
-      professionalId,
-      painLevel,
-      mainComplaint: mainComplaint.trim() || undefined,
-      observations: observations.trim() || undefined,
-      goals: goals
-        .split(",")
-        .map((g) => g.trim())
-        .filter(Boolean),
-    });
-    toast.success("Avaliação criada.");
-    navigate({ to: "/avaliacoes/$id", params: { id: created.id } });
+    if (!studentId) {
+      toast.error("Selecione um aluno.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const created = await createAssessment({
+        clinic_id: clinicId,
+        student_id: studentId,
+        pain_level: painLevel,
+        main_complaint: mainComplaint.trim() || null,
+        observations: observations.trim() || null,
+        goals: goals
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean),
+      });
+      toast.success("Avaliação criada.");
+      navigate({ to: "/avaliacoes/$id", params: { id: created.id } });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao criar avaliação.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -94,37 +103,24 @@ function NovaAvaliacaoPage() {
           onSubmit={submit}
           className="space-y-6 rounded-xl border border-border/60 bg-card/40 p-6"
         >
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label>Aluno *</Label>
-              <Select value={studentId} onValueChange={setStudentId}>
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder="Selecione um aluno" />
-                </SelectTrigger>
-                <SelectContent>
-                  {students.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Profissional *</Label>
-              <Select value={professionalId} onValueChange={setProfessionalId}>
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {professionals.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} · {p.specialty}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label>Aluno *</Label>
+            <Select value={studentId} onValueChange={setStudentId}>
+              <SelectTrigger className="mt-1.5">
+                <SelectValue
+                  placeholder={
+                    studentsLoading ? "Carregando alunos…" : "Selecione um aluno"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {students.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -180,7 +176,8 @@ function NovaAvaliacaoPage() {
                 Cancelar
               </Button>
             </Link>
-            <Button type="submit" variant="hero">
+            <Button type="submit" variant="hero" disabled={submitting || profileLoading}>
+              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
               Criar avaliação
             </Button>
           </div>

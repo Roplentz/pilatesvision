@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Building2,
+  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -10,14 +11,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getClinic } from "@/lib/clinicsStore.mock";
-import { mockApi } from "@/lib/mockData";
+import { useClinicById, useClinicCounts } from "@/lib/clinicsStore";
+import { useStudents } from "@/lib/studentsStore";
 
 export const Route = createFileRoute("/_authenticated/clinicas/$id")({
   component: ClinicaDetailPage,
-  head: () => ({
-    meta: [{ title: "Clínica | PilatesVision" }],
-  }),
+  head: () => ({ meta: [{ title: "Clínica | PilatesVision" }] }),
 });
 
 const planLabel: Record<string, string> = {
@@ -26,9 +25,26 @@ const planLabel: Record<string, string> = {
   enterprise: "Enterprise",
 };
 
+type Address = {
+  street?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+} | null;
+
 function ClinicaDetailPage() {
   const { id } = Route.useParams();
-  const clinic = getClinic(id);
+  const { clinic, loading } = useClinicById(id);
+  const { counts } = useClinicCounts(id);
+  const { students } = useStudents(id);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!clinic) {
     return (
@@ -45,15 +61,7 @@ function ClinicaDetailPage() {
     );
   }
 
-  const professionals = mockApi
-    .listProfessionals()
-    .filter((p) => p.clinicId === clinic.id);
-  const students = mockApi
-    .listStudents()
-    .filter((s) => s.clinicId === clinic.id);
-  const assessments = mockApi
-    .listAssessments()
-    .filter((a) => a.clinicId === clinic.id);
+  const address = clinic.address as Address;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -79,12 +87,12 @@ function ClinicaDetailPage() {
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {clinic.slug} · cadastrada em{" "}
-              {new Date(clinic.createdAt).toLocaleDateString("pt-BR")}
+              {new Date(clinic.created_at).toLocaleDateString("pt-BR")}
             </p>
           </div>
           <Badge variant="secondary" className="text-[11px]">
             <Sparkles className="mr-1 h-3 w-3" />
-            Plano {planLabel[clinic.plan]}
+            Plano {planLabel[clinic.plan] ?? clinic.plan}
           </Badge>
         </div>
 
@@ -96,7 +104,7 @@ function ClinicaDetailPage() {
             <ul className="mt-3 space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                {clinic.email}
+                {clinic.email ?? "—"}
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
@@ -109,14 +117,15 @@ function ClinicaDetailPage() {
             <div className="text-xs uppercase tracking-wide text-muted-foreground">
               Endereço
             </div>
-            {clinic.address ? (
+            {address ? (
               <div className="mt-3 flex items-start gap-2 text-sm leading-relaxed">
                 <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
                 <div>
-                  {clinic.address.street}
+                  {address.street}
                   <br />
-                  {clinic.address.city}/{clinic.address.state} · CEP{" "}
-                  {clinic.address.zip}
+                  {address.city}
+                  {address.state ? `/${address.state}` : ""}
+                  {address.zip ? ` · CEP ${address.zip}` : ""}
                 </div>
               </div>
             ) : (
@@ -127,21 +136,13 @@ function ClinicaDetailPage() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-border/60 bg-card/40 p-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Profissionais
-            </div>
-            <div className="mt-2 font-display text-3xl font-semibold">
-              {professionals.length}
-            </div>
-          </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">
               Alunos
             </div>
             <div className="mt-2 font-display text-3xl font-semibold">
-              {students.length}
+              {counts.students}
             </div>
           </div>
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
@@ -149,47 +150,9 @@ function ClinicaDetailPage() {
               Avaliações
             </div>
             <div className="mt-2 font-display text-3xl font-semibold">
-              {assessments.length}
+              {counts.assessments}
             </div>
           </div>
-        </div>
-
-        <div className="mt-10">
-          <h2 className="font-display text-xl font-semibold">Equipe</h2>
-          {professionals.length === 0 ? (
-            <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center text-sm text-muted-foreground">
-              Nenhum profissional vinculado a esta clínica.
-            </div>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {professionals.map((p) => (
-                <li
-                  key={p.id}
-                  className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 px-5 py-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
-                      {p.name
-                        .split(" ")
-                        .slice(0, 2)
-                        .map((part) => part[0])
-                        .join("")}
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium">{p.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {p.specialty}
-                        {p.license ? ` · ${p.license}` : ""}
-                      </div>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="text-[11px]">
-                    {p.role}
-                  </Badge>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
         <div className="mt-10">
@@ -211,7 +174,7 @@ function ClinicaDetailPage() {
                   >
                     <div className="text-sm font-medium">{s.name}</div>
                     <div className="text-xs text-muted-foreground">
-                      {s.goals[0] ?? "—"}
+                      {(s.goals ?? [])[0] ?? "—"}
                     </div>
                   </Link>
                 </li>

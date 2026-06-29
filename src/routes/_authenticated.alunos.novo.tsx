@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Building2 } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -11,60 +12,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addClinic } from "@/lib/clinicsStore";
+import { addStudent } from "@/lib/studentsStore";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/clinicas/nova")({
-  component: NovaClinicaPage,
+export const Route = createFileRoute("/_authenticated/alunos/novo")({
+  component: NovoAlunoPage,
   head: () => ({
-    meta: [{ title: "Nova clínica | Kinetik" }],
+    meta: [{ title: "Novo aluno | Kinetik" }],
   }),
 });
 
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function NovaClinicaPage() {
+function NovoAlunoPage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [plan, setPlan] = useState<"starter" | "pro" | "enterprise">("starter");
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [gender, setGender] = useState<"F" | "M" | "outro">("F");
+  const [heightCm, setHeightCm] = useState("");
+  const [weightKg, setWeightKg] = useState("");
+  const [goals, setGoals] = useState("");
+  const [medical, setMedical] = useState("");
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      toast.error("Nome e e-mail são obrigatórios.");
+    if (!name.trim() || !birthDate) {
+      toast.error("Nome e data de nascimento são obrigatórios.");
       return;
     }
-    const created = addClinic({
+    const created = addStudent({
       name: name.trim(),
-      slug: slugify(name.trim()),
-      email: email.trim(),
+      email: email.trim() || undefined,
       phone: phone.trim() || undefined,
-      plan,
-      address: city || street
-        ? {
-            street: street.trim(),
-            city: city.trim(),
-            state: state.trim(),
-            zip: zip.trim(),
-            country: "BR",
-          }
-        : undefined,
+      birthDate,
+      gender,
+      heightCm: Number(heightCm) || 0,
+      weightKg: Number(weightKg) || 0,
+      goals: goals
+        .split(",")
+        .map((g) => g.trim())
+        .filter(Boolean),
+      medicalHistory: medical.trim() || undefined,
     });
-    toast.success("Clínica cadastrada com sucesso.");
-    navigate({ to: "/clinicas/$id", params: { id: created.id } });
+    toast.success("Aluno cadastrado com sucesso.");
+    navigate({ to: "/alunos/$id", params: { id: created.id } });
   };
 
   return (
@@ -72,10 +63,10 @@ function NovaClinicaPage() {
       <header className="border-b border-border/60 bg-card/30 backdrop-blur">
         <div className="mx-auto max-w-3xl px-6 py-5">
           <Link
-            to="/clinicas"
+            to="/alunos"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" /> Clínicas
+            <ArrowLeft className="h-4 w-4" /> Alunos
           </Link>
         </div>
       </header>
@@ -83,10 +74,10 @@ function NovaClinicaPage() {
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
-            <Building2 className="h-3.5 w-3.5" /> Novo cadastro
+            <UserPlus className="h-3.5 w-3.5" /> Novo cadastro
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
-            Cadastrar clínica
+            Cadastrar aluno
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Os dados ficam salvos apenas nesta sessão (mock local).
@@ -99,17 +90,17 @@ function NovaClinicaPage() {
         >
           <div className="grid gap-4 md:grid-cols-2">
             <div className="md:col-span-2">
-              <Label htmlFor="name">Nome da clínica *</Label>
+              <Label htmlFor="name">Nome completo *</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Studio Kinetik São Paulo"
+                placeholder="Ana Beatriz Souza"
                 className="mt-1.5"
               />
             </div>
             <div>
-              <Label htmlFor="email">E-mail *</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
@@ -128,68 +119,82 @@ function NovaClinicaPage() {
                 className="mt-1.5"
               />
             </div>
-            <div className="md:col-span-2">
-              <Label>Plano</Label>
-              <Select value={plan} onValueChange={(v) => setPlan(v as typeof plan)}>
+            <div>
+              <Label htmlFor="birth">Data de nascimento *</Label>
+              <Input
+                id="birth"
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label>Gênero</Label>
+              <Select value={gender} onValueChange={(v) => setGender(v as typeof gender)}>
                 <SelectTrigger className="mt-1.5">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="starter">Starter</SelectItem>
-                  <SelectItem value="pro">Pro</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
+                  <SelectItem value="F">Feminino</SelectItem>
+                  <SelectItem value="M">Masculino</SelectItem>
+                  <SelectItem value="outro">Outro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2">
-              <Label htmlFor="street">Endereço</Label>
+            <div>
+              <Label htmlFor="height">Altura (cm)</Label>
               <Input
-                id="street"
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-                placeholder="Rua, número"
+                id="height"
+                type="number"
+                value={heightCm}
+                onChange={(e) => setHeightCm(e.target.value)}
                 className="mt-1.5"
               />
             </div>
             <div>
-              <Label htmlFor="city">Cidade</Label>
+              <Label htmlFor="weight">Peso (kg)</Label>
               <Input
-                id="city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="state">Estado</Label>
-              <Input
-                id="state"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                maxLength={2}
-                placeholder="SP"
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="zip">CEP</Label>
-              <Input
-                id="zip"
-                value={zip}
-                onChange={(e) => setZip(e.target.value)}
+                id="weight"
+                type="number"
+                value={weightKg}
+                onChange={(e) => setWeightKg(e.target.value)}
                 className="mt-1.5"
               />
             </div>
           </div>
 
+          <div>
+            <Label htmlFor="goals">Objetivos (separados por vírgula)</Label>
+            <Input
+              id="goals"
+              value={goals}
+              onChange={(e) => setGoals(e.target.value)}
+              placeholder="Melhorar postura, Reduzir dor lombar"
+              className="mt-1.5"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="medical">Histórico clínico</Label>
+            <Textarea
+              id="medical"
+              value={medical}
+              onChange={(e) => setMedical(e.target.value)}
+              rows={4}
+              className="mt-1.5"
+              placeholder="Cirurgias, condições crônicas, restrições…"
+            />
+          </div>
+
           <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-5">
-            <Link to="/clinicas">
+            <Link to="/alunos">
               <Button type="button" variant="ghost">
                 Cancelar
               </Button>
             </Link>
             <Button type="submit" variant="hero">
-              Cadastrar clínica
+              Cadastrar aluno
             </Button>
           </div>
         </form>

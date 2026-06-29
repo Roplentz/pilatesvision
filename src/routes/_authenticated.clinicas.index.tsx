@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useClinics } from "@/lib/clinicsStore";
 import { mockApi } from "@/lib/mockData";
 
-export const Route = createFileRoute("/clinicas/")({
+export const Route = createFileRoute("/_authenticated/clinicas/")({
   component: ClinicasListPage,
   head: () => ({
     meta: [

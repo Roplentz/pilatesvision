@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { getClinic } from "@/lib/clinicsStore";
 import { mockApi } from "@/lib/mockData";
 
-export const Route = createFileRoute("/clinicas/$id")({
+export const Route = createFileRoute("/_authenticated/clinicas/$id")({
   component: ClinicaDetailPage,
   head: () => ({
     meta: [{ title: "Clínica | Kinetik" }],

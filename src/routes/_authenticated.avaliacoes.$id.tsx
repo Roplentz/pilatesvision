@@ -15,7 +15,7 @@ import { getAssessment } from "@/lib/assessmentsStore";
 import { getStudent } from "@/lib/studentsStore";
 import { mockApi } from "@/lib/mockData";
 
-export const Route = createFileRoute("/avaliacoes/$id")({
+export const Route = createFileRoute("/_authenticated/avaliacoes/$id")({
   component: AvaliacaoDetailPage,
   head: () => ({ meta: [{ title: "Avaliação | Kinetik" }] }),
 });

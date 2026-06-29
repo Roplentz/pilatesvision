@@ -1,10 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { ArrowLeft, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -12,50 +11,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addStudent } from "@/lib/studentsStore";
+import { addClinic } from "@/lib/clinicsStore";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/alunos/novo")({
-  component: NovoAlunoPage,
+export const Route = createFileRoute("/_authenticated/clinicas/nova")({
+  component: NovaClinicaPage,
   head: () => ({
-    meta: [{ title: "Novo aluno | Kinetik" }],
+    meta: [{ title: "Nova clínica | Kinetik" }],
   }),
 });
 
-function NovoAlunoPage() {
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function NovaClinicaPage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState<"F" | "M" | "outro">("F");
-  const [heightCm, setHeightCm] = useState("");
-  const [weightKg, setWeightKg] = useState("");
-  const [goals, setGoals] = useState("");
-  const [medical, setMedical] = useState("");
+  const [plan, setPlan] = useState<"starter" | "pro" | "enterprise">("starter");
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zip, setZip] = useState("");
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !birthDate) {
-      toast.error("Nome e data de nascimento são obrigatórios.");
+    if (!name.trim() || !email.trim()) {
+      toast.error("Nome e e-mail são obrigatórios.");
       return;
     }
-    const created = addStudent({
+    const created = addClinic({
       name: name.trim(),
-      email: email.trim() || undefined,
+      slug: slugify(name.trim()),
+      email: email.trim(),
       phone: phone.trim() || undefined,
-      birthDate,
-      gender,
-      heightCm: Number(heightCm) || 0,
-      weightKg: Number(weightKg) || 0,
-      goals: goals
-        .split(",")
-        .map((g) => g.trim())
-        .filter(Boolean),
-      medicalHistory: medical.trim() || undefined,
+      plan,
+      address: city || street
+        ? {
+            street: street.trim(),
+            city: city.trim(),
+            state: state.trim(),
+            zip: zip.trim(),
+            country: "BR",
+          }
+        : undefined,
     });
-    toast.success("Aluno cadastrado com sucesso.");
-    navigate({ to: "/alunos/$id", params: { id: created.id } });
+    toast.success("Clínica cadastrada com sucesso.");
+    navigate({ to: "/clinicas/$id", params: { id: created.id } });
   };
 
   return (
@@ -63,10 +72,10 @@ function NovoAlunoPage() {
       <header className="border-b border-border/60 bg-card/30 backdrop-blur">
         <div className="mx-auto max-w-3xl px-6 py-5">
           <Link
-            to="/alunos"
+            to="/clinicas"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" /> Alunos
+            <ArrowLeft className="h-4 w-4" /> Clínicas
           </Link>
         </div>
       </header>
@@ -74,10 +83,10 @@ function NovoAlunoPage() {
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
-            <UserPlus className="h-3.5 w-3.5" /> Novo cadastro
+            <Building2 className="h-3.5 w-3.5" /> Novo cadastro
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
-            Cadastrar aluno
+            Cadastrar clínica
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Os dados ficam salvos apenas nesta sessão (mock local).
@@ -90,17 +99,17 @@ function NovoAlunoPage() {
         >
           <div className="grid gap-4 md:grid-cols-2">
             <div className="md:col-span-2">
-              <Label htmlFor="name">Nome completo *</Label>
+              <Label htmlFor="name">Nome da clínica *</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ana Beatriz Souza"
+                placeholder="Studio Kinetik São Paulo"
                 className="mt-1.5"
               />
             </div>
             <div>
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email">E-mail *</Label>
               <Input
                 id="email"
                 type="email"
@@ -119,82 +128,68 @@ function NovoAlunoPage() {
                 className="mt-1.5"
               />
             </div>
-            <div>
-              <Label htmlFor="birth">Data de nascimento *</Label>
-              <Input
-                id="birth"
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label>Gênero</Label>
-              <Select value={gender} onValueChange={(v) => setGender(v as typeof gender)}>
+            <div className="md:col-span-2">
+              <Label>Plano</Label>
+              <Select value={plan} onValueChange={(v) => setPlan(v as typeof plan)}>
                 <SelectTrigger className="mt-1.5">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="F">Feminino</SelectItem>
-                  <SelectItem value="M">Masculino</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
+                  <SelectItem value="starter">Starter</SelectItem>
+                  <SelectItem value="pro">Pro</SelectItem>
+                  <SelectItem value="enterprise">Enterprise</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="height">Altura (cm)</Label>
+            <div className="md:col-span-2">
+              <Label htmlFor="street">Endereço</Label>
               <Input
-                id="height"
-                type="number"
-                value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value)}
+                id="street"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="Rua, número"
                 className="mt-1.5"
               />
             </div>
             <div>
-              <Label htmlFor="weight">Peso (kg)</Label>
+              <Label htmlFor="city">Cidade</Label>
               <Input
-                id="weight"
-                type="number"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
                 className="mt-1.5"
               />
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="goals">Objetivos (separados por vírgula)</Label>
-            <Input
-              id="goals"
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-              placeholder="Melhorar postura, Reduzir dor lombar"
-              className="mt-1.5"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="medical">Histórico clínico</Label>
-            <Textarea
-              id="medical"
-              value={medical}
-              onChange={(e) => setMedical(e.target.value)}
-              rows={4}
-              className="mt-1.5"
-              placeholder="Cirurgias, condições crônicas, restrições…"
-            />
+            <div>
+              <Label htmlFor="state">Estado</Label>
+              <Input
+                id="state"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                maxLength={2}
+                placeholder="SP"
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label htmlFor="zip">CEP</Label>
+              <Input
+                id="zip"
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+                className="mt-1.5"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-5">
-            <Link to="/alunos">
+            <Link to="/clinicas">
               <Button type="button" variant="ghost">
                 Cancelar
               </Button>
             </Link>
             <Button type="submit" variant="hero">
-              Cadastrar aluno
+              Cadastrar clínica
             </Button>
           </div>
         </form>

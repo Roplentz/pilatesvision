@@ -81,3 +81,74 @@ export async function createClinic(input: NewClinicInput): Promise<ClinicRow> {
   if (error) throw new Error(error.message);
   return data as ClinicRow;
 }
+
+/** Busca uma clínica pelo id (sujeito a RLS — geralmente a do próprio usuário). */
+export function useClinicById(id: string | null | undefined) {
+  const [clinic, setClinic] = useState<ClinicRow | null>(null);
+  const [loading, setLoading] = useState<boolean>(Boolean(id));
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!id) {
+      setClinic(null);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    supabase
+      .from("clinics")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) setError(new Error(error.message));
+        else setClinic((data as ClinicRow | null) ?? null);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  return { clinic, loading, error };
+}
+
+/** Conta alunos e avaliações de uma clínica. */
+export function useClinicCounts(clinicId: string | null | undefined) {
+  const [counts, setCounts] = useState({ students: 0, assessments: 0 });
+  const [loading, setLoading] = useState<boolean>(Boolean(clinicId));
+
+  useEffect(() => {
+    if (!clinicId) {
+      setCounts({ students: 0, assessments: 0 });
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    Promise.all([
+      supabase.from("students").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("assessments").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+    ]).then(([s, a]) => {
+      if (cancelled) return;
+      setCounts({ students: s.count ?? 0, assessments: a.count ?? 0 });
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [clinicId]);
+
+  return { counts, loading };
+}
+
+/** Vincula a clínica ao perfil do usuário (após criar a primeira clínica). */
+export async function setProfileClinic(userId: string, clinicId: string) {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ clinic_id: clinicId })
+    .eq("id", userId);
+  if (error) throw new Error(error.message);
+}

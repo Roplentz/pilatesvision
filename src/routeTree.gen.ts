@@ -14,8 +14,11 @@ import { Route as NovaAvaliacaoRouteImport } from './routes/nova-avaliacao'
 import { Route as ExerciciosRouteImport } from './routes/exercicios'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClinicasIndexRouteImport } from './routes/clinicas.index'
 import { Route as AvaliacoesIndexRouteImport } from './routes/avaliacoes.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
+import { Route as ClinicasNovaRouteImport } from './routes/clinicas.nova'
+import { Route as ClinicasIdRouteImport } from './routes/clinicas.$id'
 import { Route as AvaliacoesNovaRouteImport } from './routes/avaliacoes.nova'
 import { Route as AvaliacoesIdRouteImport } from './routes/avaliacoes.$id'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
@@ -46,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClinicasIndexRoute = ClinicasIndexRouteImport.update({
+  id: '/clinicas/',
+  path: '/clinicas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AvaliacoesIndexRoute = AvaliacoesIndexRouteImport.update({
   id: '/avaliacoes/',
   path: '/avaliacoes/',
@@ -54,6 +62,16 @@ const AvaliacoesIndexRoute = AvaliacoesIndexRouteImport.update({
 const AlunosIndexRoute = AlunosIndexRouteImport.update({
   id: '/alunos/',
   path: '/alunos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClinicasNovaRoute = ClinicasNovaRouteImport.update({
+  id: '/clinicas/nova',
+  path: '/clinicas/nova',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClinicasIdRoute = ClinicasIdRouteImport.update({
+  id: '/clinicas/$id',
+  path: '/clinicas/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AvaliacoesNovaRoute = AvaliacoesNovaRouteImport.update({
@@ -87,8 +105,11 @@ export interface FileRoutesByFullPath {
   '/alunos/novo': typeof AlunosNovoRoute
   '/avaliacoes/$id': typeof AvaliacoesIdRoute
   '/avaliacoes/nova': typeof AvaliacoesNovaRoute
+  '/clinicas/$id': typeof ClinicasIdRoute
+  '/clinicas/nova': typeof ClinicasNovaRoute
   '/alunos/': typeof AlunosIndexRoute
   '/avaliacoes/': typeof AvaliacoesIndexRoute
+  '/clinicas/': typeof ClinicasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -100,8 +121,11 @@ export interface FileRoutesByTo {
   '/alunos/novo': typeof AlunosNovoRoute
   '/avaliacoes/$id': typeof AvaliacoesIdRoute
   '/avaliacoes/nova': typeof AvaliacoesNovaRoute
+  '/clinicas/$id': typeof ClinicasIdRoute
+  '/clinicas/nova': typeof ClinicasNovaRoute
   '/alunos': typeof AlunosIndexRoute
   '/avaliacoes': typeof AvaliacoesIndexRoute
+  '/clinicas': typeof ClinicasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,8 +138,11 @@ export interface FileRoutesById {
   '/alunos/novo': typeof AlunosNovoRoute
   '/avaliacoes/$id': typeof AvaliacoesIdRoute
   '/avaliacoes/nova': typeof AvaliacoesNovaRoute
+  '/clinicas/$id': typeof ClinicasIdRoute
+  '/clinicas/nova': typeof ClinicasNovaRoute
   '/alunos/': typeof AlunosIndexRoute
   '/avaliacoes/': typeof AvaliacoesIndexRoute
+  '/clinicas/': typeof ClinicasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -129,8 +156,11 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
+    | '/clinicas/$id'
+    | '/clinicas/nova'
     | '/alunos/'
     | '/avaliacoes/'
+    | '/clinicas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,8 +172,11 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
+    | '/clinicas/$id'
+    | '/clinicas/nova'
     | '/alunos'
     | '/avaliacoes'
+    | '/clinicas'
   id:
     | '__root__'
     | '/'
@@ -155,8 +188,11 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
+    | '/clinicas/$id'
+    | '/clinicas/nova'
     | '/alunos/'
     | '/avaliacoes/'
+    | '/clinicas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -169,8 +205,11 @@ export interface RootRouteChildren {
   AlunosNovoRoute: typeof AlunosNovoRoute
   AvaliacoesIdRoute: typeof AvaliacoesIdRoute
   AvaliacoesNovaRoute: typeof AvaliacoesNovaRoute
+  ClinicasIdRoute: typeof ClinicasIdRoute
+  ClinicasNovaRoute: typeof ClinicasNovaRoute
   AlunosIndexRoute: typeof AlunosIndexRoute
   AvaliacoesIndexRoute: typeof AvaliacoesIndexRoute
+  ClinicasIndexRoute: typeof ClinicasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -210,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clinicas/': {
+      id: '/clinicas/'
+      path: '/clinicas'
+      fullPath: '/clinicas/'
+      preLoaderRoute: typeof ClinicasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/avaliacoes/': {
       id: '/avaliacoes/'
       path: '/avaliacoes'
@@ -222,6 +268,20 @@ declare module '@tanstack/react-router' {
       path: '/alunos'
       fullPath: '/alunos/'
       preLoaderRoute: typeof AlunosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clinicas/nova': {
+      id: '/clinicas/nova'
+      path: '/clinicas/nova'
+      fullPath: '/clinicas/nova'
+      preLoaderRoute: typeof ClinicasNovaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clinicas/$id': {
+      id: '/clinicas/$id'
+      path: '/clinicas/$id'
+      fullPath: '/clinicas/$id'
+      preLoaderRoute: typeof ClinicasIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/avaliacoes/nova': {
@@ -265,8 +325,11 @@ const rootRouteChildren: RootRouteChildren = {
   AlunosNovoRoute: AlunosNovoRoute,
   AvaliacoesIdRoute: AvaliacoesIdRoute,
   AvaliacoesNovaRoute: AvaliacoesNovaRoute,
+  ClinicasIdRoute: ClinicasIdRoute,
+  ClinicasNovaRoute: ClinicasNovaRoute,
   AlunosIndexRoute: AlunosIndexRoute,
   AvaliacoesIndexRoute: AvaliacoesIndexRoute,
+  ClinicasIndexRoute: ClinicasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

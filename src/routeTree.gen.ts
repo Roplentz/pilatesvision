@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedAvaliacaoPosturalRouteImport } from './routes/_authenticated.avaliacao-postural'
 import { Route as AuthenticatedAvaliacaoDinamicaRouteImport } from './routes/_authenticated.avaliacao-dinamica'
 import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
@@ -63,6 +64,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAvaliacaoPosturalRoute =
   AuthenticatedAvaliacaoPosturalRouteImport.update({
     id: '/avaliacao-postural',
@@ -133,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
@@ -152,6 +160,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
@@ -173,6 +182,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/_authenticated/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/avaliacao-dinamica'
     | '/avaliacao-postural'
+    | '/configuracoes'
     | '/dashboard'
     | '/exercicios'
     | '/nova-avaliacao'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/avaliacao-dinamica'
     | '/avaliacao-postural'
+    | '/configuracoes'
     | '/dashboard'
     | '/exercicios'
     | '/nova-avaliacao'
@@ -233,6 +245,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/avaliacao-dinamica'
     | '/_authenticated/avaliacao-postural'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/exercicios'
     | '/_authenticated/nova-avaliacao'
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/avaliacao-postural': {
@@ -388,6 +408,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAvaliacaoDinamicaRoute: typeof AuthenticatedAvaliacaoDinamicaRoute
   AuthenticatedAvaliacaoPosturalRoute: typeof AuthenticatedAvaliacaoPosturalRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
@@ -405,6 +426,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAvaliacaoDinamicaRoute: AuthenticatedAvaliacaoDinamicaRoute,
   AuthenticatedAvaliacaoPosturalRoute: AuthenticatedAvaliacaoPosturalRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,

@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
-import { createClinic, setProfileClinic } from "@/lib/clinicsStore";
+import { supabase } from "@/integrations/supabase/client";
+import { setProfileClinic } from "@/lib/clinicsStore";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Bem-vindo | PilatesVision" }] }),
@@ -15,25 +15,37 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 function OnboardingPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [stateUf, setStateUf] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user?.id) return;
-    if (!name.trim()) { toast.error("Informe o nome da clínica."); return; }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      navigate({ to: "/login", replace: true });
+      return;
+    }
+    if (!name.trim()) {
+      toast.error("Informe o nome da clínica.");
+      return;
+    }
     setSubmitting(true);
     try {
-      const created = await createClinic({
-        name: name.trim(),
-        owner_user_id: user.id,
-        city: city.trim() || null,
-        state: stateUf.trim() || null,
-      });
-      await setProfileClinic(user.id, created.id);
+      const { data: created, error } = await supabase
+        .from("clinics")
+        .insert({
+          name: name.trim(),
+          owner_user_id: user.id,
+          city: city.trim() || null,
+          state: stateUf.trim() || null,
+        } as any)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      await setProfileClinic(user.id, (created as any).id);
       toast.success("Clínica criada. Bem-vindo!");
       navigate({ to: "/dashboard", replace: true });
     } catch (err) {
@@ -50,9 +62,7 @@ function OnboardingPage() {
           <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5 text-primary" /> Bem-vindo ao PilatesVision
           </div>
-          <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">
-            Vamos configurar sua clínica
-          </h1>
+          <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">Vamos configurar sua clínica</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Esses dados aparecem em relatórios e prontuários. Você pode ajustar depois em Configurações.
           </p>
@@ -69,20 +79,47 @@ function OnboardingPage() {
           </div>
           <div>
             <Label htmlFor="cname">Nome da clínica *</Label>
-            <Input id="cname" value={name} onChange={(e) => setName(e.target.value)} required autoFocus className="mt-1.5" placeholder="Ex: Studio PilatesVision" />
+            <Input
+              id="cname"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoFocus
+              className="mt-1.5"
+              placeholder="Ex: Studio PilatesVision"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="city">Cidade</Label>
-              <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1.5" placeholder="Porto Alegre" />
+              <Input
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="mt-1.5"
+                placeholder="Porto Alegre"
+              />
             </div>
             <div>
               <Label htmlFor="state">UF</Label>
-              <Input id="state" value={stateUf} onChange={(e) => setStateUf(e.target.value)} className="mt-1.5" placeholder="RS" maxLength={2} />
+              <Input
+                id="state"
+                value={stateUf}
+                onChange={(e) => setStateUf(e.target.value)}
+                className="mt-1.5"
+                placeholder="RS"
+                maxLength={2}
+              />
             </div>
           </div>
           <Button type="submit" disabled={submitting || !name.trim()} className="w-full" variant="hero">
-            {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando...</> : "Criar clínica e continuar"}
+            {submitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Criando...
+              </>
+            ) : (
+              "Criar clínica e continuar"
+            )}
           </Button>
         </form>
       </div>

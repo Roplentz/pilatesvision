@@ -105,7 +105,7 @@ function ClinicasListPage() {
 
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   <Badge variant="secondary" className="text-[10px]">
-                    Plano {planLabel[clinic.plan] ?? clinic.plan}
+                    Plano {(clinic.plan && planLabel[clinic.plan]) ?? clinic.plan ?? "starter"}
                   </Badge>
                 </div>
 

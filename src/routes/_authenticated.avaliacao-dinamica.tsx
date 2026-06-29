@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/_authenticated/dinamica")({
+export const Route = createFileRoute("/_authenticated/avaliacao-dinamica")({
   head: () => ({ meta: [{ title: "Avaliação Dinâmica | PilatesVision" }] }),
   component: DinamicaPage,
 });
@@ -32,7 +32,7 @@ function DinamicaPage() {
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
       <header>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Avaliação Dinâmica</h1>
-        <p className="text-sm text-muted-foreground">Selecione um movimento para analisar.</p>
+        <p className="text-sm text-muted-foreground">Análise da qualidade do movimento em exercícios funcionais e Pilates.</p>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

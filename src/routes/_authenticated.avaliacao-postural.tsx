@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Camera, CheckCircle2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/postural")({
+export const Route = createFileRoute("/_authenticated/avaliacao-postural")({
   head: () => ({ meta: [{ title: "Avaliação Postural | PilatesVision" }] }),
   component: PosturalPage,
 });
@@ -74,6 +74,10 @@ function PosturalPage() {
           </CardContent>
         </Card>
       )}
+
+      <p className="rounded-md border border-border/60 bg-surface/40 p-3 text-xs text-muted-foreground">
+        Os indicadores são apoio à decisão profissional e não substituem avaliação clínica.
+      </p>
     </div>
   );
 }

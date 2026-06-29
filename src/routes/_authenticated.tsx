@@ -10,6 +10,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -37,6 +38,7 @@ import {
   Sparkles,
   Loader2,
   LogOut,
+  Shield,
 } from "lucide-react";
 
 const menu = [
@@ -50,7 +52,7 @@ const menu = [
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ] as const;
 
-function AppSidebar() {
+function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <Sidebar collapsible="icon">
@@ -84,6 +86,19 @@ function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+              {isAdmin ? (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/admin" || pathname.startsWith("/admin/")}
+                  >
+                    <Link to="/admin" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      <span>Admin</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -95,6 +110,7 @@ function AppSidebar() {
 function AuthedLayout() {
   const { user, loading, signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -107,12 +123,14 @@ function AuthedLayout() {
 
   // Onboarding: usuário sem clínica vinculada é levado para /onboarding.
   useEffect(() => {
-    if (loading || profileLoading || !user) return;
+    if (loading || profileLoading || adminLoading || !user) return;
+    // Admins não precisam de clínica vinculada.
+    if (isAdmin) return;
     const needsOnboarding = profile && !profile.clinic_id;
     if (needsOnboarding && pathname !== "/onboarding") {
       navigate({ to: "/onboarding", replace: true });
     }
-  }, [loading, profileLoading, user, profile, pathname, navigate]);
+  }, [loading, profileLoading, adminLoading, isAdmin, user, profile, pathname, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -155,7 +173,7 @@ function AuthedLayout() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background text-foreground">
-        <AppSidebar />
+        <AppSidebar isAdmin={isAdmin} />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border/60 bg-background/70 px-3 backdrop-blur-xl">
             <SidebarTrigger />

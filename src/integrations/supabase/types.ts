@@ -18,42 +18,42 @@ export type Database = {
         Row: {
           clinic_id: string
           created_at: string
-          current_stage: Database["public"]["Enums"]["assessment_stage"]
-          goals: string[]
+          current_stage: string
+          goals: string[] | null
           id: string
           main_complaint: string | null
           observations: string | null
-          pain_level: number
-          professional_id: string
-          status: Database["public"]["Enums"]["assessment_status"]
+          pain_level: number | null
+          professional_id: string | null
+          status: string
           student_id: string
           updated_at: string
         }
         Insert: {
           clinic_id: string
           created_at?: string
-          current_stage?: Database["public"]["Enums"]["assessment_stage"]
-          goals?: string[]
+          current_stage?: string
+          goals?: string[] | null
           id?: string
           main_complaint?: string | null
           observations?: string | null
-          pain_level?: number
-          professional_id: string
-          status?: Database["public"]["Enums"]["assessment_status"]
+          pain_level?: number | null
+          professional_id?: string | null
+          status?: string
           student_id: string
           updated_at?: string
         }
         Update: {
           clinic_id?: string
           created_at?: string
-          current_stage?: Database["public"]["Enums"]["assessment_stage"]
-          goals?: string[]
+          current_stage?: string
+          goals?: string[] | null
           id?: string
           main_complaint?: string | null
           observations?: string | null
-          pain_level?: number
-          professional_id?: string
-          status?: Database["public"]["Enums"]["assessment_status"]
+          pain_level?: number | null
+          professional_id?: string | null
+          status?: string
           student_id?: string
           updated_at?: string
         }
@@ -63,13 +63,6 @@ export type Database = {
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assessments_professional_id_fkey"
-            columns: ["professional_id"]
-            isOneToOne: false
-            referencedRelation: "professionals"
             referencedColumns: ["id"]
           },
           {
@@ -85,113 +78,71 @@ export type Database = {
         Row: {
           address: Json | null
           created_at: string
-          email: string
+          email: string | null
           id: string
           logo_url: string | null
           name: string
           phone: string | null
-          plan: Database["public"]["Enums"]["clinic_plan"]
+          plan: string
           slug: string
-          updated_at: string
         }
         Insert: {
           address?: Json | null
           created_at?: string
-          email: string
+          email?: string | null
           id?: string
           logo_url?: string | null
           name: string
           phone?: string | null
-          plan?: Database["public"]["Enums"]["clinic_plan"]
+          plan?: string
           slug: string
-          updated_at?: string
         }
         Update: {
           address?: Json | null
           created_at?: string
-          email?: string
+          email?: string | null
           id?: string
           logo_url?: string | null
           name?: string
           phone?: string | null
-          plan?: Database["public"]["Enums"]["clinic_plan"]
+          plan?: string
           slug?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      exercise_definitions: {
-        Row: {
-          category: Database["public"]["Enums"]["exercise_category"]
-          common_compensations: string[]
-          created_at: string
-          description: string
-          goal: Database["public"]["Enums"]["exercise_goal"]
-          id: string
-          ideal_view: Database["public"]["Enums"]["ideal_view"]
-          joints: string[]
-          level: Database["public"]["Enums"]["exercise_level"]
-          name: string
-          quality_criteria: string[]
-          updated_at: string
-        }
-        Insert: {
-          category: Database["public"]["Enums"]["exercise_category"]
-          common_compensations?: string[]
-          created_at?: string
-          description: string
-          goal: Database["public"]["Enums"]["exercise_goal"]
-          id?: string
-          ideal_view: Database["public"]["Enums"]["ideal_view"]
-          joints?: string[]
-          level: Database["public"]["Enums"]["exercise_level"]
-          name: string
-          quality_criteria?: string[]
-          updated_at?: string
-        }
-        Update: {
-          category?: Database["public"]["Enums"]["exercise_category"]
-          common_compensations?: string[]
-          created_at?: string
-          description?: string
-          goal?: Database["public"]["Enums"]["exercise_goal"]
-          id?: string
-          ideal_view?: Database["public"]["Enums"]["ideal_view"]
-          joints?: string[]
-          level?: Database["public"]["Enums"]["exercise_level"]
-          name?: string
-          quality_criteria?: string[]
-          updated_at?: string
         }
         Relationships: []
       }
       movement_results: {
         Row: {
-          analyses: Json
+          amplitude: number | null
           assessment_id: string
+          controle: number | null
           created_at: string
-          generated_at: string
+          estabilidade: number | null
           id: string
-          overall_score: number
-          updated_at: string
+          movements_evaluated: string[] | null
+          simetria: number | null
+          video_url: string | null
         }
         Insert: {
-          analyses?: Json
+          amplitude?: number | null
           assessment_id: string
+          controle?: number | null
           created_at?: string
-          generated_at?: string
+          estabilidade?: number | null
           id?: string
-          overall_score?: number
-          updated_at?: string
+          movements_evaluated?: string[] | null
+          simetria?: number | null
+          video_url?: string | null
         }
         Update: {
-          analyses?: Json
+          amplitude?: number | null
           assessment_id?: string
+          controle?: number | null
           created_at?: string
-          generated_at?: string
+          estabilidade?: number | null
           id?: string
-          overall_score?: number
-          updated_at?: string
+          movements_evaluated?: string[] | null
+          simetria?: number | null
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -207,32 +158,26 @@ export type Database = {
         Row: {
           assessment_id: string
           created_at: string
-          findings: Json
-          generated_at: string
+          findings: Json | null
           id: string
-          scores: Json
-          shots: Json
-          updated_at: string
+          image_urls: Json | null
+          score: number | null
         }
         Insert: {
           assessment_id: string
           created_at?: string
-          findings?: Json
-          generated_at?: string
+          findings?: Json | null
           id?: string
-          scores?: Json
-          shots?: Json
-          updated_at?: string
+          image_urls?: Json | null
+          score?: number | null
         }
         Update: {
           assessment_id?: string
           created_at?: string
-          findings?: Json
-          generated_at?: string
+          findings?: Json | null
           id?: string
-          scores?: Json
-          shots?: Json
-          updated_at?: string
+          image_urls?: Json | null
+          score?: number | null
         }
         Relationships: [
           {
@@ -247,39 +192,30 @@ export type Database = {
       prescribed_exercises: {
         Row: {
           assessment_id: string
-          created_at: string
-          exercise_id: string
+          focus: string | null
           id: string
-          notes: string | null
-          order: number
-          reps: number
-          sets: number
-          tempo: string | null
-          updated_at: string
+          level: string | null
+          name: string | null
+          order_index: number | null
+          series: string | null
         }
         Insert: {
           assessment_id: string
-          created_at?: string
-          exercise_id: string
+          focus?: string | null
           id?: string
-          notes?: string | null
-          order?: number
-          reps?: number
-          sets?: number
-          tempo?: string | null
-          updated_at?: string
+          level?: string | null
+          name?: string | null
+          order_index?: number | null
+          series?: string | null
         }
         Update: {
           assessment_id?: string
-          created_at?: string
-          exercise_id?: string
+          focus?: string | null
           id?: string
-          notes?: string | null
-          order?: number
-          reps?: number
-          sets?: number
-          tempo?: string | null
-          updated_at?: string
+          level?: string | null
+          name?: string | null
+          order_index?: number | null
+          series?: string | null
         }
         Relationships: [
           {
@@ -287,66 +223,6 @@ export type Database = {
             columns: ["assessment_id"]
             isOneToOne: false
             referencedRelation: "assessments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "prescribed_exercises_exercise_id_fkey"
-            columns: ["exercise_id"]
-            isOneToOne: false
-            referencedRelation: "exercise_definitions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      professionals: {
-        Row: {
-          avatar_url: string | null
-          clinic_id: string
-          created_at: string
-          email: string
-          id: string
-          license: string | null
-          name: string
-          phone: string | null
-          role: Database["public"]["Enums"]["professional_role"]
-          specialty: Database["public"]["Enums"]["professional_specialty"]
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          clinic_id: string
-          created_at?: string
-          email: string
-          id?: string
-          license?: string | null
-          name: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["professional_role"]
-          specialty?: Database["public"]["Enums"]["professional_specialty"]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          clinic_id?: string
-          created_at?: string
-          email?: string
-          id?: string
-          license?: string | null
-          name?: string
-          phone?: string | null
-          role?: Database["public"]["Enums"]["professional_role"]
-          specialty?: Database["public"]["Enums"]["professional_specialty"]
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "professionals_clinic_id_fkey"
-            columns: ["clinic_id"]
-            isOneToOne: false
-            referencedRelation: "clinics"
             referencedColumns: ["id"]
           },
         ]
@@ -389,39 +265,33 @@ export type Database = {
       reports: {
         Row: {
           assessment_id: string
+          clinic_id: string
+          content: Json | null
           created_at: string
-          generated_at: string
-          generated_by: string
           id: string
-          next_review_date: string | null
           pdf_url: string | null
-          recommendations: string[]
-          summary: string
-          updated_at: string
+          student_id: string
+          version: number
         }
         Insert: {
           assessment_id: string
+          clinic_id: string
+          content?: Json | null
           created_at?: string
-          generated_at?: string
-          generated_by: string
           id?: string
-          next_review_date?: string | null
           pdf_url?: string | null
-          recommendations?: string[]
-          summary: string
-          updated_at?: string
+          student_id: string
+          version?: number
         }
         Update: {
           assessment_id?: string
+          clinic_id?: string
+          content?: Json | null
           created_at?: string
-          generated_at?: string
-          generated_by?: string
           id?: string
-          next_review_date?: string | null
           pdf_url?: string | null
-          recommendations?: string[]
-          summary?: string
-          updated_at?: string
+          student_id?: string
+          version?: number
         }
         Relationships: [
           {
@@ -432,10 +302,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "reports_generated_by_fkey"
-            columns: ["generated_by"]
+            foreignKeyName: "reports_clinic_id_fkey"
+            columns: ["clinic_id"]
             isOneToOne: false
-            referencedRelation: "professionals"
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -443,54 +320,51 @@ export type Database = {
       students: {
         Row: {
           avatar_url: string | null
-          birth_date: string
+          birth_date: string | null
           clinic_id: string
-          contraindications: string[]
+          contraindications: string[] | null
           created_at: string
           email: string | null
-          gender: Database["public"]["Enums"]["student_gender"]
-          goals: string[]
-          height_cm: number
+          gender: string | null
+          goals: string[] | null
+          height_cm: number | null
           id: string
           medical_history: string | null
           name: string
           phone: string | null
-          updated_at: string
-          weight_kg: number
+          weight_kg: number | null
         }
         Insert: {
           avatar_url?: string | null
-          birth_date: string
+          birth_date?: string | null
           clinic_id: string
-          contraindications?: string[]
+          contraindications?: string[] | null
           created_at?: string
           email?: string | null
-          gender: Database["public"]["Enums"]["student_gender"]
-          goals?: string[]
-          height_cm: number
+          gender?: string | null
+          goals?: string[] | null
+          height_cm?: number | null
           id?: string
           medical_history?: string | null
           name: string
           phone?: string | null
-          updated_at?: string
-          weight_kg: number
+          weight_kg?: number | null
         }
         Update: {
           avatar_url?: string | null
-          birth_date?: string
+          birth_date?: string | null
           clinic_id?: string
-          contraindications?: string[]
+          contraindications?: string[] | null
           created_at?: string
           email?: string | null
-          gender?: Database["public"]["Enums"]["student_gender"]
-          goals?: string[]
-          height_cm?: number
+          gender?: string | null
+          goals?: string[] | null
+          height_cm?: number | null
           id?: string
           medical_history?: string | null
           name?: string
           phone?: string | null
-          updated_at?: string
-          weight_kg?: number
+          weight_kg?: number | null
         }
         Relationships: [
           {
@@ -539,32 +413,6 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "instrutor" | "recepcionista"
-      assessment_stage:
-        | "ficha"
-        | "postural"
-        | "dinamica"
-        | "exercicios"
-        | "relatorio"
-      assessment_status: "draft" | "in_progress" | "completed" | "archived"
-      clinic_plan: "starter" | "pro" | "enterprise"
-      exercise_category: "Mat" | "Reformer" | "Funcional" | "Alongamento"
-      exercise_goal:
-        | "Core"
-        | "Mobilidade"
-        | "Estabilidade"
-        | "Força"
-        | "Postura"
-        | "Equilíbrio"
-      exercise_level: "Iniciante" | "Intermediário" | "Avançado"
-      ideal_view: "Lateral" | "Frontal" | "Posterior" | "Superior"
-      professional_role: "owner" | "admin" | "professional" | "assistant"
-      professional_specialty:
-        | "Pilates"
-        | "Fisioterapia"
-        | "Educação Física"
-        | "Osteopatia"
-        | "RPG"
-      student_gender: "F" | "M" | "outro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -693,35 +541,6 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "instrutor", "recepcionista"],
-      assessment_stage: [
-        "ficha",
-        "postural",
-        "dinamica",
-        "exercicios",
-        "relatorio",
-      ],
-      assessment_status: ["draft", "in_progress", "completed", "archived"],
-      clinic_plan: ["starter", "pro", "enterprise"],
-      exercise_category: ["Mat", "Reformer", "Funcional", "Alongamento"],
-      exercise_goal: [
-        "Core",
-        "Mobilidade",
-        "Estabilidade",
-        "Força",
-        "Postura",
-        "Equilíbrio",
-      ],
-      exercise_level: ["Iniciante", "Intermediário", "Avançado"],
-      ideal_view: ["Lateral", "Frontal", "Posterior", "Superior"],
-      professional_role: ["owner", "admin", "professional", "assistant"],
-      professional_specialty: [
-        "Pilates",
-        "Fisioterapia",
-        "Educação Física",
-        "Osteopatia",
-        "RPG",
-      ],
-      student_gender: ["F", "M", "outro"],
     },
   },
 } as const

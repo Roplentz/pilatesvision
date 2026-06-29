@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/")({
   component: AvaliacoesListPage,
   head: () => ({
     meta: [
-      { title: "Avaliações | Kinetik" },
+      { title: "Avaliações | PilatesVision" },
       {
         name: "description",
         content:

@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/exercicios")({
   component: ExerciciosPage,
   head: () => ({
     meta: [
-      { title: "Exercícios Pilates | Kinetik" },
+      { title: "Exercícios Pilates | PilatesVision" },
       {
         name: "description",
         content:

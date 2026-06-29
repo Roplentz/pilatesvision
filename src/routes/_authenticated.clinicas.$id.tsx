@@ -16,7 +16,7 @@ import { mockApi } from "@/lib/mockData";
 export const Route = createFileRoute("/_authenticated/clinicas/$id")({
   component: ClinicaDetailPage,
   head: () => ({
-    meta: [{ title: "Clínica | Kinetik" }],
+    meta: [{ title: "Clínica | PilatesVision" }],
   }),
 });
 

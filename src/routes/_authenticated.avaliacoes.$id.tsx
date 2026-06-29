@@ -17,7 +17,7 @@ import { mockApi } from "@/lib/mockData";
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/$id")({
   component: AvaliacaoDetailPage,
-  head: () => ({ meta: [{ title: "Avaliação | Kinetik" }] }),
+  head: () => ({ meta: [{ title: "Avaliação | PilatesVision" }] }),
 });
 
 const statusLabel: Record<string, string> = {

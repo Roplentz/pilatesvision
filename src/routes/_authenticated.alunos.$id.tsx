@@ -17,7 +17,7 @@ import { mockApi } from "@/lib/mockData";
 export const Route = createFileRoute("/_authenticated/alunos/$id")({
   component: AlunoDetailPage,
   head: () => ({
-    meta: [{ title: "Aluno | Kinetik" }],
+    meta: [{ title: "Aluno | PilatesVision" }],
   }),
 });
 

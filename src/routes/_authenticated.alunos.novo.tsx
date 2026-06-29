@@ -18,7 +18,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/alunos/novo")({
   component: NovoAlunoPage,
   head: () => ({
-    meta: [{ title: "Novo aluno | Kinetik" }],
+    meta: [{ title: "Novo aluno | PilatesVision" }],
   }),
 });
 

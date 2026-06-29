@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addStudent } from "@/lib/studentsStore";
+import { addStudent } from "@/lib/studentsStore.mock";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/alunos/novo")({

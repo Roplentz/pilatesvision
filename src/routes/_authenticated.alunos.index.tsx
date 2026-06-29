@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Plus, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useStudents } from "@/lib/studentsStore";
+import { useStudents } from "@/lib/studentsStore.mock";
 import { mockApi } from "@/lib/mockData";
 
 export const Route = createFileRoute("/_authenticated/alunos/")({

@@ -14,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStudents } from "@/lib/studentsStore";
+import { useStudents } from "@/lib/studentsStore.mock";
 import { mockApi } from "@/lib/mockData";
-import { addAssessment } from "@/lib/assessmentsStore";
+import { addAssessment } from "@/lib/assessmentsStore.mock";
 import { toast } from "sonner";
 
 const searchSchema = z.object({

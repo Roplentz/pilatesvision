@@ -25,6 +25,7 @@ import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
 import { Route as AuthenticatedClinicasNovaRouteImport } from './routes/_authenticated.clinicas.nova'
 import { Route as AuthenticatedClinicasIdRouteImport } from './routes/_authenticated.clinicas.$id'
+import { Route as AuthenticatedAvaliacoesNovaRouteImport } from './routes/_authenticated.avaliacoes.nova'
 import { Route as AuthenticatedAvaliacoesIdRouteImport } from './routes/_authenticated.avaliacoes.$id'
 import { Route as AuthenticatedAlunosNovoRouteImport } from './routes/_authenticated.alunos.novo'
 import { Route as AuthenticatedAlunosIdRouteImport } from './routes/_authenticated.alunos.$id'
@@ -116,6 +117,12 @@ const AuthenticatedClinicasIdRoute = AuthenticatedClinicasIdRouteImport.update({
   path: '/clinicas/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAvaliacoesNovaRoute =
+  AuthenticatedAvaliacoesNovaRouteImport.update({
+    id: '/avaliacoes/nova',
+    path: '/avaliacoes/nova',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAvaliacoesIdRoute =
   AuthenticatedAvaliacoesIdRouteImport.update({
     id: '/avaliacoes/$id',
@@ -147,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
   '/clinicas/$id': typeof AuthenticatedClinicasIdRoute
   '/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
   '/alunos/': typeof AuthenticatedAlunosIndexRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
   '/clinicas/$id': typeof AuthenticatedClinicasIdRoute
   '/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
   '/alunos': typeof AuthenticatedAlunosIndexRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/_authenticated/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/_authenticated/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/_authenticated/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
+  '/_authenticated/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
   '/_authenticated/clinicas/$id': typeof AuthenticatedClinicasIdRoute
   '/_authenticated/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
   '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/clinicas/$id'
     | '/clinicas/nova'
     | '/alunos/'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/clinicas/$id'
     | '/clinicas/nova'
     | '/alunos'
@@ -252,6 +264,7 @@ export interface FileRouteTypes {
     | '/_authenticated/alunos/$id'
     | '/_authenticated/alunos/novo'
     | '/_authenticated/avaliacoes/$id'
+    | '/_authenticated/avaliacoes/nova'
     | '/_authenticated/clinicas/$id'
     | '/_authenticated/clinicas/nova'
     | '/_authenticated/alunos/'
@@ -380,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClinicasIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/avaliacoes/nova': {
+      id: '/_authenticated/avaliacoes/nova'
+      path: '/avaliacoes/nova'
+      fullPath: '/avaliacoes/nova'
+      preLoaderRoute: typeof AuthenticatedAvaliacoesNovaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/avaliacoes/$id': {
       id: '/_authenticated/avaliacoes/$id'
       path: '/avaliacoes/$id'
@@ -415,6 +435,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
   AuthenticatedAlunosNovoRoute: typeof AuthenticatedAlunosNovoRoute
   AuthenticatedAvaliacoesIdRoute: typeof AuthenticatedAvaliacoesIdRoute
+  AuthenticatedAvaliacoesNovaRoute: typeof AuthenticatedAvaliacoesNovaRoute
   AuthenticatedClinicasIdRoute: typeof AuthenticatedClinicasIdRoute
   AuthenticatedClinicasNovaRoute: typeof AuthenticatedClinicasNovaRoute
   AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
@@ -433,6 +454,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,
   AuthenticatedAlunosNovoRoute: AuthenticatedAlunosNovoRoute,
   AuthenticatedAvaliacoesIdRoute: AuthenticatedAvaliacoesIdRoute,
+  AuthenticatedAvaliacoesNovaRoute: AuthenticatedAvaliacoesNovaRoute,
   AuthenticatedClinicasIdRoute: AuthenticatedClinicasIdRoute,
   AuthenticatedClinicasNovaRoute: AuthenticatedClinicasNovaRoute,
   AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,

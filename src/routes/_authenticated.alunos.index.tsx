@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useStudents } from "@/lib/studentsStore";
 import { mockApi } from "@/lib/mockData";
 
-export const Route = createFileRoute("/alunos/")({
+export const Route = createFileRoute("/_authenticated/alunos/")({
   component: AlunosListPage,
   head: () => ({
     meta: [

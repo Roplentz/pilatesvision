@@ -32,7 +32,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/nova-avaliacao")({
+export const Route = createFileRoute("/_authenticated/nova-avaliacao")({
   head: () => ({
     meta: [
       { title: "Nova avaliação — Kinetik" },

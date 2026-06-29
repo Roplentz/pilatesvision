@@ -10,33 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as NovaAvaliacaoRouteImport } from './routes/nova-avaliacao'
-import { Route as ExerciciosRouteImport } from './routes/exercicios'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ClinicasIndexRouteImport } from './routes/clinicas.index'
-import { Route as AvaliacoesIndexRouteImport } from './routes/avaliacoes.index'
-import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
-import { Route as ClinicasNovaRouteImport } from './routes/clinicas.nova'
-import { Route as ClinicasIdRouteImport } from './routes/clinicas.$id'
-import { Route as AvaliacoesNovaRouteImport } from './routes/avaliacoes.nova'
-import { Route as AvaliacoesIdRouteImport } from './routes/avaliacoes.$id'
-import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
-import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
+import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
+import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
+import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
+import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
+import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
+import { Route as AuthenticatedClinicasNovaRouteImport } from './routes/_authenticated.clinicas.nova'
+import { Route as AuthenticatedClinicasIdRouteImport } from './routes/_authenticated.clinicas.$id'
+import { Route as AuthenticatedAvaliacoesNovaRouteImport } from './routes/_authenticated.avaliacoes.nova'
+import { Route as AuthenticatedAvaliacoesIdRouteImport } from './routes/_authenticated.avaliacoes.$id'
+import { Route as AuthenticatedAlunosNovoRouteImport } from './routes/_authenticated.alunos.novo'
+import { Route as AuthenticatedAlunosIdRouteImport } from './routes/_authenticated.alunos.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NovaAvaliacaoRoute = NovaAvaliacaoRouteImport.update({
-  id: '/nova-avaliacao',
-  path: '/nova-avaliacao',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExerciciosRoute = ExerciciosRouteImport.update({
-  id: '/exercicios',
-  path: '/exercicios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -49,48 +39,65 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClinicasIndexRoute = ClinicasIndexRouteImport.update({
-  id: '/clinicas/',
-  path: '/clinicas/',
+const AuthenticatedNovaAvaliacaoRoute =
+  AuthenticatedNovaAvaliacaoRouteImport.update({
+    id: '/_authenticated/nova-avaliacao',
+    path: '/nova-avaliacao',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedExerciciosRoute = AuthenticatedExerciciosRouteImport.update({
+  id: '/_authenticated/exercicios',
+  path: '/exercicios',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AvaliacoesIndexRoute = AvaliacoesIndexRouteImport.update({
-  id: '/avaliacoes/',
-  path: '/avaliacoes/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AlunosIndexRoute = AlunosIndexRouteImport.update({
-  id: '/alunos/',
-  path: '/alunos/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClinicasNovaRoute = ClinicasNovaRouteImport.update({
-  id: '/clinicas/nova',
-  path: '/clinicas/nova',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClinicasIdRoute = ClinicasIdRouteImport.update({
-  id: '/clinicas/$id',
+const AuthenticatedClinicasIndexRoute =
+  AuthenticatedClinicasIndexRouteImport.update({
+    id: '/_authenticated/clinicas/',
+    path: '/clinicas/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAvaliacoesIndexRoute =
+  AuthenticatedAvaliacoesIndexRouteImport.update({
+    id: '/_authenticated/avaliacoes/',
+    path: '/avaliacoes/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAlunosIndexRoute =
+  AuthenticatedAlunosIndexRouteImport.update({
+    id: '/_authenticated/alunos/',
+    path: '/alunos/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedClinicasNovaRoute =
+  AuthenticatedClinicasNovaRouteImport.update({
+    id: '/_authenticated/clinicas/nova',
+    path: '/clinicas/nova',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedClinicasIdRoute = AuthenticatedClinicasIdRouteImport.update({
+  id: '/_authenticated/clinicas/$id',
   path: '/clinicas/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AvaliacoesNovaRoute = AvaliacoesNovaRouteImport.update({
-  id: '/avaliacoes/nova',
-  path: '/avaliacoes/nova',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AvaliacoesIdRoute = AvaliacoesIdRouteImport.update({
-  id: '/avaliacoes/$id',
-  path: '/avaliacoes/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AlunosNovoRoute = AlunosNovoRouteImport.update({
-  id: '/alunos/novo',
+const AuthenticatedAvaliacoesNovaRoute =
+  AuthenticatedAvaliacoesNovaRouteImport.update({
+    id: '/_authenticated/avaliacoes/nova',
+    path: '/avaliacoes/nova',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAvaliacoesIdRoute =
+  AuthenticatedAvaliacoesIdRouteImport.update({
+    id: '/_authenticated/avaliacoes/$id',
+    path: '/avaliacoes/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAlunosNovoRoute = AuthenticatedAlunosNovoRouteImport.update({
+  id: '/_authenticated/alunos/novo',
   path: '/alunos/novo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AlunosIdRoute = AlunosIdRouteImport.update({
-  id: '/alunos/$id',
+const AuthenticatedAlunosIdRoute = AuthenticatedAlunosIdRouteImport.update({
+  id: '/_authenticated/alunos/$id',
   path: '/alunos/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -98,60 +105,60 @@ const AlunosIdRoute = AlunosIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/exercicios': typeof ExerciciosRoute
-  '/nova-avaliacao': typeof NovaAvaliacaoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/alunos/$id': typeof AlunosIdRoute
-  '/alunos/novo': typeof AlunosNovoRoute
-  '/avaliacoes/$id': typeof AvaliacoesIdRoute
-  '/avaliacoes/nova': typeof AvaliacoesNovaRoute
-  '/clinicas/$id': typeof ClinicasIdRoute
-  '/clinicas/nova': typeof ClinicasNovaRoute
-  '/alunos/': typeof AlunosIndexRoute
-  '/avaliacoes/': typeof AvaliacoesIndexRoute
-  '/clinicas/': typeof ClinicasIndexRoute
+  '/exercicios': typeof AuthenticatedExerciciosRoute
+  '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
+  '/alunos/$id': typeof AuthenticatedAlunosIdRoute
+  '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
+  '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
+  '/clinicas/$id': typeof AuthenticatedClinicasIdRoute
+  '/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
+  '/alunos/': typeof AuthenticatedAlunosIndexRoute
+  '/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
+  '/clinicas/': typeof AuthenticatedClinicasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/exercicios': typeof ExerciciosRoute
-  '/nova-avaliacao': typeof NovaAvaliacaoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/alunos/$id': typeof AlunosIdRoute
-  '/alunos/novo': typeof AlunosNovoRoute
-  '/avaliacoes/$id': typeof AvaliacoesIdRoute
-  '/avaliacoes/nova': typeof AvaliacoesNovaRoute
-  '/clinicas/$id': typeof ClinicasIdRoute
-  '/clinicas/nova': typeof ClinicasNovaRoute
-  '/alunos': typeof AlunosIndexRoute
-  '/avaliacoes': typeof AvaliacoesIndexRoute
-  '/clinicas': typeof ClinicasIndexRoute
+  '/exercicios': typeof AuthenticatedExerciciosRoute
+  '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
+  '/alunos/$id': typeof AuthenticatedAlunosIdRoute
+  '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
+  '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
+  '/clinicas/$id': typeof AuthenticatedClinicasIdRoute
+  '/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
+  '/alunos': typeof AuthenticatedAlunosIndexRoute
+  '/avaliacoes': typeof AuthenticatedAvaliacoesIndexRoute
+  '/clinicas': typeof AuthenticatedClinicasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/exercicios': typeof ExerciciosRoute
-  '/nova-avaliacao': typeof NovaAvaliacaoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/alunos/$id': typeof AlunosIdRoute
-  '/alunos/novo': typeof AlunosNovoRoute
-  '/avaliacoes/$id': typeof AvaliacoesIdRoute
-  '/avaliacoes/nova': typeof AvaliacoesNovaRoute
-  '/clinicas/$id': typeof ClinicasIdRoute
-  '/clinicas/nova': typeof ClinicasNovaRoute
-  '/alunos/': typeof AlunosIndexRoute
-  '/avaliacoes/': typeof AvaliacoesIndexRoute
-  '/clinicas/': typeof ClinicasIndexRoute
+  '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
+  '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
+  '/_authenticated/alunos/$id': typeof AuthenticatedAlunosIdRoute
+  '/_authenticated/alunos/novo': typeof AuthenticatedAlunosNovoRoute
+  '/_authenticated/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
+  '/_authenticated/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
+  '/_authenticated/clinicas/$id': typeof AuthenticatedClinicasIdRoute
+  '/_authenticated/clinicas/nova': typeof AuthenticatedClinicasNovaRoute
+  '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
+  '/_authenticated/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
+  '/_authenticated/clinicas/': typeof AuthenticatedClinicasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/sitemap.xml'
     | '/exercicios'
     | '/nova-avaliacao'
-    | '/sitemap.xml'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
@@ -165,9 +172,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/sitemap.xml'
     | '/exercicios'
     | '/nova-avaliacao'
-    | '/sitemap.xml'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/avaliacoes/$id'
@@ -181,35 +188,35 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
-    | '/exercicios'
-    | '/nova-avaliacao'
     | '/sitemap.xml'
-    | '/alunos/$id'
-    | '/alunos/novo'
-    | '/avaliacoes/$id'
-    | '/avaliacoes/nova'
-    | '/clinicas/$id'
-    | '/clinicas/nova'
-    | '/alunos/'
-    | '/avaliacoes/'
-    | '/clinicas/'
+    | '/_authenticated/exercicios'
+    | '/_authenticated/nova-avaliacao'
+    | '/_authenticated/alunos/$id'
+    | '/_authenticated/alunos/novo'
+    | '/_authenticated/avaliacoes/$id'
+    | '/_authenticated/avaliacoes/nova'
+    | '/_authenticated/clinicas/$id'
+    | '/_authenticated/clinicas/nova'
+    | '/_authenticated/alunos/'
+    | '/_authenticated/avaliacoes/'
+    | '/_authenticated/clinicas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  ExerciciosRoute: typeof ExerciciosRoute
-  NovaAvaliacaoRoute: typeof NovaAvaliacaoRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  AlunosIdRoute: typeof AlunosIdRoute
-  AlunosNovoRoute: typeof AlunosNovoRoute
-  AvaliacoesIdRoute: typeof AvaliacoesIdRoute
-  AvaliacoesNovaRoute: typeof AvaliacoesNovaRoute
-  ClinicasIdRoute: typeof ClinicasIdRoute
-  ClinicasNovaRoute: typeof ClinicasNovaRoute
-  AlunosIndexRoute: typeof AlunosIndexRoute
-  AvaliacoesIndexRoute: typeof AvaliacoesIndexRoute
-  ClinicasIndexRoute: typeof ClinicasIndexRoute
+  AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
+  AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
+  AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
+  AuthenticatedAlunosNovoRoute: typeof AuthenticatedAlunosNovoRoute
+  AuthenticatedAvaliacoesIdRoute: typeof AuthenticatedAvaliacoesIdRoute
+  AuthenticatedAvaliacoesNovaRoute: typeof AuthenticatedAvaliacoesNovaRoute
+  AuthenticatedClinicasIdRoute: typeof AuthenticatedClinicasIdRoute
+  AuthenticatedClinicasNovaRoute: typeof AuthenticatedClinicasNovaRoute
+  AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
+  AuthenticatedAvaliacoesIndexRoute: typeof AuthenticatedAvaliacoesIndexRoute
+  AuthenticatedClinicasIndexRoute: typeof AuthenticatedClinicasIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -219,20 +226,6 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nova-avaliacao': {
-      id: '/nova-avaliacao'
-      path: '/nova-avaliacao'
-      fullPath: '/nova-avaliacao'
-      preLoaderRoute: typeof NovaAvaliacaoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/exercicios': {
-      id: '/exercicios'
-      path: '/exercicios'
-      fullPath: '/exercicios'
-      preLoaderRoute: typeof ExerciciosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -249,67 +242,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clinicas/': {
-      id: '/clinicas/'
+    '/_authenticated/nova-avaliacao': {
+      id: '/_authenticated/nova-avaliacao'
+      path: '/nova-avaliacao'
+      fullPath: '/nova-avaliacao'
+      preLoaderRoute: typeof AuthenticatedNovaAvaliacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/exercicios': {
+      id: '/_authenticated/exercicios'
+      path: '/exercicios'
+      fullPath: '/exercicios'
+      preLoaderRoute: typeof AuthenticatedExerciciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/clinicas/': {
+      id: '/_authenticated/clinicas/'
       path: '/clinicas'
       fullPath: '/clinicas/'
-      preLoaderRoute: typeof ClinicasIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedClinicasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/avaliacoes/': {
-      id: '/avaliacoes/'
+    '/_authenticated/avaliacoes/': {
+      id: '/_authenticated/avaliacoes/'
       path: '/avaliacoes'
       fullPath: '/avaliacoes/'
-      preLoaderRoute: typeof AvaliacoesIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedAvaliacoesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/alunos/': {
-      id: '/alunos/'
+    '/_authenticated/alunos/': {
+      id: '/_authenticated/alunos/'
       path: '/alunos'
       fullPath: '/alunos/'
-      preLoaderRoute: typeof AlunosIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedAlunosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clinicas/nova': {
-      id: '/clinicas/nova'
+    '/_authenticated/clinicas/nova': {
+      id: '/_authenticated/clinicas/nova'
       path: '/clinicas/nova'
       fullPath: '/clinicas/nova'
-      preLoaderRoute: typeof ClinicasNovaRouteImport
+      preLoaderRoute: typeof AuthenticatedClinicasNovaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clinicas/$id': {
-      id: '/clinicas/$id'
+    '/_authenticated/clinicas/$id': {
+      id: '/_authenticated/clinicas/$id'
       path: '/clinicas/$id'
       fullPath: '/clinicas/$id'
-      preLoaderRoute: typeof ClinicasIdRouteImport
+      preLoaderRoute: typeof AuthenticatedClinicasIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/avaliacoes/nova': {
-      id: '/avaliacoes/nova'
+    '/_authenticated/avaliacoes/nova': {
+      id: '/_authenticated/avaliacoes/nova'
       path: '/avaliacoes/nova'
       fullPath: '/avaliacoes/nova'
-      preLoaderRoute: typeof AvaliacoesNovaRouteImport
+      preLoaderRoute: typeof AuthenticatedAvaliacoesNovaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/avaliacoes/$id': {
-      id: '/avaliacoes/$id'
+    '/_authenticated/avaliacoes/$id': {
+      id: '/_authenticated/avaliacoes/$id'
       path: '/avaliacoes/$id'
       fullPath: '/avaliacoes/$id'
-      preLoaderRoute: typeof AvaliacoesIdRouteImport
+      preLoaderRoute: typeof AuthenticatedAvaliacoesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/alunos/novo': {
-      id: '/alunos/novo'
+    '/_authenticated/alunos/novo': {
+      id: '/_authenticated/alunos/novo'
       path: '/alunos/novo'
       fullPath: '/alunos/novo'
-      preLoaderRoute: typeof AlunosNovoRouteImport
+      preLoaderRoute: typeof AuthenticatedAlunosNovoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/alunos/$id': {
-      id: '/alunos/$id'
+    '/_authenticated/alunos/$id': {
+      id: '/_authenticated/alunos/$id'
       path: '/alunos/$id'
       fullPath: '/alunos/$id'
-      preLoaderRoute: typeof AlunosIdRouteImport
+      preLoaderRoute: typeof AuthenticatedAlunosIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -318,18 +325,18 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  ExerciciosRoute: ExerciciosRoute,
-  NovaAvaliacaoRoute: NovaAvaliacaoRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  AlunosIdRoute: AlunosIdRoute,
-  AlunosNovoRoute: AlunosNovoRoute,
-  AvaliacoesIdRoute: AvaliacoesIdRoute,
-  AvaliacoesNovaRoute: AvaliacoesNovaRoute,
-  ClinicasIdRoute: ClinicasIdRoute,
-  ClinicasNovaRoute: ClinicasNovaRoute,
-  AlunosIndexRoute: AlunosIndexRoute,
-  AvaliacoesIndexRoute: AvaliacoesIndexRoute,
-  ClinicasIndexRoute: ClinicasIndexRoute,
+  AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
+  AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
+  AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,
+  AuthenticatedAlunosNovoRoute: AuthenticatedAlunosNovoRoute,
+  AuthenticatedAvaliacoesIdRoute: AuthenticatedAvaliacoesIdRoute,
+  AuthenticatedAvaliacoesNovaRoute: AuthenticatedAvaliacoesNovaRoute,
+  AuthenticatedClinicasIdRoute: AuthenticatedClinicasIdRoute,
+  AuthenticatedClinicasNovaRoute: AuthenticatedClinicasNovaRoute,
+  AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,
+  AuthenticatedAvaliacoesIndexRoute: AuthenticatedAvaliacoesIndexRoute,
+  AuthenticatedClinicasIndexRoute: AuthenticatedClinicasIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

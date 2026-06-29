@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { getStudent } from "@/lib/studentsStore";
 import { mockApi } from "@/lib/mockData";
 
-export const Route = createFileRoute("/alunos/$id")({
+export const Route = createFileRoute("/_authenticated/alunos/$id")({
   component: AlunoDetailPage,
   head: () => ({
     meta: [{ title: "Aluno | Kinetik" }],

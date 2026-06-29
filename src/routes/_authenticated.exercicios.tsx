@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/exercicios")({
+export const Route = createFileRoute("/_authenticated/exercicios")({
   component: ExerciciosPage,
   head: () => ({
     meta: [

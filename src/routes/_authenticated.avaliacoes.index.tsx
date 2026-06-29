@@ -15,7 +15,7 @@ import {
 import { useAssessments } from "@/lib/assessmentsStore";
 import { useStudents } from "@/lib/studentsStore";
 
-export const Route = createFileRoute("/avaliacoes/")({
+export const Route = createFileRoute("/_authenticated/avaliacoes/")({
   component: AvaliacoesListPage,
   head: () => ({
     meta: [

@@ -14,7 +14,7 @@ import {
 import { addClinic } from "@/lib/clinicsStore";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/clinicas/nova")({
+export const Route = createFileRoute("/_authenticated/clinicas/nova")({
   component: NovaClinicaPage,
   head: () => ({
     meta: [{ title: "Nova clínica | Kinetik" }],

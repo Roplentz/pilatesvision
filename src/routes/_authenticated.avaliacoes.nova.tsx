@@ -23,7 +23,7 @@ const searchSchema = z.object({
   studentId: z.string().optional(),
 });
 
-export const Route = createFileRoute("/avaliacoes/nova")({
+export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
   component: NovaAvaliacaoPage,
   validateSearch: searchSchema,
   head: () => ({ meta: [{ title: "Nova avaliação | Kinetik" }] }),

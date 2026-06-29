@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/_authenticated/dinamica")({
+export const Route = createFileRoute("/_authenticated/avaliacao-dinamica")({
   head: () => ({ meta: [{ title: "Avaliação Dinâmica | PilatesVision" }] }),
   component: DinamicaPage,
 });

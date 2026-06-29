@@ -14,12 +14,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
-import { Route as AuthenticatedPosturalRouteImport } from './routes/_authenticated.postural'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
-import { Route as AuthenticatedDinamicaRouteImport } from './routes/_authenticated.dinamica'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
+import { Route as AuthenticatedAvaliacaoPosturalRouteImport } from './routes/_authenticated.avaliacao-postural'
+import { Route as AuthenticatedAvaliacaoDinamicaRouteImport } from './routes/_authenticated.avaliacao-dinamica'
 import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
@@ -54,11 +54,6 @@ const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   path: '/relatorios',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPosturalRoute = AuthenticatedPosturalRouteImport.update({
-  id: '/postural',
-  path: '/postural',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedNovaAvaliacaoRoute =
   AuthenticatedNovaAvaliacaoRouteImport.update({
     id: '/nova-avaliacao',
@@ -70,11 +65,6 @@ const AuthenticatedExerciciosRoute = AuthenticatedExerciciosRouteImport.update({
   path: '/exercicios',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedDinamicaRoute = AuthenticatedDinamicaRouteImport.update({
-  id: '/dinamica',
-  path: '/dinamica',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -84,6 +74,18 @@ const AuthenticatedConfiguracoesRoute =
   AuthenticatedConfiguracoesRouteImport.update({
     id: '/configuracoes',
     path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAvaliacaoPosturalRoute =
+  AuthenticatedAvaliacaoPosturalRouteImport.update({
+    id: '/avaliacao-postural',
+    path: '/avaliacao-postural',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAvaliacaoDinamicaRoute =
+  AuthenticatedAvaliacaoDinamicaRouteImport.update({
+    id: '/avaliacao-dinamica',
+    path: '/avaliacao-dinamica',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedClinicasIndexRoute =
@@ -142,12 +144,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
+  '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/dinamica': typeof AuthenticatedDinamicaRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
-  '/postural': typeof AuthenticatedPosturalRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
@@ -163,12 +165,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
+  '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/dinamica': typeof AuthenticatedDinamicaRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
-  '/postural': typeof AuthenticatedPosturalRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
@@ -186,12 +188,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
+  '/_authenticated/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/dinamica': typeof AuthenticatedDinamicaRoute
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
-  '/_authenticated/postural': typeof AuthenticatedPosturalRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/alunos/$id': typeof AuthenticatedAlunosIdRoute
   '/_authenticated/alunos/novo': typeof AuthenticatedAlunosNovoRoute
@@ -209,12 +211,12 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/avaliacao-dinamica'
+    | '/avaliacao-postural'
     | '/configuracoes'
     | '/dashboard'
-    | '/dinamica'
     | '/exercicios'
     | '/nova-avaliacao'
-    | '/postural'
     | '/relatorios'
     | '/alunos/$id'
     | '/alunos/novo'
@@ -230,12 +232,12 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/avaliacao-dinamica'
+    | '/avaliacao-postural'
     | '/configuracoes'
     | '/dashboard'
-    | '/dinamica'
     | '/exercicios'
     | '/nova-avaliacao'
-    | '/postural'
     | '/relatorios'
     | '/alunos/$id'
     | '/alunos/novo'
@@ -252,12 +254,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/sitemap.xml'
+    | '/_authenticated/avaliacao-dinamica'
+    | '/_authenticated/avaliacao-postural'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
-    | '/_authenticated/dinamica'
     | '/_authenticated/exercicios'
     | '/_authenticated/nova-avaliacao'
-    | '/_authenticated/postural'
     | '/_authenticated/relatorios'
     | '/_authenticated/alunos/$id'
     | '/_authenticated/alunos/novo'
@@ -314,13 +316,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/postural': {
-      id: '/_authenticated/postural'
-      path: '/postural'
-      fullPath: '/postural'
-      preLoaderRoute: typeof AuthenticatedPosturalRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/nova-avaliacao': {
       id: '/_authenticated/nova-avaliacao'
       path: '/nova-avaliacao'
@@ -335,13 +330,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExerciciosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dinamica': {
-      id: '/_authenticated/dinamica'
-      path: '/dinamica'
-      fullPath: '/dinamica'
-      preLoaderRoute: typeof AuthenticatedDinamicaRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -354,6 +342,20 @@ declare module '@tanstack/react-router' {
       path: '/configuracoes'
       fullPath: '/configuracoes'
       preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/avaliacao-postural': {
+      id: '/_authenticated/avaliacao-postural'
+      path: '/avaliacao-postural'
+      fullPath: '/avaliacao-postural'
+      preLoaderRoute: typeof AuthenticatedAvaliacaoPosturalRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/avaliacao-dinamica': {
+      id: '/_authenticated/avaliacao-dinamica'
+      path: '/avaliacao-dinamica'
+      fullPath: '/avaliacao-dinamica'
+      preLoaderRoute: typeof AuthenticatedAvaliacaoDinamicaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/clinicas/': {
@@ -423,12 +425,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAvaliacaoDinamicaRoute: typeof AuthenticatedAvaliacaoDinamicaRoute
+  AuthenticatedAvaliacaoPosturalRoute: typeof AuthenticatedAvaliacaoPosturalRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDinamicaRoute: typeof AuthenticatedDinamicaRoute
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
-  AuthenticatedPosturalRoute: typeof AuthenticatedPosturalRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
   AuthenticatedAlunosNovoRoute: typeof AuthenticatedAlunosNovoRoute
@@ -442,12 +444,12 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAvaliacaoDinamicaRoute: AuthenticatedAvaliacaoDinamicaRoute,
+  AuthenticatedAvaliacaoPosturalRoute: AuthenticatedAvaliacaoPosturalRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedDinamicaRoute: AuthenticatedDinamicaRoute,
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
-  AuthenticatedPosturalRoute: AuthenticatedPosturalRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,
   AuthenticatedAlunosNovoRoute: AuthenticatedAlunosNovoRoute,

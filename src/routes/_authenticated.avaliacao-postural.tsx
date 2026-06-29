@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Camera, CheckCircle2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/postural")({
+export const Route = createFileRoute("/_authenticated/avaliacao-postural")({
   head: () => ({ meta: [{ title: "Avaliação Postural | PilatesVision" }] }),
   component: PosturalPage,
 });

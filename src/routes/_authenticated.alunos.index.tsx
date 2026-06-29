@@ -5,8 +5,9 @@ import { ArrowLeft, ArrowRight, Plus, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useStudents } from "@/lib/studentsStore.mock";
-import { mockApi } from "@/lib/mockData";
+import { useStudents } from "@/lib/studentsStore";
+import { useAssessments } from "@/lib/assessmentsStore";
+import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/alunos/")({
   component: AlunosListPage,
@@ -22,15 +23,17 @@ export const Route = createFileRoute("/_authenticated/alunos/")({
   }),
 });
 
-function ageFrom(iso: string): number {
+function ageFrom(iso: string | null): number | null {
+  if (!iso) return null;
   const d = new Date(iso);
   const diff = Date.now() - d.getTime();
   return Math.floor(diff / (365.25 * 24 * 3600 * 1000));
 }
 
 function AlunosListPage() {
-  const students = useStudents();
-  const assessments = mockApi.listAssessments();
+  const { clinicId } = useProfile();
+  const { students, loading } = useStudents(clinicId);
+  const { assessments } = useAssessments(clinicId);
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
@@ -40,12 +43,12 @@ function AlunosListPage() {
       (s) =>
         s.name.toLowerCase().includes(needle) ||
         s.email?.toLowerCase().includes(needle) ||
-        s.goals.some((g) => g.toLowerCase().includes(needle)),
+        (s.goals ?? []).some((g) => g.toLowerCase().includes(needle)),
     );
   }, [students, q]);
 
   const countFor = (id: string) =>
-    assessments.filter((a) => a.studentId === id).length;
+    assessments.filter((a) => a.student_id === id).length;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -75,8 +78,9 @@ function AlunosListPage() {
               Alunos
             </h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              {students.length} aluno{students.length === 1 ? "" : "s"} cadastrado
-              {students.length === 1 ? "" : "s"} na clínica.
+              {loading
+                ? "Carregando alunos…"
+                : `${students.length} aluno${students.length === 1 ? "" : "s"} cadastrado${students.length === 1 ? "" : "s"} na clínica.`}
             </p>
           </div>
           <div className="relative w-full max-w-sm">
@@ -122,7 +126,7 @@ function AlunosListPage() {
                       <div>
                         <div className="font-medium">{s.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {ageFrom(s.birthDate)} anos · {s.gender}
+                          {ageFrom(s.birth_date) ?? "—"} anos · {s.gender ?? "—"}
                         </div>
                       </div>
                     </div>
@@ -130,20 +134,20 @@ function AlunosListPage() {
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-1.5">
-                    {s.goals.slice(0, 2).map((g) => (
+                    {(s.goals ?? []).slice(0, 2).map((g) => (
                       <Badge key={g} variant="secondary" className="text-[10px]">
                         {g}
                       </Badge>
                     ))}
-                    {s.goals.length > 2 && (
+                    {(s.goals ?? []).length > 2 && (
                       <Badge variant="outline" className="text-[10px]">
-                        +{s.goals.length - 2}
+                        +{(s.goals ?? []).length - 2}
                       </Badge>
                     )}
                   </div>
 
                   <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3 text-xs text-muted-foreground">
-                    <span>{s.heightCm} cm · {s.weightKg} kg</span>
+                    <span>{s.height_cm ?? "—"} cm · {s.weight_kg ?? "—"} kg</span>
                     <span>
                       {countFor(s.id)} avaliaç{countFor(s.id) === 1 ? "ão" : "ões"}
                     </span>

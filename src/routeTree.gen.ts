@@ -14,6 +14,7 @@ import { Route as NovaAvaliacaoRouteImport } from './routes/nova-avaliacao'
 import { Route as ExerciciosRouteImport } from './routes/exercicios'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlunosIndexRoute = AlunosIndexRouteImport.update({
+  id: '/alunos/',
+  path: '/alunos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/exercicios': typeof ExerciciosRoute
   '/nova-avaliacao': typeof NovaAvaliacaoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/alunos/': typeof AlunosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/exercicios': typeof ExerciciosRoute
   '/nova-avaliacao': typeof NovaAvaliacaoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/alunos': typeof AlunosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,12 +70,25 @@ export interface FileRoutesById {
   '/exercicios': typeof ExerciciosRoute
   '/nova-avaliacao': typeof NovaAvaliacaoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/alunos/': typeof AlunosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/exercicios' | '/nova-avaliacao' | '/sitemap.xml'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/exercicios'
+    | '/nova-avaliacao'
+    | '/sitemap.xml'
+    | '/alunos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/exercicios' | '/nova-avaliacao' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/auth'
+    | '/exercicios'
+    | '/nova-avaliacao'
+    | '/sitemap.xml'
+    | '/alunos'
   id:
     | '__root__'
     | '/'
@@ -75,6 +96,7 @@ export interface FileRouteTypes {
     | '/exercicios'
     | '/nova-avaliacao'
     | '/sitemap.xml'
+    | '/alunos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -83,6 +105,7 @@ export interface RootRouteChildren {
   ExerciciosRoute: typeof ExerciciosRoute
   NovaAvaliacaoRoute: typeof NovaAvaliacaoRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AlunosIndexRoute: typeof AlunosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alunos/': {
+      id: '/alunos/'
+      path: '/alunos'
+      fullPath: '/alunos/'
+      preLoaderRoute: typeof AlunosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -131,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExerciciosRoute: ExerciciosRoute,
   NovaAvaliacaoRoute: NovaAvaliacaoRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AlunosIndexRoute: AlunosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

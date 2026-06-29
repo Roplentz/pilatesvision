@@ -113,7 +113,6 @@ function AuthedLayout() {
   const { profile, loading: profileLoading } = useProfile();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const ensuringRef = useRef(false);
 
   // Redireciona se a sessão expirar / for revogada em tempo real.

@@ -126,7 +126,7 @@ function AlunosListPage() {
                       <div>
                         <div className="font-medium">{s.name}</div>
                         <div className="text-xs text-muted-foreground">
-                          {ageFrom(s.birthDate)} anos · {s.gender}
+                          {ageFrom(s.birth_date) ?? "—"} anos · {s.gender ?? "—"}
                         </div>
                       </div>
                     </div>

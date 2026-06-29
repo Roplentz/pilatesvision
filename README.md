@@ -32,13 +32,11 @@ src/
   styles.css                      # Design tokens
 
 docs/
-  01_ROADMAP.md                   # Roadmap por fases
-  02_INTEGRATION_ARCHITECTURE.md  # Arquitetura SaaS + API Python + Supabase
-  03_LOVABLE_PROMPT_CONEXOES.md   # Prompt operacional para Lovable
-  04_FASTAPI_CONTRACT.md          # Contrato tecnico da API Python
-
-backend/
-  README.md                       # Diretriz para extrair o motor Python do MVP antigo
+  01_ROADMAP.md                       # Roadmap por fases
+  02_INTEGRATION_ARCHITECTURE.md      # Arquitetura SaaS + API Python + Supabase
+  03_LOVABLE_TAREFAS_CONEXOES.md      # Escopo operacional para Lovable
+  04_FASTAPI_CONTRACT.md              # Contrato tecnico da API Python
+  05_PYTHON_ENGINE_EXTRACTION.md      # Extracao do motor Python do MVP antigo
 ```
 
 ## Rodando localmente

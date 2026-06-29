@@ -1,11 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, ArrowLeft, Loader2, Mail, Lock, User } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -31,16 +34,71 @@ function AuthPage() {
   const mode = search.mode ?? "signin";
   const isSignup = mode === "signup";
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Se já está logado, redireciona
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/alunos" });
+    });
+  }, [navigate]);
 
   const switchMode = (next: "signin" | "signup") => {
     navigate({ to: "/auth", search: { mode: next } });
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+    const name = String(formData.get("name") ?? "").trim();
     setLoading(true);
-    // TODO: integrar com Lovable Cloud quando o backend for ativado.
-    setTimeout(() => setLoading(false), 900);
+    try {
+      if (isSignup) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/alunos`,
+            data: { full_name: name },
+          },
+        });
+        if (error) throw error;
+        toast.success("Conta criada! Você já pode entrar.");
+        navigate({ to: "/alunos" });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("Bem-vindo de volta!");
+        navigate({ to: "/alunos" });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erro ao autenticar";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onGoogle = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message ?? "Falha no login com Google");
+        setGoogleLoading(false);
+        return;
+      }
+      if (result.redirected) return; // browser redirecting
+      navigate({ to: "/alunos" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erro no Google";
+      toast.error(message);
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -103,20 +161,21 @@ function AuthPage() {
           <form onSubmit={onSubmit} className="space-y-4">
             {isSignup && (
               <Field id="name" label="Nome do estúdio" icon={User}>
-                <Input id="name" placeholder="Studio Equilibrium" required />
+                <Input id="name" name="name" placeholder="Studio Equilibrium" required />
               </Field>
             )}
             <Field id="email" label="E-mail" icon={Mail}>
-              <Input id="email" type="email" placeholder="voce@estudio.com" required autoComplete="email" />
+              <Input id="email" name="email" type="email" placeholder="voce@estudio.com" required autoComplete="email" />
             </Field>
             <Field id="password" label="Senha" icon={Lock}>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="••••••••"
                 required
                 autoComplete={isSignup ? "new-password" : "current-password"}
-                minLength={8}
+                minLength={6}
               />
             </Field>
 
@@ -138,6 +197,30 @@ function AuthPage() {
               )}
             </Button>
           </form>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="h-px flex-1 bg-border/60" />
+            ou
+            <div className="h-px flex-1 bg-border/60" />
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="w-full"
+            onClick={onGoogle}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <GoogleIcon className="mr-2 h-4 w-4" />
+                Continuar com Google
+              </>
+            )}
+          </Button>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Ao continuar você concorda com nossos{" "}

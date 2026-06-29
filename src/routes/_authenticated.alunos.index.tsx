@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/alunos/")({
   component: AlunosListPage,
   head: () => ({
     meta: [
-      { title: "Alunos | Kinetik" },
+      { title: "Alunos | PilatesVision" },
       {
         name: "description",
         content:

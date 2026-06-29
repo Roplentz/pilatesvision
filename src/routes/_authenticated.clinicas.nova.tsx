@@ -17,7 +17,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/clinicas/nova")({
   component: NovaClinicaPage,
   head: () => ({
-    meta: [{ title: "Nova clínica | Kinetik" }],
+    meta: [{ title: "Nova clínica | PilatesVision" }],
   }),
 });
 
@@ -104,7 +104,7 @@ function NovaClinicaPage() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Studio Kinetik São Paulo"
+                placeholder="Studio PilatesVision São Paulo"
                 className="mt-1.5"
               />
             </div>

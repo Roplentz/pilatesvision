@@ -26,7 +26,7 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
   component: NovaAvaliacaoPage,
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Nova avaliação | Kinetik" }] }),
+  head: () => ({ meta: [{ title: "Nova avaliação | PilatesVision" }] }),
 });
 
 function NovaAvaliacaoPage() {

@@ -12,11 +12,11 @@ export const Route = createFileRoute("/_authenticated/clinicas/")({
   component: ClinicasListPage,
   head: () => ({
     meta: [
-      { title: "Clínicas | Kinetik" },
+      { title: "Clínicas | PilatesVision" },
       {
         name: "description",
         content:
-          "Rede de clínicas conectadas ao Kinetik: planos, contato e equipe.",
+          "Rede de clínicas conectadas ao PilatesVision: planos, contato e equipe.",
       },
     ],
   }),
@@ -79,7 +79,7 @@ function ClinicasListPage() {
             </h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               {clinics.length} clínica{clinics.length === 1 ? "" : "s"} conectada
-              {clinics.length === 1 ? "" : "s"} ao Kinetik.
+              {clinics.length === 1 ? "" : "s"} ao PilatesVision.
             </p>
           </div>
           <div className="relative w-full max-w-sm">

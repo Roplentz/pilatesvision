@@ -1,5 +1,5 @@
 /**
- * Modelos de domínio do Kinetik.
+ * Modelos de domínio do PilatesVision.
  *
  * Estes tipos representam o shape final esperado das entidades quando
  * a integração com Supabase for ativada. Servem como contrato único

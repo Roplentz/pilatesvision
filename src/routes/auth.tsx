@@ -18,10 +18,10 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Entrar — Kinetik" },
-      { name: "description", content: "Acesse sua conta Kinetik ou crie um estúdio em minutos." },
-      { property: "og:title", content: "Entrar — Kinetik" },
-      { property: "og:description", content: "Acesse sua conta Kinetik ou crie um estúdio." },
+      { title: "Entrar — PilatesVision" },
+      { name: "description", content: "Acesse sua conta PilatesVision ou crie um estúdio em minutos." },
+      { property: "og:title", content: "Entrar — PilatesVision" },
+      { property: "og:description", content: "Acesse sua conta PilatesVision ou crie um estúdio." },
       { name: "robots", content: "noindex" },
     ],
   }),

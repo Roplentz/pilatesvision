@@ -17,13 +17,13 @@ import heroImage from "@/assets/hero-pilates.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Kinetik — Avaliação de Pilates por Visão Computacional" },
+      { title: "PilatesVision — Avaliação de Pilates por Visão Computacional" },
       {
         name: "description",
         content:
           "IA que filma, analisa e devolve avaliações posturais e biomecânicas precisas para estúdios de Pilates em segundos.",
       },
-      { property: "og:title", content: "Kinetik — IA para avaliação de Pilates" },
+      { property: "og:title", content: "PilatesVision — IA para avaliação de Pilates" },
       {
         property: "og:description",
         content:
@@ -83,7 +83,7 @@ function Nav() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2">
           <Logo />
-          <span className="font-display text-lg font-semibold tracking-tight">Kinetik</span>
+          <span className="font-display text-lg font-semibold tracking-tight">PilatesVision</span>
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <a href="#produto" className="transition hover:text-foreground">Produto</a>
@@ -128,7 +128,7 @@ function Hero() {
             className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-surface/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
           >
             <Sparkles className="h-3 w-3 text-primary" />
-            IA clínica para estúdios de Pilates
+            Pilates 5.0
           </motion.div>
 
           <motion.h1
@@ -137,8 +137,8 @@ function Hero() {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="mt-6 font-display text-5xl font-semibold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
           >
-            Avaliação postural{" "}
-            <span className="text-gradient">precisa em segundos.</span>
+            Movimento inteligente{" "}
+            <span className="text-gradient">para clínicas de Pilates.</span>
           </motion.h1>
 
           <motion.p
@@ -147,7 +147,7 @@ function Hero() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="mt-6 max-w-xl text-lg text-muted-foreground"
           >
-            A Kinetik usa visão computacional para transformar um vídeo de celular em
+            A PilatesVision usa visão computacional para transformar um vídeo de celular em
             laudo biomecânico completo. Pensada para o seu estúdio, do anamnese ao relatório.
           </motion.p>
 
@@ -350,7 +350,7 @@ function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground md:flex-row">
         <div className="flex items-center gap-2">
           <Logo />
-          <span className="font-display font-medium text-foreground">Kinetik</span>
+          <span className="font-display font-medium text-foreground">PilatesVision</span>
           <span>© {new Date().getFullYear()}</span>
         </div>
         <div className="flex gap-6">

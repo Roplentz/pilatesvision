@@ -23,7 +23,7 @@ import type {
 
 export const mockClinic: Clinic = {
   id: "clinic-001",
-  name: "Studio Kinetik São Paulo",
+  name: "Studio PilatesVision São Paulo",
   slug: "kinetik-sp",
   email: "contato@kinetik.studio",
   phone: "+55 11 99999-0000",

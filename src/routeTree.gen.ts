@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedPosturalRouteImport } from './routes/_authenticated.postural'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
+import { Route as AuthenticatedDinamicaRouteImport } from './routes/_authenticated.dinamica'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedClinicasIndexRouteImport } from './routes/_authenticated.clinicas.index'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
@@ -60,6 +61,11 @@ const AuthenticatedNovaAvaliacaoRoute =
 const AuthenticatedExerciciosRoute = AuthenticatedExerciciosRouteImport.update({
   id: '/exercicios',
   path: '/exercicios',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDinamicaRoute = AuthenticatedDinamicaRouteImport.update({
+  id: '/dinamica',
+  path: '/dinamica',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dinamica': typeof AuthenticatedDinamicaRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/postural': typeof AuthenticatedPosturalRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dinamica': typeof AuthenticatedDinamicaRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/postural': typeof AuthenticatedPosturalRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dinamica': typeof AuthenticatedDinamicaRoute
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/postural': typeof AuthenticatedPosturalRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/dashboard'
+    | '/dinamica'
     | '/exercicios'
     | '/nova-avaliacao'
     | '/postural'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/dashboard'
+    | '/dinamica'
     | '/exercicios'
     | '/nova-avaliacao'
     | '/postural'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/_authenticated/dashboard'
+    | '/_authenticated/dinamica'
     | '/_authenticated/exercicios'
     | '/_authenticated/nova-avaliacao'
     | '/_authenticated/postural'
@@ -289,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/exercicios'
       fullPath: '/exercicios'
       preLoaderRoute: typeof AuthenticatedExerciciosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dinamica': {
+      id: '/_authenticated/dinamica'
+      path: '/dinamica'
+      fullPath: '/dinamica'
+      preLoaderRoute: typeof AuthenticatedDinamicaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -366,6 +385,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDinamicaRoute: typeof AuthenticatedDinamicaRoute
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
   AuthenticatedPosturalRoute: typeof AuthenticatedPosturalRoute
@@ -382,6 +402,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDinamicaRoute: AuthenticatedDinamicaRoute,
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
   AuthenticatedPosturalRoute: AuthenticatedPosturalRoute,

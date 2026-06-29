@@ -388,7 +388,19 @@ function StepCard({
   );
 }
 
-function FichaStep({ ficha, setFicha }: { ficha: Ficha; setFicha: (f: Ficha) => void }) {
+type StudentOption = { id: string; name: string; age: number | null };
+
+function FichaStep({
+  ficha,
+  setFicha,
+  students,
+  loading,
+}: {
+  ficha: Ficha;
+  setFicha: (f: Ficha) => void;
+  students: StudentOption[];
+  loading: boolean;
+}) {
   return (
     <StepCard title="Ficha do aluno" desc="Comece com os dados essenciais. Eles aparecem no relatório final.">
       <div className="grid gap-6 md:grid-cols-2">
@@ -396,14 +408,20 @@ function FichaStep({ ficha, setFicha }: { ficha: Ficha; setFicha: (f: Ficha) => 
           <Label htmlFor="aluno" className="text-xs font-medium text-muted-foreground">Aluno</Label>
           <Select value={ficha.alunoId} onValueChange={(v) => setFicha({ ...ficha, alunoId: v })}>
             <SelectTrigger id="aluno" className="h-11 bg-background/60">
-              <SelectValue placeholder="Selecione o aluno" />
+              <SelectValue placeholder={loading ? "Carregando alunos…" : "Selecione o aluno"} />
             </SelectTrigger>
             <SelectContent>
-              {ALUNOS.map((a) => (
-                <SelectItem key={a.id} value={a.id}>
-                  {a.name} · {a.age} anos
-                </SelectItem>
-              ))}
+              {students.length === 0 && !loading ? (
+                <div className="px-2 py-3 text-xs text-muted-foreground">
+                  Nenhum aluno cadastrado.
+                </div>
+              ) : (
+                students.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.name}{a.age != null ? ` · ${a.age} anos` : ""}
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
         </div>

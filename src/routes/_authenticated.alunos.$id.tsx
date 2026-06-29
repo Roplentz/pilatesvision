@@ -3,6 +3,7 @@ import {
   Activity,
   ArrowLeft,
   CalendarDays,
+  Loader2,
   Mail,
   Phone,
   Ruler,
@@ -11,8 +12,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getStudent } from "@/lib/studentsStore.mock";
-import { mockApi } from "@/lib/mockData";
+import { useStudent } from "@/lib/studentsStore";
+import { useStudentAssessments } from "@/lib/assessmentsStore";
 
 export const Route = createFileRoute("/_authenticated/alunos/$id")({
   component: AlunoDetailPage,
@@ -21,7 +22,8 @@ export const Route = createFileRoute("/_authenticated/alunos/$id")({
   }),
 });
 
-function ageFrom(iso: string): number {
+function ageFrom(iso: string | null): number | null {
+  if (!iso) return null;
   const d = new Date(iso);
   return Math.floor((Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000));
 }
@@ -43,7 +45,16 @@ const stageLabel: Record<string, string> = {
 
 function AlunoDetailPage() {
   const { id } = Route.useParams();
-  const student = getStudent(id);
+  const { student, loading } = useStudent(id);
+  const { assessments } = useStudentAssessments(id);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!student) {
     return (
@@ -60,9 +71,7 @@ function AlunoDetailPage() {
     );
   }
 
-  const assessments = mockApi
-    .listAssessments()
-    .filter((a) => a.studentId === student.id);
+  const age = ageFrom(student.birth_date);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -96,8 +105,9 @@ function AlunoDetailPage() {
               {student.name}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              {ageFrom(student.birthDate)} anos · {student.gender} · cadastrado em{" "}
-              {new Date(student.createdAt).toLocaleDateString("pt-BR")}
+              {age != null ? `${age} anos · ` : ""}
+              {student.gender ?? "—"} · cadastrado em{" "}
+              {new Date(student.created_at).toLocaleDateString("pt-BR")}
             </p>
           </div>
         </div>
@@ -118,7 +128,9 @@ function AlunoDetailPage() {
               </li>
               <li className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                {new Date(student.birthDate).toLocaleDateString("pt-BR")}
+                {student.birth_date
+                  ? new Date(student.birth_date).toLocaleDateString("pt-BR")
+                  : "—"}
               </li>
             </ul>
           </div>
@@ -130,11 +142,11 @@ function AlunoDetailPage() {
             <ul className="mt-3 space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <Ruler className="h-4 w-4 text-muted-foreground" />
-                {student.heightCm} cm
+                {student.height_cm != null ? `${student.height_cm} cm` : "—"}
               </li>
               <li className="flex items-center gap-2">
                 <Weight className="h-4 w-4 text-muted-foreground" />
-                {student.weightKg} kg
+                {student.weight_kg != null ? `${student.weight_kg} kg` : "—"}
               </li>
             </ul>
           </div>
@@ -144,7 +156,7 @@ function AlunoDetailPage() {
               Objetivos
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {student.goals.length === 0 ? (
+              {!student.goals || student.goals.length === 0 ? (
                 <span className="text-sm text-muted-foreground">—</span>
               ) : (
                 student.goals.map((g) => (
@@ -158,13 +170,13 @@ function AlunoDetailPage() {
           </div>
         </div>
 
-        {(student.medicalHistory || student.contraindications?.length) && (
+        {(student.medical_history || student.contraindications?.length) && (
           <div className="mt-6 rounded-xl border border-border/60 bg-card/40 p-5">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">
               Histórico clínico
             </div>
-            {student.medicalHistory && (
-              <p className="mt-3 text-sm leading-relaxed">{student.medicalHistory}</p>
+            {student.medical_history && (
+              <p className="mt-3 text-sm leading-relaxed">{student.medical_history}</p>
             )}
             {student.contraindications && student.contraindications.length > 0 && (
               <div className="mt-3">
@@ -192,25 +204,28 @@ function AlunoDetailPage() {
           ) : (
             <ul className="mt-4 space-y-3">
               {assessments.map((a) => (
-                <li
-                  key={a.id}
-                  className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 px-5 py-4"
-                >
-                  <div>
-                    <div className="text-sm font-medium">
-                      {new Date(a.createdAt).toLocaleDateString("pt-BR")} ·{" "}
-                      {stageLabel[a.currentStage]}
-                    </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      Dor: {a.painLevel}/10 · {a.goals.join(", ") || "—"}
-                    </div>
-                  </div>
-                  <Badge
-                    variant={a.status === "completed" ? "default" : "secondary"}
-                    className="text-[11px]"
+                <li key={a.id}>
+                  <Link
+                    to="/avaliacoes/$id"
+                    params={{ id: a.id }}
+                    className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 px-5 py-4 transition hover:border-primary/60"
                   >
-                    {statusLabel[a.status]}
-                  </Badge>
+                    <div>
+                      <div className="text-sm font-medium">
+                        {new Date(a.created_at).toLocaleDateString("pt-BR")} ·{" "}
+                        {stageLabel[a.current_stage] ?? a.current_stage}
+                      </div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        Dor: {a.pain_level ?? 0}/10 · {(a.goals ?? []).join(", ") || "—"}
+                      </div>
+                    </div>
+                    <Badge
+                      variant={a.status === "completed" ? "default" : "secondary"}
+                      className="text-[11px]"
+                    >
+                      {statusLabel[a.status] ?? a.status}
+                    </Badge>
+                  </Link>
                 </li>
               ))}
             </ul>

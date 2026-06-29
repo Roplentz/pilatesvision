@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, ArrowLeft, ArrowRight, Plus, Search } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, Loader2, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAssessments } from "@/lib/assessmentsStore.mock";
-import { useStudents } from "@/lib/studentsStore.mock";
+import { useAssessments } from "@/lib/assessmentsStore";
+import { useStudents } from "@/lib/studentsStore";
+import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/")({
   component: AvaliacoesListPage,
@@ -45,8 +46,9 @@ const stageLabel: Record<string, string> = {
 };
 
 function AvaliacoesListPage() {
-  const assessments = useAssessments();
-  const students = useStudents();
+  const { clinicId, loading: profileLoading } = useProfile();
+  const { assessments, loading: assessmentsLoading } = useAssessments(clinicId);
+  const { students } = useStudents(clinicId);
   const [q, setQ] = useState("");
   const [studentFilter, setStudentFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -59,17 +61,22 @@ function AvaliacoesListPage() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return assessments.filter((a) => {
-      if (studentFilter !== "all" && a.studentId !== studentFilter) return false;
+      if (studentFilter !== "all" && a.student_id !== studentFilter) return false;
       if (statusFilter !== "all" && a.status !== statusFilter) return false;
       if (!needle) return true;
-      const name = studentMap[a.studentId]?.name.toLowerCase() ?? "";
+      const name =
+        a.students?.name?.toLowerCase() ??
+        studentMap[a.student_id]?.name.toLowerCase() ??
+        "";
       return (
         name.includes(needle) ||
-        a.mainComplaint?.toLowerCase().includes(needle) ||
-        a.goals.some((g) => g.toLowerCase().includes(needle))
+        a.main_complaint?.toLowerCase().includes(needle) ||
+        (a.goals ?? []).some((g) => g.toLowerCase().includes(needle))
       );
     });
   }, [assessments, q, studentFilter, statusFilter, studentMap]);
+
+  const loading = profileLoading || assessmentsLoading;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -139,14 +146,19 @@ function AvaliacoesListPage() {
           </Select>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center text-sm text-muted-foreground">
             Nenhuma avaliação encontrada.
           </div>
         ) : (
           <ul className="space-y-3">
             {filtered.map((a, i) => {
-              const student = studentMap[a.studentId];
+              const studentName =
+                a.students?.name ?? studentMap[a.student_id]?.name ?? "Aluno";
               return (
                 <motion.li
                   key={a.id}
@@ -161,19 +173,18 @@ function AvaliacoesListPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
-                        {(student?.name ?? "?")
+                        {studentName
                           .split(" ")
                           .slice(0, 2)
                           .map((p) => p[0])
                           .join("")}
                       </div>
                       <div>
-                        <div className="font-medium">
-                          {student?.name ?? "Aluno removido"}
-                        </div>
+                        <div className="font-medium">{studentName}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">
-                          {new Date(a.createdAt).toLocaleDateString("pt-BR")} ·
-                          Etapa: {stageLabel[a.currentStage]} · Dor {a.painLevel}/10
+                          {new Date(a.created_at).toLocaleDateString("pt-BR")} ·
+                          Etapa: {stageLabel[a.current_stage] ?? a.current_stage} · Dor{" "}
+                          {a.pain_level ?? 0}/10
                         </div>
                       </div>
                     </div>
@@ -182,7 +193,7 @@ function AvaliacoesListPage() {
                         variant={a.status === "completed" ? "default" : "secondary"}
                         className="text-[11px]"
                       >
-                        {statusLabel[a.status]}
+                        {statusLabel[a.status] ?? a.status}
                       </Badge>
                       <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
                     </div>

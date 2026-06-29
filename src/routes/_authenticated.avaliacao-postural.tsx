@@ -74,6 +74,10 @@ function PosturalPage() {
           </CardContent>
         </Card>
       )}
+
+      <p className="rounded-md border border-border/60 bg-surface/40 p-3 text-xs text-muted-foreground">
+        Os indicadores são apoio à decisão profissional e não substituem avaliação clínica.
+      </p>
     </div>
   );
 }

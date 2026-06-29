@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getStudent } from "@/lib/studentsStore";
+import { getStudent } from "@/lib/studentsStore.mock";
 import { mockApi } from "@/lib/mockData";
 
 export const Route = createFileRoute("/_authenticated/alunos/$id")({

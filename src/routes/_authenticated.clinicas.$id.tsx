@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getClinic } from "@/lib/clinicsStore";
+import { getClinic } from "@/lib/clinicsStore.mock";
 import { mockApi } from "@/lib/mockData";
 
 export const Route = createFileRoute("/_authenticated/clinicas/$id")({

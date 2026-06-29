@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Building2, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useClinics } from "@/lib/clinicsStore";
+import { useClinics } from "@/lib/clinicsStore.mock";
 import { mockApi } from "@/lib/mockData";
 
 export const Route = createFileRoute("/_authenticated/clinicas/")({

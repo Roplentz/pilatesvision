@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addClinic } from "@/lib/clinicsStore";
+import { addClinic } from "@/lib/clinicsStore.mock";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/clinicas/nova")({

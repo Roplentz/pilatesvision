@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAssessments } from "@/lib/assessmentsStore";
-import { useStudents } from "@/lib/studentsStore";
+import { useAssessments } from "@/lib/assessmentsStore.mock";
+import { useStudents } from "@/lib/studentsStore.mock";
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/")({
   component: AvaliacoesListPage,

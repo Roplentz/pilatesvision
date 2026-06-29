@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addStudent } from "@/lib/studentsStore.mock";
+import { createStudent } from "@/lib/studentsStore";
+import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/alunos/novo")({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/alunos/novo")({
 
 function NovoAlunoPage() {
   const navigate = useNavigate();
+  const { clinicId, loading: profileLoading } = useProfile();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -33,29 +35,42 @@ function NovoAlunoPage() {
   const [weightKg, setWeightKg] = useState("");
   const [goals, setGoals] = useState("");
   const [medical, setMedical] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !birthDate) {
       toast.error("Nome e data de nascimento são obrigatórios.");
       return;
     }
-    const created = addStudent({
-      name: name.trim(),
-      email: email.trim() || undefined,
-      phone: phone.trim() || undefined,
-      birthDate,
-      gender,
-      heightCm: Number(heightCm) || 0,
-      weightKg: Number(weightKg) || 0,
-      goals: goals
-        .split(",")
-        .map((g) => g.trim())
-        .filter(Boolean),
-      medicalHistory: medical.trim() || undefined,
-    });
-    toast.success("Aluno cadastrado com sucesso.");
-    navigate({ to: "/alunos/$id", params: { id: created.id } });
+    if (!clinicId) {
+      toast.error("Sua conta ainda não está vinculada a uma clínica.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const created = await createStudent({
+        clinic_id: clinicId,
+        name: name.trim(),
+        email: email.trim() || null,
+        phone: phone.trim() || null,
+        birth_date: birthDate,
+        gender,
+        height_cm: Number(heightCm) || null,
+        weight_kg: Number(weightKg) || null,
+        goals: goals
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean),
+        medical_history: medical.trim() || null,
+      });
+      toast.success("Aluno cadastrado com sucesso.");
+      navigate({ to: "/alunos/$id", params: { id: created.id } });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao cadastrar aluno.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -80,7 +95,7 @@ function NovoAlunoPage() {
             Cadastrar aluno
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Os dados ficam salvos apenas nesta sessão (mock local).
+            Os dados são salvos na clínica vinculada ao seu perfil.
           </p>
         </div>
 
@@ -193,8 +208,8 @@ function NovoAlunoPage() {
                 Cancelar
               </Button>
             </Link>
-            <Button type="submit" variant="hero">
-              Cadastrar aluno
+            <Button type="submit" variant="hero" disabled={submitting || profileLoading}>
+              {submitting ? "Salvando…" : "Cadastrar aluno"}
             </Button>
           </div>
         </form>

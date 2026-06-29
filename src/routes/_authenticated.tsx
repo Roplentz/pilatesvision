@@ -1,5 +1,16 @@
-import { createFileRoute, Outlet, Link, useRouterState, redirect } from "@tanstack/react-router";
+import { useEffect } from "react";
+import {
+  createFileRoute,
+  Outlet,
+  Link,
+  useRouterState,
+  useNavigate,
+  redirect,
+} from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   SidebarProvider,
   Sidebar,
@@ -23,6 +34,8 @@ import {
   FileText,
   Settings,
   Sparkles,
+  Loader2,
+  LogOut,
 } from "lucide-react";
 
 const menu = [
@@ -79,6 +92,30 @@ function AppSidebar() {
 }
 
 function AuthedLayout() {
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  // Redireciona se a sessão expirar / for revogada em tempo real.
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [loading, user, navigate]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Sessão encerrada");
+    navigate({ to: "/auth", replace: true });
+  };
+
+  if (loading) {
+    return (
+      <div className="grid min-h-screen w-full place-items-center bg-background text-foreground">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background text-foreground">
@@ -89,6 +126,22 @@ function AuthedLayout() {
             <span className="font-display text-sm font-medium tracking-tight text-muted-foreground">
               PilatesVision · Movimento inteligente para clínicas de Pilates
             </span>
+            <div className="ml-auto flex items-center gap-3">
+              {user?.email ? (
+                <span className="hidden sm:inline text-xs text-muted-foreground">
+                  {user.email}
+                </span>
+              ) : null}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="h-8 gap-1.5"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sair
+              </Button>
+            </div>
           </header>
           <main className="flex-1 min-w-0">
             <Outlet />
@@ -102,14 +155,14 @@ function AuthedLayout() {
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
       throw redirect({
         to: "/auth",
         search: { redirect: location.href },
       });
     }
-    return { user: data.user };
+    return { session: data.session, user: data.session.user };
   },
   component: AuthedLayout,
 });

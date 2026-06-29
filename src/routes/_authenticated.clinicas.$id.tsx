@@ -92,7 +92,7 @@ function ClinicaDetailPage() {
           </div>
           <Badge variant="secondary" className="text-[11px]">
             <Sparkles className="mr-1 h-3 w-3" />
-            Plano {planLabel[clinic.plan] ?? clinic.plan}
+            Plano {(clinic.plan && planLabel[clinic.plan]) ?? clinic.plan ?? "starter"}
           </Badge>
         </div>
 

@@ -1,0 +1,1 @@
+Sprint 1.2 criado. Ver issue 1 para execução.

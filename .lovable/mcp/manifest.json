@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://hcoaemgumdbexvmfcnwj.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "pilatesvision-mcp",
+      "version": "0.1.0",
+      "title": "PilatesVision"
+    },
+    "tools": [
+      {
+        "name": "list_students",
+        "title": "Listar alunos",
+        "description": "Lista os alunos cadastrados na clínica do usuário autenticado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Máximo de alunos a retornar (padrão 25).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_student",
+        "title": "Cadastrar aluno",
+        "description": "Cria um novo aluno na clínica do usuário autenticado.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "full_name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Nome completo do aluno."
+            },
+            "email": {
+              "description": "E-mail de contato.",
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+            },
+            "phone": {
+              "description": "Telefone de contato.",
+              "type": "string"
+            },
+            "birth_date": {
+              "description": "Data de nascimento em formato YYYY-MM-DD.",
+              "type": "string"
+            },
+            "notes": {
+              "description": "Observações clínicas iniciais.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "full_name"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_assessments",
+        "title": "Listar avaliações",
+        "description": "Lista avaliações posturais/dinâmicas/exercício, opcionalmente filtradas por aluno.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "student_id": {
+              "description": "ID do aluno para filtrar.",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_assessment",
+        "title": "Detalhe da avaliação",
+        "description": "Retorna a avaliação com seus resultados posturais/movimento, exercícios prescritos e relatório.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "assessment_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "ID da avaliação."
+            }
+          },
+          "required": [
+            "assessment_id"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

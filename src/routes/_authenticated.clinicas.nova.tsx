@@ -58,6 +58,7 @@ function NovaClinicaPage() {
         email: email.trim() || null,
         phone: phone.trim() || null,
         plan,
+        owner_user_id: user?.id ?? null,
         address:
           city || street
             ? {

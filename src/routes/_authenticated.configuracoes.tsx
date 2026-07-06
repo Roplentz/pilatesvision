@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { useClinic } from "@/lib/clinicsStore";
+import { updateClinic, useClinic } from "@/lib/clinicsStore";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações | PilatesVision" }] }),
@@ -36,11 +36,9 @@ function ConfigPage() {
   const { profile, loading: profileLoading } = useProfile();
   const { clinic, clinicId, loading: clinicLoading } = useClinic(user?.id);
 
-  // Profile form
   const [fullName, setFullName] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
 
-  // Clinic form
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -63,8 +61,8 @@ function ConfigPage() {
     setPlan((clinic.plan as "starter" | "pro" | "enterprise") ?? "starter");
     const addr = (clinic.address ?? null) as Address | null;
     setStreet(addr?.street ?? "");
-    setCity(addr?.city ?? "");
-    setStateUf(addr?.state ?? "");
+    setCity(clinic.city ?? addr?.city ?? "");
+    setStateUf(clinic.state ?? addr?.state ?? "");
     setZip(addr?.zip ?? "");
   }, [clinic]);
 
@@ -84,29 +82,37 @@ function ConfigPage() {
   const saveClinic = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clinicId) return;
+    if (!name.trim()) {
+      toast.error("Informe o nome da clínica.");
+      return;
+    }
     setSavingClinic(true);
-    const { error } = await supabase
-      .from("clinics")
-      .update({
+    try {
+      const normalizedState = stateUf.trim().toUpperCase() || null;
+      await updateClinic(clinicId, {
         name: name.trim(),
         email: email.trim() || null,
         phone: phone.trim() || null,
         plan,
+        city: city.trim() || null,
+        state: normalizedState,
         address:
-          street || city || stateUf || zip
+          street.trim() || city.trim() || normalizedState || zip.trim()
             ? {
                 street: street.trim(),
                 city: city.trim(),
-                state: stateUf.trim(),
+                state: normalizedState ?? undefined,
                 zip: zip.trim(),
                 country: "BR",
               }
             : null,
-      })
-      .eq("id", clinicId);
-    setSavingClinic(false);
-    if (error) toast.error(error.message);
-    else toast.success("Clínica atualizada.");
+      });
+      toast.success("Clínica atualizada.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao atualizar clínica.");
+    } finally {
+      setSavingClinic(false);
+    }
   };
 
   const loading = profileLoading || clinicLoading;
@@ -128,7 +134,6 @@ function ConfigPage() {
         </div>
       ) : (
         <>
-          {/* Perfil */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -160,7 +165,6 @@ function ConfigPage() {
             </form>
           </Card>
 
-          {/* Clínica */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">

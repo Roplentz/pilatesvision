@@ -122,8 +122,7 @@ function AlunosListPage() {
             </div>
           )
         ) : (
-          <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
-            <div className="overflow-x-auto rounded-xl border border-border/60 bg-card/40">
+          <div className="overflow-x-auto rounded-xl border border-border/60 bg-card/40">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-border/60 text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
@@ -183,7 +182,6 @@ function AlunosListPage() {
                   })}
                 </tbody>
               </table>
-            </div>
           </div>
         )}
       </main>

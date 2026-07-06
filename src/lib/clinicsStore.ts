@@ -17,7 +17,10 @@ export interface ClinicRow {
   email: string | null;
   phone: string | null;
   address: ClinicAddress | null;
+  city?: string | null;
+  state?: string | null;
   plan: string | null;
+  owner_user_id?: string | null;
   created_at: string;
 }
 
@@ -28,6 +31,9 @@ export interface NewClinicInput {
   phone?: string | null;
   plan?: string;
   address?: ClinicAddress | null;
+  city?: string | null;
+  state?: string | null;
+  owner_user_id?: string | null;
 }
 
 export function useClinic(userId: string | null | undefined) {
@@ -128,6 +134,9 @@ export async function createClinic(input: NewClinicInput): Promise<ClinicRow> {
     phone: input.phone ?? null,
     plan: input.plan ?? "starter",
     address: input.address ?? null,
+    city: input.city ?? input.address?.city ?? null,
+    state: input.state ?? input.address?.state ?? null,
+    owner_user_id: input.owner_user_id ?? null,
   };
   const { data, error } = await supabase
     .from("clinics")

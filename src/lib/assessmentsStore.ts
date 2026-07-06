@@ -10,11 +10,38 @@ export type NewAssessmentInput = Omit<
   Database["public"]["Tables"]["assessments"]["Insert"],
   "id" | "created_at" | "updated_at"
 >;
+export type UpdateAssessmentInput = Database["public"]["Tables"]["assessments"]["Update"];
 
 export type PosturalResultRow = Database["public"]["Tables"]["postural_results"]["Row"];
 export type MovementResultRow = Database["public"]["Tables"]["movement_results"]["Row"];
+export type ExerciseResultRow = Database["public"]["Tables"]["exercise_results"]["Row"];
 export type PrescribedExerciseRow = Database["public"]["Tables"]["prescribed_exercises"]["Row"];
 export type ReportRow = Database["public"]["Tables"]["reports"]["Row"];
+
+export type AssessmentType = "postural" | "dynamic" | "exercise" | "complete";
+export type AssessmentStatus = "draft" | "in_review" | "finalized";
+
+export type PosturalView = "anterior" | "posterior" | "right_lateral" | "left_lateral";
+export type Severity = "leve" | "moderada" | "importante";
+export type ControlLevel = "baixo" | "moderado" | "bom" | "excelente";
+
+export type PosturalFinding = {
+  region: string;
+  finding: string;
+  severity: Severity;
+  notes?: string;
+};
+export type MovementCompensation = {
+  movement?: string;
+  compensation: string;
+  severity: Severity;
+  notes?: string;
+};
+export type ExerciseCompensation = {
+  compensation: string;
+  severity: Severity;
+  notes?: string;
+};
 
 /** Lista avaliações de uma clínica, incluindo o nome do aluno relacionado. */
 export function useAssessments(clinicId: string | null | undefined) {
@@ -55,6 +82,128 @@ export async function createAssessment(input: NewAssessmentInput): Promise<Asses
   const { data, error } = await supabase.from("assessments").insert(input).select("*").single();
   if (error) throw new Error(error.message);
   return data as AssessmentRow;
+}
+
+/** Atualiza uma avaliação (usada enquanto rascunho). */
+export async function updateAssessment(
+  id: string,
+  patch: UpdateAssessmentInput,
+): Promise<AssessmentRow> {
+  const { data, error } = await supabase
+    .from("assessments")
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as AssessmentRow;
+}
+
+/** Finaliza avaliação: status='finalized' e finalized_at=now(). */
+export async function finalizeAssessment(id: string): Promise<AssessmentRow> {
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("assessments")
+    .update({ status: "finalized", finalized_at: now, updated_at: now })
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as AssessmentRow;
+}
+
+/** Insere um achado postural (uma vista por registro). */
+export async function insertPosturalResult(
+  input: Database["public"]["Tables"]["postural_results"]["Insert"],
+): Promise<PosturalResultRow> {
+  const { data, error } = await supabase
+    .from("postural_results")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as PosturalResultRow;
+}
+
+/** Insere um resultado dinâmico. */
+export async function insertMovementResult(
+  input: Database["public"]["Tables"]["movement_results"]["Insert"],
+): Promise<MovementResultRow> {
+  const { data, error } = await supabase
+    .from("movement_results")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as MovementResultRow;
+}
+
+/** Insere um resultado por exercício. */
+export async function insertExerciseResult(
+  input: Database["public"]["Tables"]["exercise_results"]["Insert"],
+): Promise<ExerciseResultRow> {
+  const { data, error } = await supabase
+    .from("exercise_results")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data as ExerciseResultRow;
+}
+
+/** Lista todos os resultados posturais/dinâmicos/exercício vinculados à avaliação. */
+export function useAssessmentResults(assessmentId: string | null | undefined) {
+  const [postural, setPostural] = useState<PosturalResultRow[]>([]);
+  const [movement, setMovement] = useState<MovementResultRow[]>([]);
+  const [exercise, setExercise] = useState<ExerciseResultRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(Boolean(assessmentId));
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    if (!assessmentId) {
+      setPostural([]);
+      setMovement([]);
+      setExercise([]);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    Promise.all([
+      supabase
+        .from("postural_results")
+        .select("*")
+        .eq("assessment_id", assessmentId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("movement_results")
+        .select("*")
+        .eq("assessment_id", assessmentId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("exercise_results")
+        .select("*")
+        .eq("assessment_id", assessmentId)
+        .order("created_at", { ascending: true }),
+    ]).then(([p, m, e]) => {
+      if (cancelled) return;
+      setPostural((p.data ?? []) as PosturalResultRow[]);
+      setMovement((m.data ?? []) as MovementResultRow[]);
+      setExercise((e.data ?? []) as ExerciseResultRow[]);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [assessmentId, reloadKey]);
+
+  return {
+    postural,
+    movement,
+    exercise,
+    loading,
+    reload: () => setReloadKey((k) => k + 1),
+  };
 }
 
 /** Busca uma avaliação pelo id, com o nome do aluno. */

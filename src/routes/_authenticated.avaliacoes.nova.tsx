@@ -15,8 +15,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStudents } from "@/lib/studentsStore";
-import { createAssessment } from "@/lib/assessmentsStore";
+import { createAssessment, type AssessmentType } from "@/lib/assessmentsStore";
 import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const searchSchema = z.object({ studentId: z.string().optional() });
@@ -27,43 +28,49 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
   head: () => ({ meta: [{ title: "Nova avaliação | PilatesVision" }] }),
 });
 
+const typeOptions: { value: AssessmentType; label: string; hint: string }[] = [
+  { value: "postural", label: "Postural", hint: "Análise estática por vistas" },
+  { value: "dynamic", label: "Dinâmica", hint: "Movimento e compensações" },
+  { value: "exercise", label: "Por exercício", hint: "Execução em aparelhos" },
+  { value: "complete", label: "Completa", hint: "Postural + dinâmica + exercícios" },
+];
+
 function NovaAvaliacaoPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const { user } = useAuth();
   const { clinicId, loading: profileLoading } = useProfile();
   const { students, loading: studentsLoading } = useStudents(clinicId);
 
   const [studentId, setStudentId] = useState(search.studentId ?? "");
-  const [painLevel, setPainLevel] = useState(0);
+  const [type, setType] = useState<AssessmentType>("postural");
+  const [title, setTitle] = useState("");
+  const [objective, setObjective] = useState("");
   const [mainComplaint, setMainComplaint] = useState("");
-  const [observations, setObservations] = useState("");
-  const [goals, setGoals] = useState("");
+  const [painScore, setPainScore] = useState(0);
+  const [clinicalNotes, setClinicalNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clinicId) {
-      toast.error("Perfil sem clínica vinculada.");
-      return;
-    }
-    if (!studentId) {
-      toast.error("Selecione um aluno.");
-      return;
-    }
+    if (!clinicId) return toast.error("Perfil sem clínica vinculada.");
+    if (!studentId) return toast.error("Selecione um paciente.");
     setSubmitting(true);
     try {
       const created = await createAssessment({
         clinic_id: clinicId,
         student_id: studentId,
-        pain_level: painLevel,
+        professional_id: user?.id ?? null,
+        type,
+        title: title.trim() || null,
+        objective: objective.trim() || null,
         main_complaint: mainComplaint.trim() || null,
-        observations: observations.trim() || null,
-        goals: goals
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean),
+        pain_score: painScore,
+        pain_level: painScore,
+        clinical_notes: clinicalNotes.trim() || null,
+        status: "draft",
       });
-      toast.success("Avaliação criada.");
+      toast.success("Rascunho criado.");
       navigate({ to: "/avaliacoes/$id", params: { id: created.id } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Falha ao criar avaliação.");
@@ -88,13 +95,14 @@ function NovaAvaliacaoPage() {
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
-            <ClipboardPlus className="h-3.5 w-3.5" /> Ficha clínica
+            <ClipboardPlus className="h-3.5 w-3.5" /> Ficha inicial
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
             Nova avaliação
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cria o registro inicial. As etapas postural e dinâmica acontecem na jornada guiada.
+            Registra os dados iniciais como rascunho. Achados posturais, dinâmicos e por exercício
+            são adicionados na tela seguinte.
           </p>
         </div>
 
@@ -103,11 +111,11 @@ function NovaAvaliacaoPage() {
           className="space-y-6 rounded-xl border border-border/60 bg-card/40 p-6"
         >
           <div>
-            <Label>Aluno *</Label>
+            <Label>Paciente *</Label>
             <Select value={studentId} onValueChange={setStudentId}>
               <SelectTrigger className="mt-1.5">
                 <SelectValue
-                  placeholder={studentsLoading ? "Carregando alunos…" : "Selecione um aluno"}
+                  placeholder={studentsLoading ? "Carregando…" : "Selecione um paciente"}
                 />
               </SelectTrigger>
               <SelectContent>
@@ -118,6 +126,49 @@ function NovaAvaliacaoPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label>Tipo de avaliação *</Label>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {typeOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setType(opt.value)}
+                  className={`rounded-lg border px-3 py-3 text-left text-sm transition ${
+                    type === opt.value
+                      ? "border-primary/70 bg-primary/10"
+                      : "border-border/60 bg-card/30 hover:border-border"
+                  }`}
+                >
+                  <div className="font-medium">{opt.label}</div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">{opt.hint}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="title">Título (opcional)</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Avaliação inicial"
+              className="mt-1.5"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="objective">Objetivo</Label>
+            <Input
+              id="objective"
+              value={objective}
+              onChange={(e) => setObjective(e.target.value)}
+              placeholder="Reduzir dor lombar em 8 semanas"
+              className="mt-1.5"
+            />
           </div>
 
           <div>
@@ -133,11 +184,11 @@ function NovaAvaliacaoPage() {
 
           <div>
             <Label>
-              Nível de dor: <span className="text-primary">{painLevel}/10</span>
+              Dor atual: <span className="text-primary">{painScore}/10</span>
             </Label>
             <Slider
-              value={[painLevel]}
-              onValueChange={(v) => setPainLevel(v[0])}
+              value={[painScore]}
+              onValueChange={(v) => setPainScore(v[0])}
               min={0}
               max={10}
               step={1}
@@ -146,22 +197,11 @@ function NovaAvaliacaoPage() {
           </div>
 
           <div>
-            <Label htmlFor="goals">Objetivos (separados por vírgula)</Label>
-            <Input
-              id="goals"
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-              placeholder="Reduzir dor lombar, Melhorar postura"
-              className="mt-1.5"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="obs">Observações</Label>
+            <Label htmlFor="notes">Observações clínicas</Label>
             <Textarea
-              id="obs"
-              value={observations}
-              onChange={(e) => setObservations(e.target.value)}
+              id="notes"
+              value={clinicalNotes}
+              onChange={(e) => setClinicalNotes(e.target.value)}
               rows={4}
               className="mt-1.5"
             />
@@ -175,7 +215,7 @@ function NovaAvaliacaoPage() {
             </Link>
             <Button type="submit" variant="hero" disabled={submitting || profileLoading}>
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Criar avaliação
+              Salvar rascunho
             </Button>
           </div>
         </form>

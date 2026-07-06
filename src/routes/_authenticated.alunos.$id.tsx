@@ -35,7 +35,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { archiveStudent, updateStudent, useStudent, type StudentStatus } from "@/lib/studentsStore";
+import { useStudentAssessments } from "@/lib/assessmentsStore";
 import { toast } from "sonner";
+import { ClipboardPlus, FileText, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/alunos/$id")({
   component: AlunoDetailPage,
@@ -402,22 +404,90 @@ function AlunoDetailPage() {
             )}
 
             <div className="mt-10">
-              <h2 className="font-display text-xl font-semibold">Avaliações</h2>
-              <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center text-sm text-muted-foreground">
-                Nenhuma avaliação ainda — na próxima etapa você poderá criar avaliações e
-                relatórios para este paciente.
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h2 className="font-display text-xl font-semibold">Relatórios</h2>
-              <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center text-sm text-muted-foreground">
-                Nenhum relatório ainda — disponível na próxima etapa.
-              </div>
+              <AssessmentsHistory studentId={student.id} />
             </div>
           </>
         )}
       </main>
     </div>
+  );
+}
+
+const asmtStatusLabel: Record<string, string> = {
+  draft: "Rascunho",
+  in_review: "Em revisão",
+  finalized: "Finalizada",
+};
+const asmtTypeLabel: Record<string, string> = {
+  postural: "Postural",
+  dynamic: "Dinâmica",
+  exercise: "Por exercício",
+  complete: "Completa",
+};
+
+function AssessmentsHistory({ studentId }: { studentId: string }) {
+  const { assessments, loading } = useStudentAssessments(studentId);
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-xl font-semibold">Avaliações</h2>
+        <Link to="/avaliacoes/nova" search={{ studentId }}>
+          <Button variant="hero" size="sm">
+            <ClipboardPlus className="h-4 w-4" /> Nova avaliação
+          </Button>
+        </Link>
+      </div>
+      {loading ? (
+        <div className="mt-4 flex justify-center py-8">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </div>
+      ) : assessments.length === 0 ? (
+        <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center text-sm text-muted-foreground">
+          Nenhuma avaliação registrada. Crie a primeira usando o botão acima.
+        </div>
+      ) : (
+        <ul className="mt-4 space-y-2">
+          {assessments.map((a) => {
+            const summary =
+              a.title?.trim() ||
+              a.objective?.trim() ||
+              a.main_complaint?.trim() ||
+              "Sem resumo informado.";
+            return (
+              <li
+                key={a.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/40 px-5 py-4"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant={a.status === "finalized" ? "default" : "secondary"}
+                      className="text-[10px]"
+                    >
+                      {asmtStatusLabel[a.status] ?? a.status}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px]">
+                      {asmtTypeLabel[a.type] ?? a.type}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(a.created_at).toLocaleDateString("pt-BR")}
+                    </span>
+                  </div>
+                  <p className="mt-1 truncate text-sm">{summary}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link to="/avaliacoes/$id" params={{ id: a.id }}>
+                    <Button variant="outline" size="sm">Abrir avaliação</Button>
+                  </Link>
+                  <Button variant="ghost" size="sm" disabled title="Disponível em breve">
+                    <FileText className="h-4 w-4" /> Gerar relatório
+                  </Button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </>
   );
 }

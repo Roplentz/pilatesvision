@@ -31,17 +31,15 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/")({
 
 const statusLabel: Record<string, string> = {
   draft: "Rascunho",
-  in_progress: "Em andamento",
-  completed: "Concluída",
-  archived: "Arquivada",
+  in_review: "Em revisão",
+  finalized: "Finalizada",
 };
 
-const stageLabel: Record<string, string> = {
-  ficha: "Ficha",
+const typeLabel: Record<string, string> = {
   postural: "Postural",
-  dinamica: "Dinâmica",
-  exercicios: "Exercícios",
-  relatorio: "Relatório",
+  dynamic: "Dinâmica",
+  exercise: "Por exercício",
+  complete: "Completa",
 };
 
 function AvaliacoesListPage() {
@@ -131,9 +129,8 @@ function AvaliacoesListPage() {
             <SelectContent>
               <SelectItem value="all">Todos os status</SelectItem>
               <SelectItem value="draft">Rascunho</SelectItem>
-              <SelectItem value="in_progress">Em andamento</SelectItem>
-              <SelectItem value="completed">Concluída</SelectItem>
-              <SelectItem value="archived">Arquivada</SelectItem>
+              <SelectItem value="in_review">Em revisão</SelectItem>
+              <SelectItem value="finalized">Finalizada</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -173,15 +170,15 @@ function AvaliacoesListPage() {
                       <div>
                         <div className="font-medium">{studentName}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">
-                          {new Date(a.created_at).toLocaleDateString("pt-BR")} · Etapa:{" "}
-                          {stageLabel[a.current_stage] ?? a.current_stage} · Dor {a.pain_level ?? 0}
-                          /10
+                          {new Date(a.created_at).toLocaleDateString("pt-BR")} ·{" "}
+                          {typeLabel[a.type] ?? a.type} · Dor{" "}
+                          {a.pain_score ?? a.pain_level ?? 0}/10
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge
-                        variant={a.status === "completed" ? "default" : "secondary"}
+                        variant={a.status === "finalized" ? "default" : "secondary"}
                         className="text-[11px]"
                       >
                         {statusLabel[a.status] ?? a.status}

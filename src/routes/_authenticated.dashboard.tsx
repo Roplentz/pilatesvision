@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, ClipboardCheck, FileText, TrendingUp, Plus } from "lucide-react";
+import { Users, ClipboardCheck, FileText, Plus, ArrowRight } from "lucide-react";
 import { useStudents } from "@/lib/studentsStore";
-import { useAssessments } from "@/lib/assessmentsStore";
 import { useProfile } from "@/hooks/useProfile";
+import { useClinicCounts } from "@/lib/clinicsStore";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard | PilatesVision" }] }),
@@ -16,15 +16,14 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function DashboardPage() {
   const { clinicId, loading: profileLoading } = useProfile();
   const { students, loading: studentsLoading } = useStudents(clinicId);
-  const { assessments, loading: assessmentsLoading } = useAssessments(clinicId);
+  const { counts, loading: countsLoading } = useClinicCounts(clinicId);
 
-  const loading = profileLoading || studentsLoading || assessmentsLoading;
+  const loading = profileLoading || studentsLoading || countsLoading;
 
   const stats = [
-    { label: "Alunos ativos", value: students.length, icon: Users },
-    { label: "Avaliações realizadas", value: assessments.length, icon: ClipboardCheck },
-    { label: "Relatórios gerados", value: 8, icon: FileText, placeholder: true },
-    { label: "Evolução média", value: "+12%", icon: TrendingUp, placeholder: true },
+    { label: "Pacientes cadastrados", value: counts.students, icon: Users },
+    { label: "Avaliações criadas", value: counts.assessments, icon: ClipboardCheck },
+    { label: "Relatórios gerados", value: counts.reports, icon: FileText },
   ];
 
   const recent = students.slice(0, 5);
@@ -33,16 +32,18 @@ function DashboardPage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Visão geral da clínica</p>
+          <p className="text-sm text-muted-foreground">
+            Fluxo MVP: paciente, avaliação, relatório e PDF.
+          </p>
         </div>
-        <Link to="/nova-avaliacao">
+        <Link to="/alunos/novo">
           <Button variant="hero" size="sm">
-            <Plus className="mr-1 h-4 w-4" /> Nova avaliação
+            <Plus className="mr-1 h-4 w-4" /> Cadastrar primeiro paciente
           </Button>
         </Link>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((s) => (
           <Card key={s.label} className="bg-surface/60">
             <CardContent className="flex items-center gap-4 p-5">
@@ -63,7 +64,7 @@ function DashboardPage() {
       <section className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Alunos recentes</CardTitle>
+            <CardTitle>Pacientes recentes</CardTitle>
           </CardHeader>
           <CardContent className="divide-y divide-border/60">
             {loading && recent.length === 0 && (
@@ -74,9 +75,14 @@ function DashboardPage() {
               </div>
             )}
             {!loading && recent.length === 0 && (
-              <p className="py-6 text-sm text-muted-foreground">
-                Nenhum aluno cadastrado ainda.
-              </p>
+              <div className="space-y-4 py-6 text-sm text-muted-foreground">
+                <p>Nenhum paciente cadastrado ainda.</p>
+                <Link to="/alunos/novo">
+                  <Button size="sm" variant="outline">
+                    Cadastrar primeiro paciente
+                  </Button>
+                </Link>
+              </div>
             )}
             {recent.map((st) => (
               <Link
@@ -97,18 +103,30 @@ function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Próximas reavaliações</CardTitle>
+            <CardTitle>Próximos passos</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            {recent.slice(0, 3).map((st, i) => (
-              <div key={st.id} className="flex items-center justify-between rounded-md border border-border/60 p-3">
-                <span>{st.name}</span>
-                <Badge>{`em ${(i + 1) * 7}d`}</Badge>
-              </div>
-            ))}
-            {!loading && recent.length === 0 && (
-              <p className="text-muted-foreground">Sem reavaliações no horizonte.</p>
-            )}
+            <Link
+              to="/alunos/novo"
+              className="flex items-center justify-between rounded-md border border-border/60 p-3 transition hover:bg-muted/40"
+            >
+              <span>Cadastrar paciente</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/avaliacoes/nova"
+              className="flex items-center justify-between rounded-md border border-border/60 p-3 transition hover:bg-muted/40"
+            >
+              <span>Criar avaliação</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/relatorios"
+              className="flex items-center justify-between rounded-md border border-border/60 p-3 transition hover:bg-muted/40"
+            >
+              <span>Gerar relatório</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
           </CardContent>
         </Card>
       </section>

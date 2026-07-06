@@ -120,9 +120,7 @@ function ConfigPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-6 py-8">
       <header>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Configurações
-        </h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Configurações</h1>
         <p className="text-sm text-muted-foreground">
           Gerencie seu perfil e os dados da sua clínica.
         </p>
@@ -219,9 +217,7 @@ function ConfigPage() {
                       <Label>Plano</Label>
                       <Select
                         value={plan}
-                        onValueChange={(v) =>
-                          setPlan(v as "starter" | "pro" | "enterprise")
-                        }
+                        onValueChange={(v) => setPlan(v as "starter" | "pro" | "enterprise")}
                       >
                         <SelectTrigger className="mt-1.5">
                           <SelectValue />

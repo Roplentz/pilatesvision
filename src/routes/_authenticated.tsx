@@ -74,8 +74,7 @@ function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
           <SidebarGroupContent>
             <SidebarMenu>
               {menu.map((item) => {
-                const active =
-                  pathname === item.url || pathname.startsWith(item.url + "/");
+                const active = pathname === item.url || pathname.startsWith(item.url + "/");
                 return (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild isActive={active}>
@@ -189,16 +188,9 @@ function AuthedLayout() {
             </span>
             <div className="ml-auto flex items-center gap-3">
               {user?.email ? (
-                <span className="hidden sm:inline text-xs text-muted-foreground">
-                  {user.email}
-                </span>
+                <span className="hidden sm:inline text-xs text-muted-foreground">{user.email}</span>
               ) : null}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSignOut}
-                className="h-8 gap-1.5"
-              >
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-8 gap-1.5">
                 <LogOut className="h-3.5 w-3.5" />
                 Sair
               </Button>

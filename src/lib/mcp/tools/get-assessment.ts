@@ -12,7 +12,8 @@ function sb(ctx: ToolContext) {
 export default defineTool({
   name: "get_assessment",
   title: "Detalhe da avaliação",
-  description: "Retorna a avaliação com seus resultados posturais/movimento, exercícios prescritos e relatório.",
+  description:
+    "Retorna a avaliação com seus resultados posturais/movimento, exercícios prescritos e relatório.",
   inputSchema: {
     assessment_id: z.string().uuid().describe("ID da avaliação."),
   },
@@ -28,7 +29,8 @@ export default defineTool({
       .eq("id", assessment_id)
       .maybeSingle();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    if (!data) return { content: [{ type: "text", text: "Avaliação não encontrada." }], isError: true };
+    if (!data)
+      return { content: [{ type: "text", text: "Avaliação não encontrada." }], isError: true };
     return {
       content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
       structuredContent: { assessment: data },

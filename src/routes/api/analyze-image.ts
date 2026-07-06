@@ -23,7 +23,9 @@ export const Route = createFileRoute("/api/analyze-image")({
         }
         const { image, mode, context } = payload;
         if (!image || typeof image !== "string" || !image.startsWith("data:image/")) {
-          return new Response("Missing or invalid image (expected data:image/...;base64)", { status: 400 });
+          return new Response("Missing or invalid image (expected data:image/...;base64)", {
+            status: 400,
+          });
         }
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
@@ -61,8 +63,8 @@ export const Route = createFileRoute("/api/analyze-image")({
             status === 429
               ? "Limite de requisições atingido. Tente novamente em instantes."
               : status === 402
-              ? "Créditos de IA esgotados nesta workspace."
-              : `Falha ao analisar a imagem (${res.status}). ${text.slice(0, 200)}`,
+                ? "Créditos de IA esgotados nesta workspace."
+                : `Falha ao analisar a imagem (${res.status}). ${text.slice(0, 200)}`,
             { status },
           );
         }

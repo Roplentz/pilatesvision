@@ -40,7 +40,10 @@ export const Route = createFileRoute("/_authenticated/nova-avaliacao")({
   head: () => ({
     meta: [
       { title: "Nova avaliação — PilatesVision" },
-      { name: "description", content: "Jornada clínica guiada: ficha, postural, dinâmica, exercícios e relatório." },
+      {
+        name: "description",
+        content: "Jornada clínica guiada: ficha, postural, dinâmica, exercícios e relatório.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -273,10 +276,7 @@ function NovaAvaliacao() {
                 />
               )}
               {step.id === "exercicios" && (
-                <ExerciciosStep
-                  selected={selectedExercises}
-                  toggle={toggleExercise}
-                />
+                <ExerciciosStep selected={selectedExercises} toggle={toggleExercise} />
               )}
               {step.id === "relatorio" && (
                 <RelatorioStep
@@ -301,9 +301,13 @@ function NovaAvaliacao() {
           ) : (
             <Button variant="hero" onClick={handleConcluir} disabled={saving}>
               {saving ? (
-                <><Loader2 className="mr-1 h-4 w-4 animate-spin" /> Salvando…</>
+                <>
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Salvando…
+                </>
               ) : (
-                <><Check className="mr-1 h-4 w-4" /> Concluir e salvar</>
+                <>
+                  <Check className="mr-1 h-4 w-4" /> Concluir e salvar
+                </>
               )}
             </Button>
           )}
@@ -402,10 +406,15 @@ function FichaStep({
   loading: boolean;
 }) {
   return (
-    <StepCard title="Ficha do aluno" desc="Comece com os dados essenciais. Eles aparecem no relatório final.">
+    <StepCard
+      title="Ficha do aluno"
+      desc="Comece com os dados essenciais. Eles aparecem no relatório final."
+    >
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="aluno" className="text-xs font-medium text-muted-foreground">Aluno</Label>
+          <Label htmlFor="aluno" className="text-xs font-medium text-muted-foreground">
+            Aluno
+          </Label>
           <Select value={ficha.alunoId} onValueChange={(v) => setFicha({ ...ficha, alunoId: v })}>
             <SelectTrigger id="aluno" className="h-11 bg-background/60">
               <SelectValue placeholder={loading ? "Carregando alunos…" : "Selecione o aluno"} />
@@ -418,7 +427,8 @@ function FichaStep({
               ) : (
                 students.map((a) => (
                   <SelectItem key={a.id} value={a.id}>
-                    {a.name}{a.age != null ? ` · ${a.age} anos` : ""}
+                    {a.name}
+                    {a.age != null ? ` · ${a.age} anos` : ""}
                   </SelectItem>
                 ))
               )}
@@ -427,14 +437,18 @@ function FichaStep({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="objetivo" className="text-xs font-medium text-muted-foreground">Objetivo</Label>
+          <Label htmlFor="objetivo" className="text-xs font-medium text-muted-foreground">
+            Objetivo
+          </Label>
           <Select value={ficha.objetivo} onValueChange={(v) => setFicha({ ...ficha, objetivo: v })}>
             <SelectTrigger id="objetivo" className="h-11 bg-background/60">
               <SelectValue placeholder="Defina o foco da avaliação" />
             </SelectTrigger>
             <SelectContent>
               {OBJETIVOS.map((o) => (
-                <SelectItem key={o} value={o}>{o}</SelectItem>
+                <SelectItem key={o} value={o}>
+                  {o}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -459,7 +473,9 @@ function FichaStep({
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="obs" className="text-xs font-medium text-muted-foreground">Observações</Label>
+          <Label htmlFor="obs" className="text-xs font-medium text-muted-foreground">
+            Observações
+          </Label>
           <Textarea
             id="obs"
             rows={4}
@@ -489,7 +505,10 @@ function PosturalStep({
 }) {
   const allCaptured = VIEWS.every((v) => done[v.key]);
   return (
-    <StepCard title="Avaliação postural" desc="Capture as três vistas. A IA simulada analisa alinhamento e simetria.">
+    <StepCard
+      title="Avaliação postural"
+      desc="Capture as três vistas. A IA simulada analisa alinhamento e simetria."
+    >
       <div className="grid gap-4 md:grid-cols-3">
         {VIEWS.map((v) => (
           <button
@@ -526,9 +545,13 @@ function PosturalStep({
         </div>
         <Button variant="hero" onClick={onAnalyze} disabled={!allCaptured || analyzing}>
           {analyzing ? (
-            <><Loader2 className="mr-1 h-4 w-4 animate-spin" /> Analisando…</>
+            <>
+              <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Analisando…
+            </>
           ) : (
-            <><Sparkles className="mr-1 h-4 w-4" /> Analisar postura</>
+            <>
+              <Sparkles className="mr-1 h-4 w-4" /> Analisar postura
+            </>
           )}
         </Button>
       </div>
@@ -543,7 +566,9 @@ function PosturalStep({
           >
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">Score postural</p>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                  Score postural
+                </p>
                 <p className="mt-1 font-display text-4xl font-semibold text-gradient">
                   {POSTURAL_RESULT.score}
                   <span className="ml-1 text-xl text-muted-foreground">/100</span>
@@ -560,7 +585,9 @@ function PosturalStep({
                   <span className="text-foreground">{f.label}</span>
                   <span className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{f.severity}</span>
-                    <span className="rounded bg-background/60 px-1.5 py-0.5 font-mono text-foreground">{f.value}</span>
+                    <span className="rounded bg-background/60 px-1.5 py-0.5 font-mono text-foreground">
+                      {f.value}
+                    </span>
                   </span>
                 </li>
               ))}
@@ -586,7 +613,10 @@ function DinamicaStep({
   onAnalyze: () => void;
 }) {
   return (
-    <StepCard title="Avaliação dinâmica" desc="Escolha um movimento. A análise mockada devolve quatro métricas-chave.">
+    <StepCard
+      title="Avaliação dinâmica"
+      desc="Escolha um movimento. A análise mockada devolve quatro métricas-chave."
+    >
       <div className="grid gap-6 md:grid-cols-[1fr_auto]">
         <div className="space-y-2">
           <Label className="text-xs font-medium text-muted-foreground">Movimento</Label>
@@ -596,17 +626,28 @@ function DinamicaStep({
             </SelectTrigger>
             <SelectContent>
               {MOVIMENTOS.map((m) => (
-                <SelectItem key={m} value={m}>{m}</SelectItem>
+                <SelectItem key={m} value={m}>
+                  {m}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="flex items-end">
-          <Button variant="hero" onClick={onAnalyze} disabled={!movimento || analyzing} className="w-full md:w-auto">
+          <Button
+            variant="hero"
+            onClick={onAnalyze}
+            disabled={!movimento || analyzing}
+            className="w-full md:w-auto"
+          >
             {analyzing ? (
-              <><Loader2 className="mr-1 h-4 w-4 animate-spin" /> Analisando…</>
+              <>
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" /> Analisando…
+              </>
             ) : (
-              <><Sparkles className="mr-1 h-4 w-4" /> Analisar movimento</>
+              <>
+                <Sparkles className="mr-1 h-4 w-4" /> Analisar movimento
+              </>
             )}
           </Button>
         </div>
@@ -651,15 +692,12 @@ function Metric({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ExerciciosStep({
-  selected,
-  toggle,
-}: {
-  selected: string[];
-  toggle: (s: string) => void;
-}) {
+function ExerciciosStep({ selected, toggle }: { selected: string[]; toggle: (s: string) => void }) {
   return (
-    <StepCard title="Exercícios recomendados" desc="Selecione os exercícios que entram no plano do aluno.">
+    <StepCard
+      title="Exercícios recomendados"
+      desc="Selecione os exercícios que entram no plano do aluno."
+    >
       <ul className="grid gap-3">
         {EXERCICIOS.map((ex) => {
           const isSelected = selected.includes(ex.name);
@@ -677,11 +715,25 @@ function ExerciciosStep({
                 </div>
                 <div>
                   <div className="font-display text-base font-semibold">{ex.name}</div>
-                  <div className="text-xs text-muted-foreground">{ex.focus} · {ex.series}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {ex.focus} · {ex.series}
+                  </div>
                 </div>
               </div>
-              <Button variant={isSelected ? "outline" : "hero"} size="sm" onClick={() => toggle(ex.name)}>
-                {isSelected ? (<><Check className="mr-1 h-4 w-4" /> Adicionado</>) : (<><Plus className="mr-1 h-4 w-4" /> Adicionar</>)}
+              <Button
+                variant={isSelected ? "outline" : "hero"}
+                size="sm"
+                onClick={() => toggle(ex.name)}
+              >
+                {isSelected ? (
+                  <>
+                    <Check className="mr-1 h-4 w-4" /> Adicionado
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-1 h-4 w-4" /> Adicionar
+                  </>
+                )}
               </Button>
             </li>
           );
@@ -717,9 +769,12 @@ function RelatorioStep({
         <div className="relative flex items-start justify-between gap-6">
           <div>
             <p className="text-xs uppercase tracking-widest text-primary">Relatório clínico</p>
-            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">{aluno?.name ?? "Aluno"}</h2>
+            <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">
+              {aluno?.name ?? "Aluno"}
+            </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {aluno?.age != null ? `${aluno.age} anos · ` : ""}{ficha.objetivo || "Objetivo a definir"} · {today}
+              {aluno?.age != null ? `${aluno.age} anos · ` : ""}
+              {ficha.objetivo || "Objetivo a definir"} · {today}
             </p>
           </div>
           <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-primary shadow-glow">
@@ -729,14 +784,20 @@ function RelatorioStep({
       </div>
 
       <div className="grid gap-px bg-border/60 md:grid-cols-3">
-        <SummaryStat label="Score postural" value={`${POSTURAL_RESULT.score}/100`} icon={ScanLine} />
+        <SummaryStat
+          label="Score postural"
+          value={`${POSTURAL_RESULT.score}/100`}
+          icon={ScanLine}
+        />
         <SummaryStat label="Nível de dor" value={`${ficha.dor}/10`} icon={User} />
         <SummaryStat label="Exercícios" value={`${exercises.length}`} icon={Target} />
       </div>
 
       <div className="grid gap-px bg-border/60 md:grid-cols-2">
         <div className="bg-surface p-6">
-          <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">Achados posturais</h3>
+          <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Achados posturais
+          </h3>
           <ul className="mt-4 space-y-2 text-sm">
             {POSTURAL_RESULT.findings.map((f) => (
               <li key={f.label} className="flex items-center justify-between">
@@ -747,21 +808,37 @@ function RelatorioStep({
           </ul>
         </div>
         <div className="bg-surface p-6">
-          <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">Avaliação dinâmica</h3>
+          <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Avaliação dinâmica
+          </h3>
           <p className="mt-3 text-sm text-muted-foreground">
             Movimento: <span className="text-foreground">{movimento || "—"}</span>
           </p>
           <ul className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <li className="flex justify-between"><span>Controle</span><span className="font-mono">{DINAMICA_RESULT.controle}</span></li>
-            <li className="flex justify-between"><span>Estabilidade</span><span className="font-mono">{DINAMICA_RESULT.estabilidade}</span></li>
-            <li className="flex justify-between"><span>Simetria</span><span className="font-mono">{DINAMICA_RESULT.simetria}</span></li>
-            <li className="flex justify-between"><span>Amplitude</span><span className="font-mono">{DINAMICA_RESULT.amplitude}</span></li>
+            <li className="flex justify-between">
+              <span>Controle</span>
+              <span className="font-mono">{DINAMICA_RESULT.controle}</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Estabilidade</span>
+              <span className="font-mono">{DINAMICA_RESULT.estabilidade}</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Simetria</span>
+              <span className="font-mono">{DINAMICA_RESULT.simetria}</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Amplitude</span>
+              <span className="font-mono">{DINAMICA_RESULT.amplitude}</span>
+            </li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-border/60 bg-surface p-6">
-        <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">Plano de exercícios</h3>
+        <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+          Plano de exercícios
+        </h3>
         {exercises.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">Nenhum exercício selecionado.</p>
         ) : (
@@ -784,7 +861,9 @@ function RelatorioStep({
 
       {ficha.observacoes && (
         <div className="border-t border-border/60 bg-surface p-6">
-          <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">Observações</h3>
+          <h3 className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Observações
+          </h3>
           <p className="mt-3 text-sm text-muted-foreground">{ficha.observacoes}</p>
         </div>
       )}

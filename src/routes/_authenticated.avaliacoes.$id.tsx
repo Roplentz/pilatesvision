@@ -45,8 +45,13 @@ type Finding = { region?: string; description?: string; severity?: string };
 function AvaliacaoDetailPage() {
   const { id } = Route.useParams();
   const { assessment, loading } = useAssessment(id);
-  const { postural, movement, prescribed, report, loading: extrasLoading } =
-    useAssessmentExtras(id);
+  const {
+    postural,
+    movement,
+    prescribed,
+    report,
+    loading: extrasLoading,
+  } = useAssessmentExtras(id);
 
   if (loading || extrasLoading) {
     return (
@@ -76,7 +81,7 @@ function AvaliacaoDetailPage() {
     : [];
   const posturalAnalysisText =
     postural?.findings && !Array.isArray(postural.findings)
-      ? (postural.findings as { analysis?: string }).analysis ?? null
+      ? ((postural.findings as { analysis?: string }).analysis ?? null)
       : null;
 
   const movementMetrics = movement
@@ -89,15 +94,13 @@ function AvaliacaoDetailPage() {
     : [];
 
   const reportContent =
-    (report?.content as
-      | {
-          summary?: string;
-          recommendations?: string[];
-          postural?: string;
-          dinamica?: string;
-          exercicio?: string;
-        }
-      | null) ?? null;
+    (report?.content as {
+      summary?: string;
+      recommendations?: string[];
+      postural?: string;
+      dinamica?: string;
+      exercicio?: string;
+    } | null) ?? null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -154,9 +157,7 @@ function AvaliacaoDetailPage() {
           </div>
           {(assessment.goals ?? []).length > 0 && (
             <div className="mt-4">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                Objetivos
-              </div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">Objetivos</div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {(assessment.goals ?? []).map((g) => (
                   <Badge key={g} variant="secondary" className="text-[11px]">
@@ -180,8 +181,7 @@ function AvaliacaoDetailPage() {
             </div>
             {postural.score != null && (
               <div className="mt-2 text-xs text-muted-foreground">
-                Score geral:{" "}
-                <span className="font-semibold text-primary">{postural.score}</span>
+                Score geral: <span className="font-semibold text-primary">{postural.score}</span>
               </div>
             )}
             {findings.length > 0 && (
@@ -257,9 +257,7 @@ function AvaliacaoDetailPage() {
                   <div>
                     <div className="font-medium">{p.name ?? "Exercício"}</div>
                     {p.focus && (
-                      <div className="mt-0.5 text-xs text-muted-foreground">
-                        {p.focus}
-                      </div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">{p.focus}</div>
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">
@@ -293,7 +291,9 @@ function AvaliacaoDetailPage() {
               <div className="mt-4 space-y-4">
                 {reportContent.postural && (
                   <div>
-                    <div className="text-xs uppercase tracking-wider text-primary">Parecer postural</div>
+                    <div className="text-xs uppercase tracking-wider text-primary">
+                      Parecer postural
+                    </div>
                     <div className="mt-1 whitespace-pre-wrap rounded-lg border border-border/40 bg-background/40 p-4 text-sm leading-relaxed">
                       {reportContent.postural}
                     </div>
@@ -301,7 +301,9 @@ function AvaliacaoDetailPage() {
                 )}
                 {reportContent.dinamica && (
                   <div>
-                    <div className="text-xs uppercase tracking-wider text-primary">Parecer dinâmico</div>
+                    <div className="text-xs uppercase tracking-wider text-primary">
+                      Parecer dinâmico
+                    </div>
                     <div className="mt-1 whitespace-pre-wrap rounded-lg border border-border/40 bg-background/40 p-4 text-sm leading-relaxed">
                       {reportContent.dinamica}
                     </div>
@@ -309,7 +311,9 @@ function AvaliacaoDetailPage() {
                 )}
                 {reportContent.exercicio && (
                   <div>
-                    <div className="text-xs uppercase tracking-wider text-primary">Parecer do exercício</div>
+                    <div className="text-xs uppercase tracking-wider text-primary">
+                      Parecer do exercício
+                    </div>
                     <div className="mt-1 whitespace-pre-wrap rounded-lg border border-border/40 bg-background/40 p-4 text-sm leading-relaxed">
                       {reportContent.exercicio}
                     </div>
@@ -324,15 +328,7 @@ function AvaliacaoDetailPage() {
   );
 }
 
-function Field({
-  icon,
-  label,
-  value,
-}: {
-  icon?: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function Field({ icon, label, value }: { icon?: React.ReactNode; label: string; value: string }) {
   return (
     <div>
       <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">

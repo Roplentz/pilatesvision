@@ -72,18 +72,13 @@ src/services/clinicService.ts
 Entrada:
 
 ```ts
-userId: string
+userId: string;
 ```
 
 Consulta:
 
 ```ts
-supabase
-  .from('clinics')
-  .select('*')
-  .eq('owner_user_id', userId)
-  .limit(1)
-  .maybeSingle()
+supabase.from("clinics").select("*").eq("owner_user_id", userId).limit(1).maybeSingle();
 ```
 
 ### createClinic
@@ -104,11 +99,7 @@ Entrada:
 Consulta:
 
 ```ts
-supabase
-  .from('clinics')
-  .insert(payload)
-  .select('*')
-  .single()
+supabase.from("clinics").insert(payload).select("*").single();
 ```
 
 ### updateClinic
@@ -116,19 +107,14 @@ supabase
 Entrada:
 
 ```ts
-clinicId: string
-payload: Partial<Clinic>
+clinicId: string;
+payload: Partial<Clinic>;
 ```
 
 Consulta:
 
 ```ts
-supabase
-  .from('clinics')
-  .update(payload)
-  .eq('id', clinicId)
-  .select('*')
-  .single()
+supabase.from("clinics").update(payload).eq("id", clinicId).select("*").single();
 ```
 
 ## Tipos mínimos

@@ -53,7 +53,11 @@ const subscribe = (cb: () => void) => {
 };
 
 export function useClinics(): Clinic[] {
-  return useSyncExternalStore(subscribe, () => clinics, () => clinics);
+  return useSyncExternalStore(
+    subscribe,
+    () => clinics,
+    () => clinics,
+  );
 }
 
 export function getClinic(id: string): Clinic | undefined {

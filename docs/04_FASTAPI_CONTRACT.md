@@ -57,9 +57,7 @@ Resposta:
       "severity": "leve"
     }
   ],
-  "alerts": [
-    "Confirmar clinicamente a assimetria observada."
-  ],
+  "alerts": ["Confirmar clinicamente a assimetria observada."],
   "annotatedImage": "data:image/jpeg;base64,...",
   "confidence": 0.86,
   "disclaimer": "Resultado de apoio a decisao profissional. Nao substitui avaliacao clinica."
@@ -102,9 +100,7 @@ Resposta:
     "amplitude": 72,
     "conformidade": 81
   },
-  "compensations": [
-    "Leve valgo dinamico no joelho direito."
-  ],
+  "compensations": ["Leve valgo dinamico no joelho direito."],
   "frames": {
     "valid": 128,
     "attention": 19
@@ -117,9 +113,7 @@ Resposta:
       "joelho_e": 97.1
     }
   ],
-  "sampleFrames": [
-    "data:image/jpeg;base64,..."
-  ],
+  "sampleFrames": ["data:image/jpeg;base64,..."],
   "disclaimer": "Resultado de apoio a decisao profissional. Nao substitui avaliacao clinica."
 }
 ```

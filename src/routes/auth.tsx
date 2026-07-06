@@ -19,7 +19,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Entrar — PilatesVision" },
-      { name: "description", content: "Acesse sua conta PilatesVision ou crie um estúdio em minutos." },
+      {
+        name: "description",
+        content: "Acesse sua conta PilatesVision ou crie um estúdio em minutos.",
+      },
       { property: "og:title", content: "Entrar — PilatesVision" },
       { property: "og:description", content: "Acesse sua conta PilatesVision ou crie um estúdio." },
       { name: "robots", content: "noindex" },
@@ -36,9 +39,8 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
 
-  const destination = (search.redirect && search.redirect.startsWith("/"))
-    ? search.redirect
-    : "/dashboard";
+  const destination =
+    search.redirect && search.redirect.startsWith("/") ? search.redirect : "/dashboard";
 
   // Se já está logado, redireciona. Também escuta mudanças de auth.
   useEffect(() => {
@@ -105,10 +107,10 @@ function AuthPage() {
       const friendly = /invalid login credentials/i.test(raw)
         ? "E-mail ou senha incorretos."
         : /email not confirmed/i.test(raw)
-        ? "Confirme seu e-mail antes de entrar."
-        : /user already registered/i.test(raw)
-        ? "Já existe uma conta com este e-mail. Entre com sua senha."
-        : raw;
+          ? "Confirme seu e-mail antes de entrar."
+          : /user already registered/i.test(raw)
+            ? "Já existe uma conta com este e-mail. Entre com sua senha."
+            : raw;
       toast.error(friendly);
     } finally {
       setLoading(false);
@@ -129,7 +131,10 @@ function AuthPage() {
       <div className="pointer-events-none absolute inset-0 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
       <div className="relative mx-auto flex min-h-screen max-w-md flex-col px-6 py-10">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" />
           Voltar
         </Link>
@@ -164,7 +169,9 @@ function AuthPage() {
               type="button"
               onClick={() => switchMode("signin")}
               className={`rounded-md px-3 py-2 transition ${
-                !isSignup ? "bg-surface-elevated text-foreground shadow" : "text-muted-foreground hover:text-foreground"
+                !isSignup
+                  ? "bg-surface-elevated text-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Entrar
@@ -173,7 +180,9 @@ function AuthPage() {
               type="button"
               onClick={() => switchMode("signup")}
               className={`rounded-md px-3 py-2 transition ${
-                isSignup ? "bg-surface-elevated text-foreground shadow" : "text-muted-foreground hover:text-foreground"
+                isSignup
+                  ? "bg-surface-elevated text-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Criar conta
@@ -187,7 +196,14 @@ function AuthPage() {
               </Field>
             )}
             <Field id="email" label="E-mail" icon={Mail}>
-              <Input id="email" name="email" type="email" placeholder="voce@estudio.com" required autoComplete="email" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="voce@estudio.com"
+                required
+                autoComplete="email"
+              />
             </Field>
             <Field id="password" label="Senha" icon={Lock}>
               <Input
@@ -203,7 +219,10 @@ function AuthPage() {
 
             {!isSignup && (
               <div className="flex justify-end">
-                <a href="#" className="text-xs text-muted-foreground transition hover:text-foreground">
+                <a
+                  href="#"
+                  className="text-xs text-muted-foreground transition hover:text-foreground"
+                >
                   Esqueci minha senha
                 </a>
               </div>
@@ -222,9 +241,14 @@ function AuthPage() {
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Ao continuar você concorda com nossos{" "}
-            <a href="#" className="underline-offset-2 hover:text-foreground hover:underline">Termos</a>{" "}
+            <a href="#" className="underline-offset-2 hover:text-foreground hover:underline">
+              Termos
+            </a>{" "}
             e{" "}
-            <a href="#" className="underline-offset-2 hover:text-foreground hover:underline">Política de Privacidade</a>.
+            <a href="#" className="underline-offset-2 hover:text-foreground hover:underline">
+              Política de Privacidade
+            </a>
+            .
           </p>
         </motion.div>
       </div>

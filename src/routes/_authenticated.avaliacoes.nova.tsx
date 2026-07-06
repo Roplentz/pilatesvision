@@ -94,8 +94,7 @@ function NovaAvaliacaoPage() {
             Nova avaliação
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cria o registro inicial. As etapas postural e dinâmica acontecem na
-            jornada guiada.
+            Cria o registro inicial. As etapas postural e dinâmica acontecem na jornada guiada.
           </p>
         </div>
 
@@ -108,9 +107,7 @@ function NovaAvaliacaoPage() {
             <Select value={studentId} onValueChange={setStudentId}>
               <SelectTrigger className="mt-1.5">
                 <SelectValue
-                  placeholder={
-                    studentsLoading ? "Carregando alunos…" : "Selecione um aluno"
-                  }
+                  placeholder={studentsLoading ? "Carregando alunos…" : "Selecione um aluno"}
                 />
               </SelectTrigger>
               <SelectContent>

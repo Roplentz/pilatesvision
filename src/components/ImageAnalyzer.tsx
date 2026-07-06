@@ -73,7 +73,6 @@ export function ImageAnalyzer({ mode, context, label, compact }: ImageAnalyzerPr
       />
 
       {preview ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={preview}
           alt={label ?? "Imagem para análise"}

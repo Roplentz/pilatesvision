@@ -326,23 +326,23 @@ Classificação:
 
 ## O que já está pronto de verdade
 
-| Módulo | Status real |
-|---|---|
-| Streamlit app | Funcional |
-| Cadastro/anamnese | Funcional em sessão/local |
-| Avaliação postural por foto | Funcional |
-| MediaPipe imagem | Funcional |
-| Avaliação dinâmica por vídeo | Funcional |
-| Câmera ao vivo | Parcial/funcional se dependências estiverem ok |
-| Biblioteca de exercícios | Funcional |
-| Motor biomecânico inicial | Funcional |
-| Relatório TXT | Funcional |
-| Histórico | Funcional local |
-| Supabase | Planejado/parcial |
-| RLS | Schema legado + novo schema no repo principal |
-| PDF profissional | Não implementado |
-| Multiusuário robusto | Não implementado |
-| Dashboard SaaS | Não implementado |
+| Módulo                       | Status real                                    |
+| ---------------------------- | ---------------------------------------------- |
+| Streamlit app                | Funcional                                      |
+| Cadastro/anamnese            | Funcional em sessão/local                      |
+| Avaliação postural por foto  | Funcional                                      |
+| MediaPipe imagem             | Funcional                                      |
+| Avaliação dinâmica por vídeo | Funcional                                      |
+| Câmera ao vivo               | Parcial/funcional se dependências estiverem ok |
+| Biblioteca de exercícios     | Funcional                                      |
+| Motor biomecânico inicial    | Funcional                                      |
+| Relatório TXT                | Funcional                                      |
+| Histórico                    | Funcional local                                |
+| Supabase                     | Planejado/parcial                              |
+| RLS                          | Schema legado + novo schema no repo principal  |
+| PDF profissional             | Não implementado                               |
+| Multiusuário robusto         | Não implementado                               |
+| Dashboard SaaS               | Não implementado                               |
 
 ## Decisão estratégica
 

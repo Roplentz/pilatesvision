@@ -14,7 +14,13 @@ export default defineTool({
   title: "Listar alunos",
   description: "Lista os alunos cadastrados na clínica do usuário autenticado.",
   inputSchema: {
-    limit: z.number().int().min(1).max(100).optional().describe("Máximo de alunos a retornar (padrão 25)."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe("Máximo de alunos a retornar (padrão 25)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ limit }, ctx) => {

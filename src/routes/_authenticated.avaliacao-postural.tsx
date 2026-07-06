@@ -14,7 +14,9 @@ function PosturalPage() {
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
       <header>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Avaliação Postural</h1>
-        <p className="text-sm text-muted-foreground">Envie uma foto de cada vista; a IA analisa alinhamento, assimetrias e compensações.</p>
+        <p className="text-sm text-muted-foreground">
+          Envie uma foto de cada vista; a IA analisa alinhamento, assimetrias e compensações.
+        </p>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">

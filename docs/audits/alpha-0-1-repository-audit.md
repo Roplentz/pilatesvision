@@ -12,18 +12,18 @@ O ponto crítico é que o repositório ainda parece estar majoritariamente em fa
 
 ## Classificação geral
 
-| Área | Status | Avaliação |
-|---|---|---|
-| Estratégia | Verde | Forte e bem direcionada |
-| Documentação | Verde | Muito boa |
-| Supabase schema | Verde | Base criada |
-| Segurança RLS | Amarelo | Criada, mas precisa teste real |
-| Storage | Amarelo | Criado, mas precisa validação no Supabase |
-| Front-end | Vermelho | Contrato existe, implementação não identificada |
-| Backend/FastAPI | Vermelho | Contrato existe, implementação não identificada |
-| MediaPipe | Vermelho | Planejado, ainda não implementado no repo |
-| Relatórios | Amarelo | Estrutura conceitual, sem motor implementado |
-| Clinical Intelligence | Amarelo | Arquitetura definida, sem execução ainda |
+| Área                  | Status   | Avaliação                                       |
+| --------------------- | -------- | ----------------------------------------------- |
+| Estratégia            | Verde    | Forte e bem direcionada                         |
+| Documentação          | Verde    | Muito boa                                       |
+| Supabase schema       | Verde    | Base criada                                     |
+| Segurança RLS         | Amarelo  | Criada, mas precisa teste real                  |
+| Storage               | Amarelo  | Criado, mas precisa validação no Supabase       |
+| Front-end             | Vermelho | Contrato existe, implementação não identificada |
+| Backend/FastAPI       | Vermelho | Contrato existe, implementação não identificada |
+| MediaPipe             | Vermelho | Planejado, ainda não implementado no repo       |
+| Relatórios            | Amarelo  | Estrutura conceitual, sem motor implementado    |
+| Clinical Intelligence | Amarelo  | Arquitetura definida, sem execução ainda        |
 
 ## O que já está pronto
 

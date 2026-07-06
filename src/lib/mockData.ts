@@ -149,11 +149,7 @@ export const mockExerciseCatalog: ExerciseDefinition[] = [
     description:
       "Ativação do powerhouse em decúbito dorsal com bombeamento dos braços e respiração coordenada.",
     joints: ["Coluna cervical", "Coluna torácica", "Coxofemoral", "Ombros"],
-    qualityCriteria: [
-      "Cabeça alinhada com o tronco",
-      "Escápulas estabilizadas",
-      "Pelve neutra",
-    ],
+    qualityCriteria: ["Cabeça alinhada com o tronco", "Escápulas estabilizadas", "Pelve neutra"],
     commonCompensations: ["Hiperextensão cervical", "Elevação dos ombros"],
   },
   {

@@ -25,7 +25,9 @@ function DinamicaPage() {
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
       <header>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Avaliação Dinâmica</h1>
-        <p className="text-sm text-muted-foreground">Análise da qualidade do movimento em exercícios funcionais e Pilates.</p>
+        <p className="text-sm text-muted-foreground">
+          Análise da qualidade do movimento em exercícios funcionais e Pilates.
+        </p>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

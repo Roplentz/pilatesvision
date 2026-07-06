@@ -101,9 +101,7 @@ function AlunoDetailPage() {
               .join("")}
           </div>
           <div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight">
-              {student.name}
-            </h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">{student.name}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {age != null ? `${age} anos · ` : ""}
               {student.gender ?? "—"} · cadastrado em{" "}
@@ -114,9 +112,7 @@ function AlunoDetailPage() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Contato
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Contato</div>
             <ul className="mt-3 space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
@@ -152,9 +148,7 @@ function AlunoDetailPage() {
           </div>
 
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Objetivos
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Objetivos</div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {!student.goals || student.goals.length === 0 ? (
                 <span className="text-sm text-muted-foreground">—</span>
@@ -180,9 +174,7 @@ function AlunoDetailPage() {
             )}
             {student.contraindications && student.contraindications.length > 0 && (
               <div className="mt-3">
-                <div className="text-xs font-medium text-muted-foreground">
-                  Contraindicações
-                </div>
+                <div className="text-xs font-medium text-muted-foreground">Contraindicações</div>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {student.contraindications.map((c) => (
                     <Badge key={c} variant="outline" className="text-[11px]">

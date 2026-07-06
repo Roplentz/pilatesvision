@@ -24,26 +24,13 @@ export type ProfessionalSpecialty =
   | "Osteopatia"
   | "RPG";
 
-export type AssessmentStatus =
-  | "draft"
-  | "in_progress"
-  | "completed"
-  | "archived";
+export type AssessmentStatus = "draft" | "in_progress" | "completed" | "archived";
 
-export type AssessmentStage =
-  | "ficha"
-  | "postural"
-  | "dinamica"
-  | "exercicios"
-  | "relatorio";
+export type AssessmentStage = "ficha" | "postural" | "dinamica" | "exercicios" | "relatorio";
 
 export type PostureView = "anterior" | "lateral" | "posterior";
 
-export type ExerciseCategory =
-  | "Mat"
-  | "Reformer"
-  | "Funcional"
-  | "Alongamento";
+export type ExerciseCategory = "Mat" | "Reformer" | "Funcional" | "Alongamento";
 
 export type ExerciseLevel = "Iniciante" | "Intermediário" | "Avançado";
 

@@ -59,29 +59,33 @@ Encontrar, analisar, classificar e recomendar projetos open source úteis para o
 
 Cada repositório deve receber notas de 0 a 5 nos seguintes critérios:
 
-| Critério | Descrição |
-|---|---|
-| Relevância | Resolve problema importante para o PilatesVision? |
-| Maturidade | Está funcional, documentado e mantido? |
-| Comunidade | Possui estrelas, forks, issues e atividade? |
-| Licença | Permite uso e adaptação segura? |
-| Qualidade técnica | Código organizado, modular e testável? |
-| Facilidade de integração | Consegue ser integrado com pouco esforço? |
-| Valor clínico | Tem aplicação real para fisioterapia? |
-| Valor comercial | Ajuda a criar diferencial competitivo? |
+| Critério                 | Descrição                                         |
+| ------------------------ | ------------------------------------------------- |
+| Relevância               | Resolve problema importante para o PilatesVision? |
+| Maturidade               | Está funcional, documentado e mantido?            |
+| Comunidade               | Possui estrelas, forks, issues e atividade?       |
+| Licença                  | Permite uso e adaptação segura?                   |
+| Qualidade técnica        | Código organizado, modular e testável?            |
+| Facilidade de integração | Consegue ser integrado com pouco esforço?         |
+| Valor clínico            | Tem aplicação real para fisioterapia?             |
+| Valor comercial          | Ajuda a criar diferencial competitivo?            |
 
 ## Classificação final
 
 ### A — Integrar
+
 Projeto maduro, útil e compatível.
 
 ### B — Adaptar
+
 Projeto útil, mas exige modificações.
 
 ### C — Estudar
+
 Projeto interessante para aprendizado, mas não pronto.
 
 ### D — Descartar
+
 Baixa qualidade, licença problemática ou pouca relevância.
 
 ## Registro padrão

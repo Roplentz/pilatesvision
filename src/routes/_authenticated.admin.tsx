@@ -9,7 +9,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Shield, Building2, Users, ClipboardCheck, FileText, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({ meta: [{ title: "Admin | PilatesVision" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Admin | PilatesVision" }, { name: "robots", content: "noindex" }],
+  }),
   component: AdminPage,
 });
 
@@ -54,8 +56,16 @@ function AdminPage() {
         supabase.from("students").select("id", { count: "exact", head: true }),
         supabase.from("assessments").select("id", { count: "exact", head: true }),
         supabase.from("reports").select("id", { count: "exact", head: true }),
-        supabase.from("clinics").select("id,name,plan,email,created_at").order("created_at", { ascending: false }).limit(20),
-        supabase.from("profiles").select("id,full_name,clinic_id,created_at").order("created_at", { ascending: false }).limit(20),
+        supabase
+          .from("clinics")
+          .select("id,name,plan,email,created_at")
+          .order("created_at", { ascending: false })
+          .limit(20),
+        supabase
+          .from("profiles")
+          .select("id,full_name,clinic_id,created_at")
+          .order("created_at", { ascending: false })
+          .limit(20),
       ]);
       if (cancelled) return;
       setCounts({
@@ -93,7 +103,9 @@ function AdminPage() {
           Esta área é exclusiva para administradores da plataforma.
         </p>
         <Link to="/dashboard">
-          <Button variant="outline" className="mt-6">Voltar ao dashboard</Button>
+          <Button variant="outline" className="mt-6">
+            Voltar ao dashboard
+          </Button>
         </Link>
       </div>
     );
@@ -113,9 +125,13 @@ function AdminPage() {
         <div>
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
-            <Badge variant="secondary" className="text-[10px]">Admin</Badge>
+            <Badge variant="secondary" className="text-[10px]">
+              Admin
+            </Badge>
           </div>
-          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Painel administrativo</h1>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
+            Painel administrativo
+          </h1>
           <p className="text-sm text-muted-foreground">Visão global da plataforma PilatesVision</p>
         </div>
       </header>

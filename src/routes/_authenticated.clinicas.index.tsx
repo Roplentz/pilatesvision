@@ -13,8 +13,7 @@ export const Route = createFileRoute("/_authenticated/clinicas/")({
       { title: "Clínicas | PilatesVision" },
       {
         name: "description",
-        content:
-          "Rede de clínicas conectadas ao PilatesVision: planos, contato e equipe.",
+        content: "Rede de clínicas conectadas ao PilatesVision: planos, contato e equipe.",
       },
     ],
   }),
@@ -56,9 +55,7 @@ function ClinicasListPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
             <Building2 className="h-3.5 w-3.5" /> Sua clínica
           </div>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-            Clínicas
-          </h1>
+          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">Clínicas</h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
             Você tem acesso aos dados da sua clínica vinculada.
           </p>
@@ -95,8 +92,7 @@ function ClinicasListPage() {
                     <div>
                       <div className="font-medium leading-tight">{clinic.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {(clinic.address as { city?: string; state?: string } | null)
-                          ?.city ?? "—"}
+                        {(clinic.address as { city?: string; state?: string } | null)?.city ?? "—"}
                       </div>
                     </div>
                   </div>

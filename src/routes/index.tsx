@@ -86,13 +86,21 @@ function Nav() {
           <span className="font-display text-lg font-semibold tracking-tight">PilatesVision</span>
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <a href="#produto" className="transition hover:text-foreground">Produto</a>
-          <a href="#como-funciona" className="transition hover:text-foreground">Como funciona</a>
-          <a href="#precos" className="transition hover:text-foreground">Planos</a>
+          <a href="#produto" className="transition hover:text-foreground">
+            Produto
+          </a>
+          <a href="#como-funciona" className="transition hover:text-foreground">
+            Como funciona
+          </a>
+          <a href="#precos" className="transition hover:text-foreground">
+            Planos
+          </a>
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/dashboard">
-            <Button variant="ghost" size="sm">Entrar</Button>
+            <Button variant="ghost" size="sm">
+              Entrar
+            </Button>
           </Link>
           <Link to="/dashboard">
             <Button variant="hero" size="sm">
@@ -137,8 +145,7 @@ function Hero() {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="mt-6 font-display text-5xl font-semibold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
           >
-            Movimento inteligente{" "}
-            <span className="text-gradient">para clínicas de Pilates.</span>
+            Movimento inteligente <span className="text-gradient">para clínicas de Pilates.</span>
           </motion.h1>
 
           <motion.p
@@ -147,8 +154,8 @@ function Hero() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="mt-6 max-w-xl text-lg text-muted-foreground"
           >
-            A PilatesVision usa visão computacional para transformar um vídeo de celular em
-            laudo biomecânico completo. Pensada para o seu estúdio, do anamnese ao relatório.
+            A PilatesVision usa visão computacional para transformar um vídeo de celular em laudo
+            biomecânico completo. Pensada para o seu estúdio, do anamnese ao relatório.
           </motion.p>
 
           <motion.div
@@ -171,9 +178,18 @@ function Hero() {
           </motion.div>
 
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" />14 dias grátis</span>
-            <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" />Sem cartão</span>
-            <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" />LGPD compliant</span>
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              14 dias grátis
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              Sem cartão
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              LGPD compliant
+            </span>
           </div>
         </div>
 
@@ -192,16 +208,8 @@ function Hero() {
               height={1280}
               className="h-full w-full object-cover"
             />
-            <FloatingStat
-              className="left-4 top-4"
-              label="Simetria pélvica"
-              value="94%"
-            />
-            <FloatingStat
-              className="bottom-4 right-4"
-              label="Ângulo de flexão"
-              value="127°"
-            />
+            <FloatingStat className="left-4 top-4" label="Simetria pélvica" value="94%" />
+            <FloatingStat className="bottom-4 right-4" label="Ângulo de flexão" value="127°" />
           </div>
         </motion.div>
       </div>
@@ -236,9 +244,13 @@ function Logos() {
   return (
     <section className="border-y border-border/60 bg-surface/30">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-12 gap-y-4 px-6 py-8 text-sm text-muted-foreground">
-        <span className="text-xs uppercase tracking-widest">Confiado por estúdios em todo Brasil</span>
+        <span className="text-xs uppercase tracking-widest">
+          Confiado por estúdios em todo Brasil
+        </span>
         {names.map((n) => (
-          <span key={n} className="font-display text-base text-muted-foreground/80">{n}</span>
+          <span key={n} className="font-display text-base text-muted-foreground/80">
+            {n}
+          </span>
         ))}
       </div>
     </section>
@@ -254,8 +266,8 @@ function Features() {
           Um sistema operacional para o seu estúdio.
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          Da avaliação inicial à evolução do aluno — tudo em uma plataforma única,
-          desenhada para a rotina clínica do Pilates.
+          Da avaliação inicial à evolução do aluno — tudo em uma plataforma única, desenhada para a
+          rotina clínica do Pilates.
         </p>
       </div>
       <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -287,14 +299,16 @@ function HowItWorks() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-xl">
-            <p className="text-sm font-medium uppercase tracking-widest text-primary">Como funciona</p>
+            <p className="text-sm font-medium uppercase tracking-widest text-primary">
+              Como funciona
+            </p>
             <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">
               Três passos. Uma câmera.
             </h2>
           </div>
           <p className="max-w-md text-muted-foreground">
-            Sem hardware especial, sem marcadores. Funciona em qualquer celular
-            moderno — basta abrir o app e gravar.
+            Sem hardware especial, sem marcadores. Funciona em qualquer celular moderno — basta
+            abrir o app e gravar.
           </p>
         </div>
         <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/60 md:grid-cols-3">
@@ -324,8 +338,7 @@ function CTA() {
             Pronto para fazer avaliações que impressionam?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Crie sua conta e faça a primeira avaliação ainda hoje.
-            Sem instalação, sem hardware.
+            Crie sua conta e faça a primeira avaliação ainda hoje. Sem instalação, sem hardware.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link to="/auth" search={{ mode: "signup" } as never}>
@@ -335,7 +348,9 @@ function CTA() {
               </Button>
             </Link>
             <Link to="/auth">
-              <Button variant="outline" size="lg">Já tenho conta</Button>
+              <Button variant="outline" size="lg">
+                Já tenho conta
+              </Button>
             </Link>
           </div>
         </div>
@@ -354,9 +369,15 @@ function Footer() {
           <span>© {new Date().getFullYear()}</span>
         </div>
         <div className="flex gap-6">
-          <a href="#" className="transition hover:text-foreground">Privacidade</a>
-          <a href="#" className="transition hover:text-foreground">Termos</a>
-          <a href="#" className="transition hover:text-foreground">Contato</a>
+          <a href="#" className="transition hover:text-foreground">
+            Privacidade
+          </a>
+          <a href="#" className="transition hover:text-foreground">
+            Termos
+          </a>
+          <a href="#" className="transition hover:text-foreground">
+            Contato
+          </a>
         </div>
       </div>
     </footer>

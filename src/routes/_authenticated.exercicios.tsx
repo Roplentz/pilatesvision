@@ -43,13 +43,7 @@ export const Route = createFileRoute("/_authenticated/exercicios")({
 
 type Categoria = "Mat" | "Reformer" | "Funcional" | "Alongamento";
 type Nivel = "Iniciante" | "Intermediário" | "Avançado";
-type Objetivo =
-  | "Core"
-  | "Mobilidade"
-  | "Estabilidade"
-  | "Força"
-  | "Postura"
-  | "Equilíbrio";
+type Objetivo = "Core" | "Mobilidade" | "Estabilidade" | "Força" | "Postura" | "Equilíbrio";
 type Vista = "Lateral" | "Frontal" | "Posterior" | "Superior";
 
 interface Exercise {
@@ -144,10 +138,7 @@ const EXERCISES: Exercise[] = [
       "Tensão cervical excessiva",
       "Joelho da perna estendida bloqueado",
     ],
-    feedback: [
-      "Simetria entre lados D/E: 94%",
-      "Estabilidade pélvica acima da média",
-    ],
+    feedback: ["Simetria entre lados D/E: 94%", "Estabilidade pélvica acima da média"],
   },
   {
     id: "shoulder-bridge",
@@ -276,10 +267,7 @@ const EXERCISES: Exercise[] = [
       "Inclinação lateral do tronco",
       "Queda pélvica contralateral",
     ],
-    feedback: [
-      "Simetria D/E: 89%",
-      "Leve queda pélvica esquerda detectada",
-    ],
+    feedback: ["Simetria D/E: 89%", "Leve queda pélvica esquerda detectada"],
   },
   {
     id: "spine-stretch",
@@ -302,10 +290,7 @@ const EXERCISES: Exercise[] = [
       "Cabeça projetada à frente",
       "Curvatura em bloco",
     ],
-    feedback: [
-      "Sequenciamento melhorado em 18% vs. baseline",
-      "Mobilidade torácica funcional",
-    ],
+    feedback: ["Sequenciamento melhorado em 18% vs. baseline", "Mobilidade torácica funcional"],
   },
   {
     id: "cat-stretch",
@@ -328,10 +313,7 @@ const EXERCISES: Exercise[] = [
       "Cotovelos hiperestendidos",
       "Respiração superficial",
     ],
-    feedback: [
-      "Fluidez do movimento alta",
-      "Boa amplitude torácica",
-    ],
+    feedback: ["Fluidez do movimento alta", "Boa amplitude torácica"],
   },
   {
     id: "mermaid",
@@ -354,10 +336,7 @@ const EXERCISES: Exercise[] = [
       "Elevação do ombro de apoio",
       "Perda do contato isquial",
     ],
-    feedback: [
-      "Amplitude lateral simétrica",
-      "Atenção: ombro de apoio elevado ~2cm",
-    ],
+    feedback: ["Amplitude lateral simétrica", "Atenção: ombro de apoio elevado ~2cm"],
   },
   {
     id: "side-kicks",
@@ -375,15 +354,8 @@ const EXERCISES: Exercise[] = [
       "Pé em flexão na ida, ponta na volta",
       "Amplitude funcional",
     ],
-    compensacoes: [
-      "Báscula pélvica posterior",
-      "Rotação do tronco",
-      "Encurtamento da amplitude",
-    ],
-    feedback: [
-      "Estabilidade pélvica 91% do tempo",
-      "Amplitude D > E em ~8°",
-    ],
+    compensacoes: ["Báscula pélvica posterior", "Rotação do tronco", "Encurtamento da amplitude"],
+    feedback: ["Estabilidade pélvica 91% do tempo", "Amplitude D > E em ~8°"],
   },
 ];
 
@@ -422,8 +394,7 @@ function ExerciciosPage() {
       if (categoria !== "Todas" && e.categoria !== categoria) return false;
       if (nivel !== "Todos" && e.nivel !== nivel) return false;
       if (objetivo !== "Todos" && e.objetivo !== objetivo) return false;
-      if (query && !e.nome.toLowerCase().includes(query.toLowerCase()))
-        return false;
+      if (query && !e.nome.toLowerCase().includes(query.toLowerCase())) return false;
       return true;
     });
   }, [query, categoria, nivel, objetivo]);
@@ -663,9 +634,7 @@ function ExerciciosPage() {
                     variant={prescritos.includes(selected.id) ? "secondary" : "default"}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    {prescritos.includes(selected.id)
-                      ? "Já prescrito"
-                      : "Adicionar à prescrição"}
+                    {prescritos.includes(selected.id) ? "Já prescrito" : "Adicionar à prescrição"}
                   </Button>
                 </div>
               </div>
@@ -746,7 +715,10 @@ function ExerciseCard({
           </div>
         </div>
         <div className="absolute bottom-2 left-3 flex gap-1.5">
-          <Badge variant="outline" className="border-border/60 bg-background/60 backdrop-blur text-[10px]">
+          <Badge
+            variant="outline"
+            className="border-border/60 bg-background/60 backdrop-blur text-[10px]"
+          >
             <Eye className="h-2.5 w-2.5 mr-1" /> {ex.vista}
           </Badge>
         </div>
@@ -781,12 +753,7 @@ function ExerciseCard({
           ))}
         </ul>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onOpen}
-          className="w-full mt-3 group/btn"
-        >
+        <Button variant="outline" size="sm" onClick={onOpen} className="w-full mt-3 group/btn">
           Ver detalhes
           <ArrowRight className="h-3.5 w-3.5 ml-1 group-hover/btn:translate-x-0.5 transition-transform" />
         </Button>

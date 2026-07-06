@@ -11,7 +11,11 @@ const subscribe = (cb: () => void) => {
 };
 
 export function useAssessments(): Assessment[] {
-  return useSyncExternalStore(subscribe, () => assessments, () => assessments);
+  return useSyncExternalStore(
+    subscribe,
+    () => assessments,
+    () => assessments,
+  );
 }
 
 export function getAssessment(id: string): Assessment | undefined {

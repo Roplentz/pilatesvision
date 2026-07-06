@@ -16,8 +16,7 @@ export const Route = createFileRoute("/_authenticated/alunos/")({
       { title: "Alunos | PilatesVision" },
       {
         name: "description",
-        content:
-          "Prontuário digital dos alunos da clínica: histórico, objetivos e avaliações.",
+        content: "Prontuário digital dos alunos da clínica: histórico, objetivos e avaliações.",
       },
     ],
   }),
@@ -47,8 +46,7 @@ function AlunosListPage() {
     );
   }, [students, q]);
 
-  const countFor = (id: string) =>
-    assessments.filter((a) => a.student_id === id).length;
+  const countFor = (id: string) => assessments.filter((a) => a.student_id === id).length;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -74,9 +72,7 @@ function AlunosListPage() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
               <Users className="h-3.5 w-3.5" /> Prontuário digital
             </div>
-            <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-              Alunos
-            </h1>
+            <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">Alunos</h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               {loading
                 ? "Carregando alunos…"
@@ -96,9 +92,7 @@ function AlunosListPage() {
 
         {filtered.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              Nenhum aluno encontrado para "{q}".
-            </p>
+            <p className="text-sm text-muted-foreground">Nenhum aluno encontrado para "{q}".</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -147,7 +141,9 @@ function AlunosListPage() {
                   </div>
 
                   <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3 text-xs text-muted-foreground">
-                    <span>{s.height_cm ?? "—"} cm · {s.weight_kg ?? "—"} kg</span>
+                    <span>
+                      {s.height_cm ?? "—"} cm · {s.weight_kg ?? "—"} kg
+                    </span>
                     <span>
                       {countFor(s.id)} avaliaç{countFor(s.id) === 1 ? "ão" : "ões"}
                     </span>

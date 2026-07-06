@@ -1,14 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  Building2,
-  Loader2,
-  Mail,
-  MapPin,
-  Phone,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ArrowLeft, Building2, Loader2, Mail, MapPin, Phone, Sparkles, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useClinicById, useClinicCounts } from "@/lib/clinicsStore";
@@ -82,9 +73,7 @@ function ClinicaDetailPage() {
             <Building2 className="h-7 w-7" />
           </div>
           <div className="flex-1">
-            <h1 className="font-display text-3xl font-semibold tracking-tight">
-              {clinic.name}
-            </h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">{clinic.name}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {clinic.slug} · cadastrada em{" "}
               {new Date(clinic.created_at).toLocaleDateString("pt-BR")}
@@ -98,9 +87,7 @@ function ClinicaDetailPage() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Contato
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Contato</div>
             <ul className="mt-3 space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
@@ -114,9 +101,7 @@ function ClinicaDetailPage() {
           </div>
 
           <div className="rounded-xl border border-border/60 bg-card/40 p-5 md:col-span-2">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Endereço
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Endereço</div>
             {address ? (
               <div className="mt-3 flex items-start gap-2 text-sm leading-relaxed">
                 <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
@@ -129,29 +114,19 @@ function ClinicaDetailPage() {
                 </div>
               </div>
             ) : (
-              <p className="mt-3 text-sm text-muted-foreground">
-                Endereço não informado.
-              </p>
+              <p className="mt-3 text-sm text-muted-foreground">Endereço não informado.</p>
             )}
           </div>
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Alunos
-            </div>
-            <div className="mt-2 font-display text-3xl font-semibold">
-              {counts.students}
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Alunos</div>
+            <div className="mt-2 font-display text-3xl font-semibold">{counts.students}</div>
           </div>
           <div className="rounded-xl border border-border/60 bg-card/40 p-5">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Avaliações
-            </div>
-            <div className="mt-2 font-display text-3xl font-semibold">
-              {counts.assessments}
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Avaliações</div>
+            <div className="mt-2 font-display text-3xl font-semibold">{counts.assessments}</div>
           </div>
         </div>
 
@@ -173,9 +148,7 @@ function ClinicaDetailPage() {
                     className="flex items-center justify-between rounded-xl border border-border/60 bg-card/40 px-5 py-4 transition hover:border-primary/60"
                   >
                     <div className="text-sm font-medium">{s.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {(s.goals ?? [])[0] ?? "—"}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{(s.goals ?? [])[0] ?? "—"}</div>
                   </Link>
                 </li>
               ))}

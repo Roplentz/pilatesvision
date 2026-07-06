@@ -78,11 +78,7 @@ export function useStudent(id: string | null | undefined) {
 
 /** Insere um novo aluno. clinic_id deve vir do perfil do usuário logado. */
 export async function createStudent(input: NewStudentInput): Promise<StudentRow> {
-  const { data, error } = await supabase
-    .from("students")
-    .insert(input)
-    .select("*")
-    .single();
+  const { data, error } = await supabase.from("students").insert(input).select("*").single();
   if (error) throw new Error(error.message);
   return data as StudentRow;
 }

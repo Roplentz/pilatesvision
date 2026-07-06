@@ -142,17 +142,18 @@ export async function analyzePosturalImage(payload: PosturalPayload): Promise<An
       console.warn("[pilatesVisionApi] postural externo falhou, usando fallback:", err);
     }
   }
-  return fallbackAnalyzeImage("postural", payload.image, payload.context ?? `Vista: ${payload.view}`);
+  return fallbackAnalyzeImage(
+    "postural",
+    payload.image,
+    payload.context ?? `Vista: ${payload.view}`,
+  );
 }
 
 export async function analyzeDynamicVideo(payload: DynamicPayload): Promise<AnalysisResult> {
   const base = externalBase();
   if (base && payload.video) {
     try {
-      const raw = await postJson<Partial<AnalysisResult>>(
-        `${base}/analyze/dynamic-video`,
-        payload,
-      );
+      const raw = await postJson<Partial<AnalysisResult>>(`${base}/analyze/dynamic-video`, payload);
       return normalizeExternal(raw, "dinamica");
     } catch (err) {
       console.warn("[pilatesVisionApi] dinâmico externo falhou, usando fallback:", err);
@@ -184,9 +185,7 @@ export async function analyzeExerciseVideo(payload: ExercisePayload): Promise<An
     }
   }
   if (!payload.image) {
-    throw new Error(
-      "Análise de vídeo ainda não disponível. Envie um frame (imagem) do exercício.",
-    );
+    throw new Error("Análise de vídeo ainda não disponível. Envie um frame (imagem) do exercício.");
   }
   return fallbackAnalyzeImage(
     "exercicio",

@@ -23,8 +23,7 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/")({
       { title: "Avaliações | PilatesVision" },
       {
         name: "description",
-        content:
-          "Histórico de avaliações posturais e dinâmicas da clínica, por aluno.",
+        content: "Histórico de avaliações posturais e dinâmicas da clínica, por aluno.",
       },
     ],
   }),
@@ -53,10 +52,7 @@ function AvaliacoesListPage() {
   const [studentFilter, setStudentFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const studentMap = useMemo(
-    () => Object.fromEntries(students.map((s) => [s.id, s])),
-    [students],
-  );
+  const studentMap = useMemo(() => Object.fromEntries(students.map((s) => [s.id, s])), [students]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -65,9 +61,7 @@ function AvaliacoesListPage() {
       if (statusFilter !== "all" && a.status !== statusFilter) return false;
       if (!needle) return true;
       const name =
-        a.students?.name?.toLowerCase() ??
-        studentMap[a.student_id]?.name.toLowerCase() ??
-        "";
+        a.students?.name?.toLowerCase() ?? studentMap[a.student_id]?.name.toLowerCase() ?? "";
       return (
         name.includes(needle) ||
         a.main_complaint?.toLowerCase().includes(needle) ||
@@ -101,9 +95,7 @@ function AvaliacoesListPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
             <Activity className="h-3.5 w-3.5" /> Prontuário
           </div>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
-            Avaliações
-          </h1>
+          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">Avaliações</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {assessments.length} avaliaç{assessments.length === 1 ? "ão" : "ões"} no histórico.
           </p>
@@ -157,8 +149,7 @@ function AvaliacoesListPage() {
         ) : (
           <ul className="space-y-3">
             {filtered.map((a, i) => {
-              const studentName =
-                a.students?.name ?? studentMap[a.student_id]?.name ?? "Aluno";
+              const studentName = a.students?.name ?? studentMap[a.student_id]?.name ?? "Aluno";
               return (
                 <motion.li
                   key={a.id}
@@ -182,9 +173,9 @@ function AvaliacoesListPage() {
                       <div>
                         <div className="font-medium">{studentName}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">
-                          {new Date(a.created_at).toLocaleDateString("pt-BR")} ·
-                          Etapa: {stageLabel[a.current_stage] ?? a.current_stage} · Dor{" "}
-                          {a.pain_level ?? 0}/10
+                          {new Date(a.created_at).toLocaleDateString("pt-BR")} · Etapa:{" "}
+                          {stageLabel[a.current_stage] ?? a.current_stage} · Dor {a.pain_level ?? 0}
+                          /10
                         </div>
                       </div>
                     </div>

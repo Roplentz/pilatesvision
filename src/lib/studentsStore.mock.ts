@@ -18,7 +18,11 @@ const subscribe = (cb: () => void) => {
 };
 
 export function useStudents(): Student[] {
-  return useSyncExternalStore(subscribe, () => students, () => students);
+  return useSyncExternalStore(
+    subscribe,
+    () => students,
+    () => students,
+  );
 }
 
 export function getStudent(id: string): Student | undefined {

@@ -51,14 +51,8 @@ export function useAssessments(clinicId: string | null | undefined) {
 }
 
 /** Insere uma nova avaliação. clinic_id deve vir do perfil do usuário logado. */
-export async function createAssessment(
-  input: NewAssessmentInput,
-): Promise<AssessmentRow> {
-  const { data, error } = await supabase
-    .from("assessments")
-    .insert(input)
-    .select("*")
-    .single();
+export async function createAssessment(input: NewAssessmentInput): Promise<AssessmentRow> {
+  const { data, error } = await supabase.from("assessments").insert(input).select("*").single();
   if (error) throw new Error(error.message);
   return data as AssessmentRow;
 }
@@ -129,7 +123,7 @@ export function useAssessmentExtras(assessmentId: string | null | undefined) {
       if (cancelled) return;
       setPostural((p.data as PosturalResultRow | null) ?? null);
       setMovement((m.data as MovementResultRow | null) ?? null);
-      setPrescribed(((pres.data ?? []) as PrescribedExerciseRow[]));
+      setPrescribed((pres.data ?? []) as PrescribedExerciseRow[]);
       setReport((r.data as ReportRow | null) ?? null);
       setLoading(false);
     });
@@ -161,7 +155,7 @@ export function useStudentAssessments(studentId: string | null | undefined) {
       .order("created_at", { ascending: false })
       .then(({ data }) => {
         if (cancelled) return;
-        setAssessments(((data ?? []) as AssessmentRow[]));
+        setAssessments((data ?? []) as AssessmentRow[]);
         setLoading(false);
       });
     return () => {

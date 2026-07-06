@@ -96,8 +96,8 @@ function Consent() {
           Conectar {clientName} à sua conta PilatesVision
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Isso permitirá que {clientName} acesse suas ferramentas e dados no PilatesVision agindo como você.
-          Você pode revogar o acesso a qualquer momento.
+          Isso permitirá que {clientName} acesse suas ferramentas e dados no PilatesVision agindo
+          como você. Você pode revogar o acesso a qualquer momento.
         </p>
         {error && (
           <p role="alert" className="mt-4 text-sm text-destructive">

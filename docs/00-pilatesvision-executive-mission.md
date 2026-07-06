@@ -58,9 +58,11 @@ O ativo principal é o motor clínico-biomecânico capaz de transformar fotos, v
 ## Camadas principais
 
 ### 1. Vision Engine
+
 Responsável por receber imagens e vídeos, organizar arquivos, padronizar entrada e preparar dados para análise.
 
 ### 2. Pose Engine
+
 Responsável por detectar pontos anatômicos e estimar pose corporal.
 
 Candidatos open source a avaliar:
@@ -71,6 +73,7 @@ Candidatos open source a avaliar:
 - OpenPose.
 
 ### 3. Movement Engine
+
 Responsável por calcular métricas biomecânicas simples:
 
 - ângulos articulares;
@@ -82,6 +85,7 @@ Responsável por calcular métricas biomecânicas simples:
 - trajetória do movimento.
 
 ### 4. Clinical Engine
+
 Diferencial proprietário do FisioHub.
 
 Responsável por interpretar os achados biomecânicos com linguagem clínica.
@@ -97,14 +101,17 @@ Exemplos:
 - sugestão de conduta fisioterapêutica.
 
 ### 5. AI Engine
+
 Responsável por apoiar a interpretação, gerar sínteses, sugerir hipóteses e organizar relatórios.
 
 Deve operar como apoio à decisão, não como substituto do fisioterapeuta.
 
 ### 6. Report Engine
+
 Responsável por gerar relatórios claros, comparativos e evolutivos.
 
 ### 7. Dashboard
+
 Interface para fisioterapeutas, gestores e, futuramente, pacientes.
 
 ## Dados clínicos essenciais

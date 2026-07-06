@@ -52,17 +52,17 @@ Hipóteses:
 
 ## Comparação com `Roplentz/pilatesvision`
 
-| Critério | pilatesvision | pilatesvision-app- |
-|---|---|---|
-| Documentação estratégica | Forte | Não identificada |
-| Supabase migrations | Sim | Não identificado |
-| RLS | Sim | Não identificado |
-| Storage | Sim | Não identificado |
-| Contrato front-end | Sim | Não identificado |
-| Contrato backend | Sim | Não identificado |
-| GitHub Innovation Agent | Sim | Não identificado |
-| Código executável | Ainda fraco | Não identificado |
-| Valor como base principal | Alto | Baixo |
+| Critério                  | pilatesvision | pilatesvision-app- |
+| ------------------------- | ------------- | ------------------ |
+| Documentação estratégica  | Forte         | Não identificada   |
+| Supabase migrations       | Sim           | Não identificado   |
+| RLS                       | Sim           | Não identificado   |
+| Storage                   | Sim           | Não identificado   |
+| Contrato front-end        | Sim           | Não identificado   |
+| Contrato backend          | Sim           | Não identificado   |
+| GitHub Innovation Agent   | Sim           | Não identificado   |
+| Código executável         | Ainda fraco   | Não identificado   |
+| Valor como base principal | Alto          | Baixo              |
 
 ## Recomendação
 

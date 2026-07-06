@@ -139,6 +139,7 @@ function AuthedLayout() {
           slug,
           email: user.email ?? null,
           plan: "starter",
+          owner_user_id: user.id,
         });
         await setProfileClinic(user.id, clinic.id);
         // Recarrega para que useProfile e os hooks dependentes reabsorvam o clinic_id.

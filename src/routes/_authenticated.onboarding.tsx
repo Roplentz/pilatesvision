@@ -6,12 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { setProfileClinic } from "@/lib/clinicsStore";
+import { createClinic, setProfileClinic } from "@/lib/clinicsStore";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Bem-vindo | PilatesVision" }] }),
   component: OnboardingPage,
 });
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
 function OnboardingPage() {
   const navigate = useNavigate();
@@ -21,11 +30,12 @@ function OnboardingPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      navigate({ to: "/login", replace: true });
+      navigate({ to: "/auth", replace: true });
       return;
     }
     if (!name.trim()) {
@@ -34,18 +44,23 @@ function OnboardingPage() {
     }
     setSubmitting(true);
     try {
-      const { data: created, error } = await supabase
-        .from("clinics")
-        .insert({
-          name: name.trim(),
-          owner_user_id: user.id,
-          city: city.trim() || null,
-          state: stateUf.trim() || null,
-        } as any)
-        .select()
-        .single();
-      if (error) throw new Error(error.message);
-      await setProfileClinic(user.id, (created as any).id);
+      const created = await createClinic({
+        name: name.trim(),
+        slug: `${slugify(name.trim()) || "clinica"}-${user.id.slice(0, 6)}`,
+        email: user.email ?? null,
+        owner_user_id: user.id,
+        city: city.trim() || null,
+        state: stateUf.trim().toUpperCase() || null,
+        address:
+          city.trim() || stateUf.trim()
+            ? {
+                city: city.trim(),
+                state: stateUf.trim().toUpperCase(),
+                country: "BR",
+              }
+            : null,
+      });
+      await setProfileClinic(user.id, created.id);
       toast.success("Clínica criada. Bem-vindo!");
       navigate({ to: "/dashboard", replace: true });
     } catch (err) {

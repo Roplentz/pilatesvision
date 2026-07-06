@@ -40,6 +40,22 @@ type ProfileClinicRow = {
   clinic_id: string | null;
 };
 
+function buildClinicAddress(input: Partial<NewClinicInput>): ClinicAddress | null {
+  if (input.address) {
+    return input.address;
+  }
+
+  if (input.city || input.state) {
+    return {
+      city: input.city ?? undefined,
+      state: input.state ?? undefined,
+      country: "BR",
+    };
+  }
+
+  return null;
+}
+
 export function useClinic(userId: string | null | undefined) {
   const [clinic, setClinic] = useState<ClinicRow | null>(null);
   const [clinicId, setClinicId] = useState<string | null>(null);
@@ -222,9 +238,7 @@ export async function createClinic(input: NewClinicInput): Promise<ClinicRow> {
     email: input.email ?? null,
     phone: input.phone ?? null,
     plan: input.plan ?? "starter",
-    address: input.address ?? null,
-    city: input.city ?? input.address?.city ?? null,
-    state: input.state ?? input.address?.state ?? null,
+    address: buildClinicAddress(input),
     owner_user_id: input.owner_user_id ?? null,
   };
 
@@ -253,9 +267,20 @@ export async function setProfileClinic(userId: string, clinicId: string): Promis
 }
 
 export async function updateClinic(id: string, input: Partial<NewClinicInput>): Promise<void> {
+  const payload: Record<string, unknown> = {
+    ...input,
+  };
+
+  delete payload.city;
+  delete payload.state;
+
+  if (input.address || input.city || input.state) {
+    payload.address = buildClinicAddress(input);
+  }
+
   const { error } = await supabase
     .from("clinics")
-    .update(input as unknown as never)
+    .update(payload as never)
     .eq("id", id);
 
   if (error) {

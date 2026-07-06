@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { createStudent } from "@/lib/studentsStore";
 import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/alunos/novo")({
@@ -26,21 +28,27 @@ export const Route = createFileRoute("/_authenticated/alunos/novo")({
 function NovoAlunoPage() {
   const navigate = useNavigate();
   const { clinicId, loading: profileLoading } = useProfile();
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState<"F" | "M" | "outro">("F");
-  const [heightCm, setHeightCm] = useState("");
-  const [weightKg, setWeightKg] = useState("");
-  const [goals, setGoals] = useState("");
-  const [medical, setMedical] = useState("");
+  const [age, setAge] = useState("");
+  const [sex, setSex] = useState<"F" | "M" | "outro">("F");
+  const [mainGoal, setMainGoal] = useState("");
+  const [mainComplaint, setMainComplaint] = useState("");
+  const [clinicalNotes, setClinicalNotes] = useState("");
+  const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !birthDate) {
-      toast.error("Nome e data de nascimento são obrigatórios.");
+    if (!name.trim()) {
+      toast.error("O nome é obrigatório.");
+      return;
+    }
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error("E-mail inválido.");
       return;
     }
     if (!clinicId) {
@@ -54,20 +62,20 @@ function NovoAlunoPage() {
         name: name.trim(),
         email: email.trim() || null,
         phone: phone.trim() || null,
-        birth_date: birthDate,
-        gender,
-        height_cm: Number(heightCm) || null,
-        weight_kg: Number(weightKg) || null,
-        goals: goals
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean),
-        medical_history: medical.trim() || null,
+        birth_date: birthDate || null,
+        age: age ? Number(age) : null,
+        gender: sex,
+        goals: mainGoal.trim() ? [mainGoal.trim()] : null,
+        main_complaint: mainComplaint.trim() || null,
+        clinical_notes: clinicalNotes.trim() || null,
+        consent_given_at: consent ? new Date().toISOString() : null,
+        created_by: user?.id ?? null,
+        status: "active",
       });
-      toast.success("Aluno cadastrado com sucesso.");
+      toast.success("Paciente cadastrado com sucesso.");
       navigate({ to: "/alunos/$id", params: { id: created.id } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Falha ao cadastrar aluno.");
+      toast.error(err instanceof Error ? err.message : "Falha ao cadastrar paciente.");
     } finally {
       setSubmitting(false);
     }
@@ -81,7 +89,7 @@ function NovoAlunoPage() {
             to="/alunos"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" /> Alunos
+            <ArrowLeft className="h-4 w-4" /> Pacientes
           </Link>
         </div>
       </header>
@@ -92,7 +100,7 @@ function NovoAlunoPage() {
             <UserPlus className="h-3.5 w-3.5" /> Novo cadastro
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
-            Cadastrar aluno
+            Cadastrar paciente
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Os dados são salvos na clínica vinculada ao seu perfil.
@@ -135,7 +143,7 @@ function NovoAlunoPage() {
               />
             </div>
             <div>
-              <Label htmlFor="birth">Data de nascimento *</Label>
+              <Label htmlFor="birth">Data de nascimento</Label>
               <Input
                 id="birth"
                 type="date"
@@ -145,8 +153,20 @@ function NovoAlunoPage() {
               />
             </div>
             <div>
-              <Label>Gênero</Label>
-              <Select value={gender} onValueChange={(v) => setGender(v as typeof gender)}>
+              <Label htmlFor="age">Idade (se não informar data)</Label>
+              <Input
+                id="age"
+                type="number"
+                min={0}
+                max={120}
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label>Sexo</Label>
+              <Select value={sex} onValueChange={(v) => setSex(v as typeof sex)}>
                 <SelectTrigger className="mt-1.5">
                   <SelectValue />
                 </SelectTrigger>
@@ -157,49 +177,52 @@ function NovoAlunoPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="height">Altura (cm)</Label>
-              <Input
-                id="height"
-                type="number"
-                value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="weight">Peso (kg)</Label>
-              <Input
-                id="weight"
-                type="number"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
           </div>
 
           <div>
-            <Label htmlFor="goals">Objetivos (separados por vírgula)</Label>
+            <Label htmlFor="goal">Objetivo principal</Label>
             <Input
-              id="goals"
-              value={goals}
-              onChange={(e) => setGoals(e.target.value)}
-              placeholder="Melhorar postura, Reduzir dor lombar"
+              id="goal"
+              value={mainGoal}
+              onChange={(e) => setMainGoal(e.target.value)}
+              placeholder="Melhorar postura"
               className="mt-1.5"
             />
           </div>
 
           <div>
-            <Label htmlFor="medical">Histórico clínico</Label>
+            <Label htmlFor="complaint">Queixa principal</Label>
+            <Input
+              id="complaint"
+              value={mainComplaint}
+              onChange={(e) => setMainComplaint(e.target.value)}
+              placeholder="Dor lombar há 3 meses"
+              className="mt-1.5"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="notes">Observações clínicas</Label>
             <Textarea
-              id="medical"
-              value={medical}
-              onChange={(e) => setMedical(e.target.value)}
+              id="notes"
+              value={clinicalNotes}
+              onChange={(e) => setClinicalNotes(e.target.value)}
               rows={4}
               className="mt-1.5"
               placeholder="Cirurgias, condições crônicas, restrições…"
             />
+          </div>
+
+          <div className="flex items-start gap-3 rounded-lg border border-border/60 bg-background/40 p-4">
+            <Checkbox
+              id="consent"
+              checked={consent}
+              onCheckedChange={(v) => setConsent(v === true)}
+            />
+            <Label htmlFor="consent" className="text-sm font-normal leading-relaxed">
+              O paciente forneceu consentimento para uso dos dados clínicos e imagens para fins
+              de avaliação e acompanhamento.
+            </Label>
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-border/40 pt-5">
@@ -209,7 +232,7 @@ function NovoAlunoPage() {
               </Button>
             </Link>
             <Button type="submit" variant="hero" disabled={submitting || profileLoading}>
-              {submitting ? "Salvando…" : "Cadastrar aluno"}
+              {submitting ? "Salvando…" : "Cadastrar paciente"}
             </Button>
           </div>
         </form>

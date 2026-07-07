@@ -220,8 +220,8 @@ function NovoAlunoPage() {
               onCheckedChange={(v) => setConsent(v === true)}
             />
             <Label htmlFor="consent" className="text-sm font-normal leading-relaxed">
-              O paciente forneceu consentimento para uso dos dados clínicos e imagens para fins
-              de avaliação e acompanhamento.
+              O paciente forneceu consentimento para uso dos dados clínicos e imagens para fins de
+              avaliação e acompanhamento.
             </Label>
           </div>
 

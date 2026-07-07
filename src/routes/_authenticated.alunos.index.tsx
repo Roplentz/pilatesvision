@@ -105,7 +105,8 @@ function AlunosListPage() {
             <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
               <Users className="mx-auto h-8 w-8 text-muted-foreground" />
               <p className="mt-4 text-sm text-muted-foreground">
-                Nenhum paciente {status === "active" ? "ativo " : status === "archived" ? "arquivado " : ""}
+                Nenhum paciente{" "}
+                {status === "active" ? "ativo " : status === "archived" ? "arquivado " : ""}
                 cadastrado ainda.
               </p>
               <Link to="/alunos/novo" className="mt-4 inline-block">
@@ -123,65 +124,61 @@ function AlunosListPage() {
           )
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border/60 bg-card/40">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-border/60 text-xs uppercase tracking-wide text-muted-foreground">
-                  <tr>
-                    <th className="px-4 py-3">Nome</th>
-                    <th className="px-4 py-3">Idade</th>
-                    <th className="px-4 py-3">Queixa principal</th>
-                    <th className="px-4 py-3">Objetivo</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Atualizado</th>
-                    <th className="px-4 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {filtered.map((s) => {
-                    const age = ageFrom(s.birth_date, s.age);
-                    const st = (s.status as StudentStatus) ?? "active";
-                    return (
-                      <tr key={s.id} className="transition hover:bg-card/60">
-                        <td className="px-4 py-3 font-medium">{s.name}</td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {age != null ? `${age} anos` : "—"}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {s.main_complaint ?? "—"}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {s.goals?.[0] ?? "—"}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            variant={
-                              st === "active"
-                                ? "default"
-                                : st === "archived"
-                                  ? "outline"
-                                  : "secondary"
-                            }
-                            className="text-[10px]"
-                          >
-                            {statusLabels[st]}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-xs text-muted-foreground">
-                          {new Date(s.updated_at).toLocaleDateString("pt-BR")}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <Link
-                            to="/alunos/$id"
-                            params={{ id: s.id }}
-                            className="text-xs font-medium text-primary hover:underline"
-                          >
-                            Abrir perfil
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border/60 text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Nome</th>
+                  <th className="px-4 py-3">Idade</th>
+                  <th className="px-4 py-3">Queixa principal</th>
+                  <th className="px-4 py-3">Objetivo</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Atualizado</th>
+                  <th className="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {filtered.map((s) => {
+                  const age = ageFrom(s.birth_date, s.age);
+                  const st = (s.status as StudentStatus) ?? "active";
+                  return (
+                    <tr key={s.id} className="transition hover:bg-card/60">
+                      <td className="px-4 py-3 font-medium">{s.name}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {age != null ? `${age} anos` : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">{s.main_complaint ?? "—"}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{s.goals?.[0] ?? "—"}</td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant={
+                            st === "active"
+                              ? "default"
+                              : st === "archived"
+                                ? "outline"
+                                : "secondary"
+                          }
+                          className="text-[10px]"
+                        >
+                          {statusLabels[st]}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {new Date(s.updated_at).toLocaleDateString("pt-BR")}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          to="/alunos/$id"
+                          params={{ id: s.id }}
+                          className="text-xs font-medium text-primary hover:underline"
+                        >
+                          Abrir perfil
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </main>

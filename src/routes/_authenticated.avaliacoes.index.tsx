@@ -171,8 +171,7 @@ function AvaliacoesListPage() {
                         <div className="font-medium">{studentName}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">
                           {new Date(a.created_at).toLocaleDateString("pt-BR")} ·{" "}
-                          {typeLabel[a.type] ?? a.type} · Dor{" "}
-                          {a.pain_score ?? a.pain_level ?? 0}/10
+                          {typeLabel[a.type] ?? a.type} · Dor {a.pain_score ?? a.pain_level ?? 0}/10
                         </div>
                       </div>
                     </div>

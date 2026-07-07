@@ -39,13 +39,12 @@ export function useStudents(
     if (statusFilter !== "all") {
       query = query.eq("status", statusFilter);
     }
-    query
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        if (error) setError(new Error(error.message));
-        else setStudents((data ?? []) as StudentRow[]);
-        setLoading(false);
-      });
+    query.then(({ data, error }) => {
+      if (cancelled) return;
+      if (error) setError(new Error(error.message));
+      else setStudents((data ?? []) as StudentRow[]);
+      setLoading(false);
+    });
     return () => {
       cancelled = true;
     };
@@ -96,10 +95,7 @@ export async function createStudent(input: NewStudentInput): Promise<StudentRow>
 }
 
 /** Atualiza dados básicos de um aluno. clinic_id nunca é alterado. */
-export async function updateStudent(
-  id: string,
-  patch: UpdateStudentInput,
-): Promise<StudentRow> {
+export async function updateStudent(id: string, patch: UpdateStudentInput): Promise<StudentRow> {
   const safe: UpdateStudentInput = { ...patch };
   delete (safe as { clinic_id?: string }).clinic_id;
   const { data, error } = await supabase
@@ -114,10 +110,7 @@ export async function updateStudent(
 
 /** Arquiva o aluno (soft delete). */
 export async function archiveStudent(id: string): Promise<void> {
-  const { error } = await supabase
-    .from("students")
-    .update({ status: "archived" })
-    .eq("id", id);
+  const { error } = await supabase.from("students").update({ status: "archived" }).eq("id", id);
   if (error) throw new Error(error.message);
 }
 

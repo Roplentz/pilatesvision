@@ -129,7 +129,9 @@ function AvaliacaoDetailPage() {
         <div className="text-center">
           <p className="text-sm text-muted-foreground">Avaliação não encontrada.</p>
           <Link to="/avaliacoes" className="mt-4 inline-block">
-            <Button variant="outline"><ArrowLeft className="h-4 w-4" /> Voltar</Button>
+            <Button variant="outline">
+              <ArrowLeft className="h-4 w-4" /> Voltar
+            </Button>
           </Link>
         </div>
       </div>
@@ -210,10 +212,15 @@ function AvaliacaoDetailPage() {
             <ArrowLeft className="h-4 w-4" /> Avaliações
           </Link>
           <div className="flex items-center gap-2">
-            <Badge variant={status === "finalized" ? "default" : "secondary"} className="text-[11px]">
+            <Badge
+              variant={status === "finalized" ? "default" : "secondary"}
+              className="text-[11px]"
+            >
               {statusLabel[status] ?? status}
             </Badge>
-            <Badge variant="outline" className="text-[11px]">{typeLabel[type] ?? type}</Badge>
+            <Badge variant="outline" className="text-[11px]">
+              {typeLabel[type] ?? type}
+            </Badge>
           </div>
         </div>
       </header>
@@ -299,7 +306,11 @@ function AvaliacaoDetailPage() {
           {isDraft && (
             <div className="mt-4 flex justify-end">
               <Button variant="outline" size="sm" onClick={saveHeader} disabled={saving}>
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
                 Salvar ficha
               </Button>
             </div>
@@ -367,7 +378,11 @@ function AvaliacaoDetailPage() {
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="hero" size="sm" disabled={finalizing}>
-                    {finalizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                    {finalizing ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4" />
+                    )}
                     Finalizar avaliação
                   </Button>
                 </AlertDialogTrigger>
@@ -427,7 +442,12 @@ function PosturalSection({
     }
     setFindings((f) => [
       ...f,
-      { region: region.trim(), finding: finding.trim(), severity, notes: findingNotes.trim() || undefined },
+      {
+        region: region.trim(),
+        finding: finding.trim(),
+        severity,
+        notes: findingNotes.trim() || undefined,
+      },
     ]);
     setRegion("");
     setFinding("");
@@ -493,14 +513,19 @@ function PosturalSection({
               <div className="flex items-center justify-between">
                 <div className="font-medium">{viewLabel[r.view ?? ""] ?? r.view ?? "—"}</div>
                 {r.score != null && (
-                  <Badge variant="outline" className="text-[11px]">Score {r.score}</Badge>
+                  <Badge variant="outline" className="text-[11px]">
+                    Score {r.score}
+                  </Badge>
                 )}
               </div>
               {fs.length > 0 && (
                 <ul className="mt-3 space-y-2">
                   {fs.map((f, i) => (
                     <li key={i} className="flex flex-wrap items-start gap-2 text-sm">
-                      <Badge className={`border ${severityTone[f.severity] ?? ""}`} variant="outline">
+                      <Badge
+                        className={`border ${severityTone[f.severity] ?? ""}`}
+                        variant="outline"
+                      >
                         {f.severity}
                       </Badge>
                       <span className="font-medium">{f.region}:</span>
@@ -530,7 +555,9 @@ function PosturalSection({
             <div>
               <Label>Vista</Label>
               <Select value={view} onValueChange={(v) => setView(v as PosturalView)}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="anterior">Anterior</SelectItem>
                   <SelectItem value="posterior">Posterior</SelectItem>
@@ -555,10 +582,20 @@ function PosturalSection({
           <div className="rounded-lg border border-border/50 bg-background/40 p-4">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Novo achado</div>
             <div className="mt-3 grid gap-3 md:grid-cols-3">
-              <Input placeholder="Região (ex.: ombros)" value={region} onChange={(e) => setRegion(e.target.value)} />
-              <Input placeholder="Achado (ex.: elevação D)" value={finding} onChange={(e) => setFinding(e.target.value)} />
+              <Input
+                placeholder="Região (ex.: ombros)"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+              />
+              <Input
+                placeholder="Achado (ex.: elevação D)"
+                value={finding}
+                onChange={(e) => setFinding(e.target.value)}
+              />
               <Select value={severity} onValueChange={(v) => setSeverity(v as Severity)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="leve">Leve</SelectItem>
                   <SelectItem value="moderada">Moderada</SelectItem>
@@ -583,7 +620,9 @@ function PosturalSection({
             <ul className="space-y-1 text-sm">
               {findings.map((f, i) => (
                 <li key={i} className="flex items-center gap-2">
-                  <Badge variant="outline" className={severityTone[f.severity]}>{f.severity}</Badge>
+                  <Badge variant="outline" className={severityTone[f.severity]}>
+                    {f.severity}
+                  </Badge>
                   <span className="font-medium">{f.region}:</span>
                   <span className="text-muted-foreground">{f.finding}</span>
                 </li>
@@ -603,7 +642,9 @@ function PosturalSection({
           </div>
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
             <Button variant="hero" size="sm" onClick={save} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Salvar vista
@@ -709,26 +750,35 @@ function MovementSection({
               <div className="flex items-center justify-between">
                 <div className="font-medium">{r.movement_name ?? "—"}</div>
                 {r.controle != null && (
-                  <Badge variant="outline" className="text-[11px]">Controle {r.controle}</Badge>
+                  <Badge variant="outline" className="text-[11px]">
+                    Controle {r.controle}
+                  </Badge>
                 )}
               </div>
               {cs.length > 0 && (
                 <ul className="mt-3 space-y-2 text-sm">
                   {cs.map((c, i) => (
                     <li key={i} className="flex flex-wrap items-start gap-2">
-                      <Badge className={`border ${severityTone[c.severity] ?? ""}`} variant="outline">
+                      <Badge
+                        className={`border ${severityTone[c.severity] ?? ""}`}
+                        variant="outline"
+                      >
                         {c.severity}
                       </Badge>
                       <span className="text-muted-foreground">{c.compensation}</span>
                       {c.notes && (
-                        <span className="basis-full pl-1 text-xs text-muted-foreground">Nota: {c.notes}</span>
+                        <span className="basis-full pl-1 text-xs text-muted-foreground">
+                          Nota: {c.notes}
+                        </span>
                       )}
                     </li>
                   ))}
                 </ul>
               )}
               {r.professional_notes && (
-                <p className="mt-3 text-xs text-muted-foreground">Observação: {r.professional_notes}</p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Observação: {r.professional_notes}
+                </p>
               )}
             </li>
           );
@@ -761,11 +811,19 @@ function MovementSection({
           </div>
 
           <div className="rounded-lg border border-border/50 bg-background/40 p-4">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Nova compensação</div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Nova compensação
+            </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <Input placeholder="Compensação observada" value={comp} onChange={(e) => setComp(e.target.value)} />
+              <Input
+                placeholder="Compensação observada"
+                value={comp}
+                onChange={(e) => setComp(e.target.value)}
+              />
               <Select value={severity} onValueChange={(v) => setSeverity(v as Severity)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="leve">Leve</SelectItem>
                   <SelectItem value="moderada">Moderada</SelectItem>
@@ -790,7 +848,9 @@ function MovementSection({
             <ul className="space-y-1 text-sm">
               {compensations.map((c, i) => (
                 <li key={i} className="flex items-center gap-2">
-                  <Badge variant="outline" className={severityTone[c.severity]}>{c.severity}</Badge>
+                  <Badge variant="outline" className={severityTone[c.severity]}>
+                    {c.severity}
+                  </Badge>
                   <span className="text-muted-foreground">{c.compensation}</span>
                 </li>
               ))}
@@ -799,11 +859,18 @@ function MovementSection({
 
           <div>
             <Label>Observações do profissional</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1.5" />
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              className="mt-1.5"
+            />
           </div>
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
             <Button variant="hero" size="sm" onClick={save} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Salvar movimento
@@ -915,7 +982,9 @@ function ExerciseSection({
                   )}
                 </div>
                 {r.control_level && (
-                  <Badge variant="outline" className="text-[11px]">Controle: {r.control_level}</Badge>
+                  <Badge variant="outline" className="text-[11px]">
+                    Controle: {r.control_level}
+                  </Badge>
                 )}
               </div>
               {r.execution_notes && (
@@ -925,14 +994,18 @@ function ExerciseSection({
                 <ul className="mt-3 space-y-1 text-sm">
                   {cs.map((c, i) => (
                     <li key={i} className="flex items-center gap-2">
-                      <Badge variant="outline" className={severityTone[c.severity]}>{c.severity}</Badge>
+                      <Badge variant="outline" className={severityTone[c.severity]}>
+                        {c.severity}
+                      </Badge>
                       <span className="text-muted-foreground">{c.compensation}</span>
                     </li>
                   ))}
                 </ul>
               )}
               {r.recommendation && (
-                <p className="mt-3 text-xs text-muted-foreground">Recomendação: {r.recommendation}</p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Recomendação: {r.recommendation}
+                </p>
               )}
             </li>
           );
@@ -958,13 +1031,20 @@ function ExerciseSection({
           </div>
           <div>
             <Label>Execução observada</Label>
-            <Textarea value={execution} onChange={(e) => setExecution(e.target.value)} rows={3} className="mt-1.5" />
+            <Textarea
+              value={execution}
+              onChange={(e) => setExecution(e.target.value)}
+              rows={3}
+              className="mt-1.5"
+            />
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <Label>Nível de controle</Label>
               <Select value={control} onValueChange={(v) => setControl(v as ControlLevel)}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="baixo">Baixo</SelectItem>
                   <SelectItem value="moderado">Moderado</SelectItem>
@@ -985,11 +1065,19 @@ function ExerciseSection({
           </div>
 
           <div className="rounded-lg border border-border/50 bg-background/40 p-4">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Nova compensação</div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Nova compensação
+            </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <Input placeholder="Compensação" value={comp} onChange={(e) => setComp(e.target.value)} />
+              <Input
+                placeholder="Compensação"
+                value={comp}
+                onChange={(e) => setComp(e.target.value)}
+              />
               <Select value={severity} onValueChange={(v) => setSeverity(v as Severity)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="leve">Leve</SelectItem>
                   <SelectItem value="moderada">Moderada</SelectItem>
@@ -1008,7 +1096,9 @@ function ExerciseSection({
             <ul className="space-y-1 text-sm">
               {comps.map((c, i) => (
                 <li key={i} className="flex items-center gap-2">
-                  <Badge variant="outline" className={severityTone[c.severity]}>{c.severity}</Badge>
+                  <Badge variant="outline" className={severityTone[c.severity]}>
+                    {c.severity}
+                  </Badge>
                   <span className="text-muted-foreground">{c.compensation}</span>
                 </li>
               ))}
@@ -1016,7 +1106,9 @@ function ExerciseSection({
           )}
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
-            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
             <Button variant="hero" size="sm" onClick={save} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Salvar exercício

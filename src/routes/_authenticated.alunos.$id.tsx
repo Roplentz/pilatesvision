@@ -477,7 +477,9 @@ function AssessmentsHistory({ studentId }: { studentId: string }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Link to="/avaliacoes/$id" params={{ id: a.id }}>
-                    <Button variant="outline" size="sm">Abrir avaliação</Button>
+                    <Button variant="outline" size="sm">
+                      Abrir avaliação
+                    </Button>
                   </Link>
                   <Button variant="ghost" size="sm" disabled title="Disponível em breve">
                     <FileText className="h-4 w-4" /> Gerar relatório

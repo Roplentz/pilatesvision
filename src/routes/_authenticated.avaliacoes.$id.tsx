@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
+import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -434,6 +436,7 @@ function PosturalSection({
   const [severity, setSeverity] = useState<Severity>("leve");
   const [findingNotes, setFindingNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   const addFinding = () => {
     if (!region.trim() || !finding.trim()) {
@@ -470,6 +473,7 @@ function PosturalSection({
         findings: findings as unknown as never,
         score: score ? Number(score) : null,
         professional_notes: notes.trim() || null,
+        image_url: imagePath,
       });
       toast.success("Achado postural salvo.");
       setOpen(false);
@@ -477,6 +481,7 @@ function PosturalSection({
       setScore("");
       setNotes("");
       setFindings([]);
+      setImagePath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");
@@ -543,6 +548,15 @@ function PosturalSection({
                 <p className="mt-3 text-xs text-muted-foreground">
                   Observação do profissional: {r.professional_notes}
                 </p>
+              )}
+              {r.image_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia
+                    path={r.image_url}
+                    kind="image"
+                    alt={`Imagem postural ${viewLabel[r.view ?? ""] ?? r.view ?? ""}`}
+                  />
+                </div>
               )}
             </li>
           );
@@ -641,6 +655,16 @@ function PosturalSection({
             />
           </div>
 
+          <ClinicalMediaUploader
+            kind="image"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={imagePath}
+            onUploaded={(p) => setImagePath(p)}
+            onCleared={() => setImagePath(null)}
+          />
+
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
               Cancelar
@@ -681,6 +705,7 @@ function MovementSection({
   const [severity, setSeverity] = useState<Severity>("leve");
   const [compNotes, setCompNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [videoPath, setVideoPath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return toast.error("Descreva a compensação.");
@@ -705,6 +730,7 @@ function MovementSection({
         compensations: compensations as unknown as never,
         controle: score ? Number(score) : null,
         professional_notes: notes.trim() || null,
+        video_url: videoPath,
       });
       toast.success("Avaliação dinâmica salva.");
       setOpen(false);
@@ -712,6 +738,7 @@ function MovementSection({
       setScore("");
       setNotes("");
       setCompensations([]);
+      setVideoPath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");
@@ -779,6 +806,11 @@ function MovementSection({
                 <p className="mt-3 text-xs text-muted-foreground">
                   Observação: {r.professional_notes}
                 </p>
+              )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia path={r.video_url} kind="video" />
+                </div>
               )}
             </li>
           );
@@ -866,6 +898,16 @@ function MovementSection({
               className="mt-1.5"
             />
           </div>
+
+          <ClinicalMediaUploader
+            kind="video"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={videoPath}
+            onUploaded={(p) => setVideoPath(p)}
+            onCleared={() => setVideoPath(null)}
+          />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>

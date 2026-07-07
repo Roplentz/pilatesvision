@@ -15,7 +15,7 @@ const movements = [
   "Lunge",
   "Apoio unipodal",
   "Sentar e levantar",
-  "Single Leg Stretch",
+  "Movimento livre",
 ];
 
 function DinamicaPage() {

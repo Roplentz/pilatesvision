@@ -1,88 +1,92 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsPlatformAdmin } from "@/hooks/useIsPlatformAdmin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Shield, Building2, Users, ClipboardCheck, FileText, AlertTriangle } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Shield,
+  Building2,
+  Users,
+  ClipboardCheck,
+  FileText,
+  AlertTriangle,
+  RefreshCw,
+  Video,
+  Activity,
+  CalendarRange,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
-    meta: [{ title: "Admin | PilatesVision" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "Controle da Plataforma | PilatesVision" },
+      { name: "robots", content: "noindex" },
+    ],
   }),
   component: AdminPage,
 });
 
-interface Counts {
-  clinics: number;
-  profiles: number;
-  students: number;
-  assessments: number;
-  reports: number;
-}
-
-interface ClinicRow {
-  id: string;
-  name: string;
-  plan: string | null;
-  email: string | null;
-  created_at: string;
-}
-
-interface ProfileRow {
-  id: string;
-  full_name: string | null;
-  clinic_id: string | null;
-  created_at: string;
+interface Overview {
+  gerado_em: string;
+  totais: {
+    clinicas: number;
+    profissionais: number;
+    pacientes: number;
+    pacientes_ativos: number;
+    avaliacoes: number;
+    avaliacoes_finalizadas: number;
+    relatorios: number;
+    relatorios_finalizados: number;
+    relatorios_mes: number;
+  };
+  adocao_video: {
+    movimento_com_video: number;
+    exercicio_com_video: number;
+    com_analise: number;
+  };
+  por_clinica: Array<{
+    clinic_id: string;
+    clinica: string;
+    pacientes: number;
+    avaliacoes: number;
+    relatorios: number;
+  }>;
 }
 
 function AdminPage() {
-  const { isAdmin, loading: roleLoading } = useIsAdmin();
-  const [counts, setCounts] = useState<Counts | null>(null);
-  const [clinics, setClinics] = useState<ClinicRow[]>([]);
-  const [profiles, setProfiles] = useState<ProfileRow[]>([]);
+  const { isPlatformAdmin, loading: roleLoading } = useIsPlatformAdmin();
+  const [overview, setOverview] = useState<Overview | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    const { data, error } = await supabase.rpc("platform_overview");
+    if (error) {
+      setError(error.message);
+      setOverview(null);
+    } else {
+      setOverview(data as unknown as Overview);
+    }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    if (!isAdmin) return;
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      const [c, p, s, a, r, cl, pr] = await Promise.all([
-        supabase.from("clinics").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("students").select("id", { count: "exact", head: true }),
-        supabase.from("assessments").select("id", { count: "exact", head: true }),
-        supabase.from("reports").select("id", { count: "exact", head: true }),
-        supabase
-          .from("clinics")
-          .select("id,name,plan,email,created_at")
-          .order("created_at", { ascending: false })
-          .limit(20),
-        supabase
-          .from("profiles")
-          .select("id,full_name,clinic_id,created_at")
-          .order("created_at", { ascending: false })
-          .limit(20),
-      ]);
-      if (cancelled) return;
-      setCounts({
-        clinics: c.count ?? 0,
-        profiles: p.count ?? 0,
-        students: s.count ?? 0,
-        assessments: a.count ?? 0,
-        reports: r.count ?? 0,
-      });
-      setClinics((cl.data as ClinicRow[] | null) ?? []);
-      setProfiles((pr.data as ProfileRow[] | null) ?? []);
-      setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [isAdmin]);
+    if (!isPlatformAdmin) return;
+    void load();
+  }, [isPlatformAdmin, load]);
 
   if (roleLoading) {
     return (
@@ -92,7 +96,7 @@ function AdminPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!isPlatformAdmin) {
     return (
       <div className="mx-auto max-w-md px-6 py-16 text-center">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-destructive/15 text-destructive">
@@ -100,7 +104,7 @@ function AdminPage() {
         </div>
         <h1 className="mt-4 font-display text-2xl font-semibold">Acesso restrito</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Esta área é exclusiva para administradores da plataforma.
+          Área exclusiva do administrador da plataforma.
         </p>
         <Link to="/dashboard">
           <Button variant="outline" className="mt-6">
@@ -111,12 +115,41 @@ function AdminPage() {
     );
   }
 
+  const t = overview?.totais;
+  const v = overview?.adocao_video;
+
   const stats = [
-    { label: "Clínicas", value: counts?.clinics ?? 0, icon: Building2 },
-    { label: "Usuários", value: counts?.profiles ?? 0, icon: Users },
-    { label: "Alunos", value: counts?.students ?? 0, icon: Users },
-    { label: "Avaliações", value: counts?.assessments ?? 0, icon: ClipboardCheck },
-    { label: "Relatórios", value: counts?.reports ?? 0, icon: FileText },
+    { label: "Clínicas", value: t?.clinicas ?? 0, icon: Building2 },
+    { label: "Profissionais", value: t?.profissionais ?? 0, icon: Users },
+    {
+      label: "Pacientes",
+      value: t?.pacientes ?? 0,
+      hint: t ? `${t.pacientes_ativos} ativos` : undefined,
+      icon: Users,
+    },
+    {
+      label: "Avaliações",
+      value: t?.avaliacoes ?? 0,
+      hint: t ? `${t.avaliacoes_finalizadas} finalizadas` : undefined,
+      icon: ClipboardCheck,
+    },
+    {
+      label: "Relatórios",
+      value: t?.relatorios ?? 0,
+      hint: t ? `${t.relatorios_finalizados} finalizados` : undefined,
+      icon: FileText,
+    },
+    {
+      label: "Relatórios no mês",
+      value: t?.relatorios_mes ?? 0,
+      icon: CalendarRange,
+    },
+  ];
+
+  const adocao = [
+    { label: "Vídeos de movimento", value: v?.movimento_com_video ?? 0, icon: Video },
+    { label: "Vídeos de exercício", value: v?.exercicio_com_video ?? 0, icon: Video },
+    { label: "Avaliações com análise biomecânica", value: v?.com_analise ?? 0, icon: Activity },
   ];
 
   return (
@@ -126,87 +159,110 @@ function AdminPage() {
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
             <Badge variant="secondary" className="text-[10px]">
-              Admin
+              Plataforma
             </Badge>
           </div>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
-            Painel administrativo
+            Controle da Plataforma
           </h1>
-          <p className="text-sm text-muted-foreground">Visão global da plataforma PilatesVision</p>
+          <p className="text-sm text-muted-foreground">
+            Visão agregada de todas as clínicas — acesso exclusivo do administrador.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {overview?.gerado_em ? (
+            <span className="text-xs text-muted-foreground">
+              Atualizado em {new Date(overview.gerado_em).toLocaleString("pt-BR")}
+            </span>
+          ) : null}
+          <Button size="sm" variant="outline" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            Atualizar
+          </Button>
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {error ? (
+        <Card className="border-destructive/50 bg-destructive/5">
+          <CardContent className="p-4 text-sm text-destructive">{error}</CardContent>
+        </Card>
+      ) : null}
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((s) => (
           <Card key={s.label} className="bg-surface/60">
             <CardContent className="flex items-center gap-3 p-5">
               <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-primary shadow-glow">
                 <s.icon className="h-5 w-5 text-primary-foreground" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-2xl font-semibold leading-none">
-                  {loading ? <Skeleton className="h-7 w-12" /> : s.value}
+                  {loading && !overview ? <Skeleton className="h-7 w-12" /> : s.value}
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+                {s.hint ? (
+                  <div className="text-[10px] text-muted-foreground/80">{s.hint}</div>
+                ) : null}
               </div>
             </CardContent>
           </Card>
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section>
         <Card className="bg-surface/60">
           <CardHeader>
-            <CardTitle className="text-base">Clínicas recentes</CardTitle>
+            <CardTitle className="text-base">Adoção do diferencial</CardTitle>
           </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-24 w-full" />
-            ) : clinics.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma clínica cadastrada.</p>
-            ) : (
-              <ul className="divide-y divide-border/60">
-                {clinics.map((c) => (
-                  <li key={c.id} className="flex items-center justify-between py-3 text-sm">
-                    <div>
-                      <div className="font-medium">{c.name}</div>
-                      <div className="text-xs text-muted-foreground">{c.email ?? "—"}</div>
-                    </div>
-                    <Badge variant="outline" className="text-[10px] uppercase">
-                      {c.plan ?? "free"}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-            )}
+          <CardContent className="grid gap-4 sm:grid-cols-3">
+            {adocao.map((a) => (
+              <div key={a.label} className="flex items-center gap-3 rounded-lg border border-border/60 p-4">
+                <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <a.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-xl font-semibold leading-none">
+                    {loading && !overview ? <Skeleton className="h-6 w-10" /> : a.value}
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">{a.label}</div>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
+      </section>
 
+      <section>
         <Card className="bg-surface/60">
           <CardHeader>
-            <CardTitle className="text-base">Usuários recentes</CardTitle>
+            <CardTitle className="text-base">Por clínica</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-24 w-full" />
-            ) : profiles.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum usuário.</p>
+            {loading && !overview ? (
+              <Skeleton className="h-32 w-full" />
+            ) : !overview || overview.por_clinica.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma clínica registrada.</p>
             ) : (
-              <ul className="divide-y divide-border/60">
-                {profiles.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between py-3 text-sm">
-                    <div>
-                      <div className="font-medium">{p.full_name ?? "Sem nome"}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {p.clinic_id ? "Vinculado" : "Sem clínica"}
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(p.created_at).toLocaleDateString("pt-BR")}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Clínica</TableHead>
+                    <TableHead className="text-right">Pacientes</TableHead>
+                    <TableHead className="text-right">Avaliações</TableHead>
+                    <TableHead className="text-right">Relatórios</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {overview.por_clinica.map((row) => (
+                    <TableRow key={row.clinic_id}>
+                      <TableCell className="font-medium">{row.clinica}</TableCell>
+                      <TableCell className="text-right tabular-nums">{row.pacientes}</TableCell>
+                      <TableCell className="text-right tabular-nums">{row.avaliacoes}</TableCell>
+                      <TableCell className="text-right tabular-nums">{row.relatorios}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </CardContent>
         </Card>

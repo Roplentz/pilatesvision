@@ -133,6 +133,7 @@ export type Database = {
       }
       exercise_results: {
         Row: {
+          analysis_status: string | null
           apparatus: string | null
           assessment_id: string
           clinic_id: string
@@ -142,11 +143,14 @@ export type Database = {
           execution_notes: string | null
           exercise_name: string
           id: string
+          metrics: Json
           recommendation: string | null
           student_id: string
           updated_at: string
+          video_url: string | null
         }
         Insert: {
+          analysis_status?: string | null
           apparatus?: string | null
           assessment_id: string
           clinic_id: string
@@ -156,11 +160,14 @@ export type Database = {
           execution_notes?: string | null
           exercise_name: string
           id?: string
+          metrics?: Json
           recommendation?: string | null
           student_id: string
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
+          analysis_status?: string | null
           apparatus?: string | null
           assessment_id?: string
           clinic_id?: string
@@ -170,9 +177,11 @@ export type Database = {
           execution_notes?: string | null
           exercise_name?: string
           id?: string
+          metrics?: Json
           recommendation?: string | null
           student_id?: string
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
           {

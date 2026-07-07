@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
+import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import {
   AlertDialog,
   AlertDialogAction,

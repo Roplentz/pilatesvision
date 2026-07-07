@@ -295,6 +295,21 @@ export type Database = {
           },
         ]
       }
+      platform_admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       postural_results: {
         Row: {
           assessment_id: string
@@ -629,6 +644,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_platform_admin: { Args: never; Returns: boolean }
+      platform_overview: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "instrutor" | "recepcionista"

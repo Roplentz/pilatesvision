@@ -968,6 +968,7 @@ function ExerciseSection({
   const [comp, setComp] = useState("");
   const [severity, setSeverity] = useState<Severity>("leve");
   const [saving, setSaving] = useState(false);
+  const [videoPath, setVideoPath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return;
@@ -990,6 +991,7 @@ function ExerciseSection({
         control_level: control,
         recommendation: recommendation.trim() || null,
         compensations: comps as unknown as never,
+        video_url: videoPath,
       });
       toast.success("Registro de exercício salvo.");
       setOpen(false);
@@ -999,6 +1001,7 @@ function ExerciseSection({
       setControl("bom");
       setRecommendation("");
       setComps([]);
+      setVideoPath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");

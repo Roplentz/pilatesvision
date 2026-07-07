@@ -1189,6 +1189,16 @@ function ExerciseSection({
             </ul>
           )}
 
+          <ClinicalMediaUploader
+            kind="video"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={videoPath}
+            onUploaded={(p) => setVideoPath(p)}
+            onCleared={() => setVideoPath(null)}
+          />
+
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
               Cancelar

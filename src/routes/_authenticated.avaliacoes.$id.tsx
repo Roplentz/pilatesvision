@@ -92,6 +92,36 @@ const severityTone: Record<Severity, string> = {
   importante: "bg-red-500/15 text-red-300 border-red-500/30",
 };
 
+const FUNCTIONAL_MOVEMENTS = [
+  "Agachamento",
+  "Ponte",
+  "Lunge",
+  "Apoio unipodal",
+  "Sentar e levantar",
+  "Movimento livre",
+] as const;
+
+const PILATES_EXERCISES = [
+  "Hundred",
+  "Roll Up",
+  "Single Leg Stretch",
+  "Bridge",
+  "Swan",
+  "Side Kick",
+  "Footwork no Reformer",
+  "Squat no Reformer",
+  "Exercício livre",
+] as const;
+
+const APPARATUS_OPTIONS = [
+  "Solo",
+  "Reformer",
+  "Cadillac",
+  "Chair",
+  "Barrel",
+  "Outro",
+] as const;
+
 function AvaliacaoDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();

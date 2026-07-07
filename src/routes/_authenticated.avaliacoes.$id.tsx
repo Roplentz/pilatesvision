@@ -31,6 +31,8 @@ import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
+import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
+import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -893,21 +895,12 @@ function MovementSection({
 
       {editable && open && (
         <div className="space-y-4 rounded-xl border border-border/60 bg-card/40 p-5">
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="space-y-3">
             <div>
               <Label>Movimento avaliado *</Label>
-              <Select value={movementPreset} onValueChange={setMovementPreset}>
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FUNCTIONAL_MOVEMENTS.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="mt-1.5 rounded-md border border-border/60 bg-background/40 px-3 py-2 text-sm">
+                Selecionado: <span className="font-medium">{movementPreset}</span>
+              </div>
               {movementPreset === "Movimento livre" && (
                 <Input
                   value={movementCustom}
@@ -916,8 +909,15 @@ function MovementSection({
                   className="mt-2"
                 />
               )}
+              <div className="mt-2">
+                <ExerciseCatalogPicker
+                  allowedCategories={["funcional"]}
+                  selectedName={movementPreset}
+                  onPick={(it: ExerciseCatalogItem) => setMovementPreset(it.name)}
+                />
+              </div>
             </div>
-            <div>
+            <div className="max-w-xs">
               <Label>Controle motor (0-100, opcional)</Label>
               <Input
                 type="number"
@@ -1204,20 +1204,16 @@ function ExerciseSection({
       {editable && open && (
         <div className="space-y-4 rounded-xl border border-border/60 bg-card/40 p-5">
           <div className="grid gap-3 md:grid-cols-2">
-            <div>
+            <div className="md:col-span-2">
               <Label>Exercício *</Label>
-              <Select value={namePreset} onValueChange={setNamePreset}>
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PILATES_EXERCISES.map((e) => (
-                    <SelectItem key={e} value={e}>
-                      {e}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="mt-1.5 rounded-md border border-border/60 bg-background/40 px-3 py-2 text-sm">
+                Selecionado: <span className="font-medium">{namePreset}</span>
+                {apparatus && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    · {apparatus}
+                  </span>
+                )}
+              </div>
               {namePreset === "Exercício livre" && (
                 <Input
                   value={nameCustom}
@@ -1226,6 +1222,16 @@ function ExerciseSection({
                   className="mt-2"
                 />
               )}
+              <div className="mt-2">
+                <ExerciseCatalogPicker
+                  allowedCategories={["mat", "reformer", "cadillac", "chair", "barrel"]}
+                  selectedName={namePreset}
+                  onPick={(it: ExerciseCatalogItem) => {
+                    setNamePreset(it.name);
+                    if (it.apparatus !== "—") setApparatus(it.apparatus);
+                  }}
+                />
+              </div>
             </div>
             <div>
               <Label>Aparelho</Label>

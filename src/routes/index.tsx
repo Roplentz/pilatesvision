@@ -332,9 +332,158 @@ function HowItWorks() {
   );
 }
 
+function Pricing() {
+  return (
+    <section id="planos" className="relative border-t border-border/60 bg-surface/30 py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-medium uppercase tracking-widest text-primary">Planos</p>
+          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">
+            Planos simples para transformar sua avaliação de Pilates.
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Comece com uma avaliação mais visual, moderna e organizada. O PilatesVision ajuda sua
+            clínica a registrar alunos, analisar movimento, acompanhar evolução e gerar relatórios
+            clínicos com mais clareza.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {plans.map((plan, i) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              className={`relative flex flex-col overflow-hidden rounded-2xl border p-6 transition ${
+                plan.popular
+                  ? "border-primary/60 bg-gradient-surface shadow-glow"
+                  : "border-border/60 bg-surface/70 hover:border-primary/40"
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute right-0 top-0 rounded-bl-xl rounded-tr-2xl bg-gradient-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                  Mais escolhido
+                </div>
+              )}
+              <div className="mb-4">
+                <h3 className="font-display text-xl font-semibold">{plan.name}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
+              </div>
+              <div className="mb-6">
+                <span className="font-display text-4xl font-semibold tracking-tight">
+                  {plan.price}
+                </span>
+                <span className="text-muted-foreground">/mês</span>
+              </div>
+              <ul className="mb-8 flex flex-1 flex-col gap-3">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-muted-foreground">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/auth" search={{ mode: "signup" } as never} className="mt-auto">
+                <Button variant={plan.popular ? "hero" : "outline"} className="w-full">
+                  {plan.cta}
+                </Button>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-10 flex flex-col items-center gap-4 text-center text-sm text-muted-foreground">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-4 py-2 backdrop-blur">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="font-medium text-foreground">
+              14 dias grátis. Sem cartão. Condição especial para as primeiras 30 clínicas.
+            </span>
+          </div>
+          <p className="max-w-2xl text-xs">
+            O PilatesVision é uma ferramenta de apoio à decisão. Não substitui a avaliação
+            profissional.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const plans = [
+  {
+    name: "Solo",
+    price: "R$ 97",
+    description: "Para fisioterapeuta ou instrutor independente.",
+    features: [
+      "1 profissional",
+      "até 50 alunos ativos",
+      "cadastro de alunos",
+      "avaliação postural",
+      "avaliação dinâmica básica",
+      "biblioteca de exercícios",
+      "relatório simples",
+      "armazenamento limitado de mídia",
+    ],
+    cta: "Começar teste grátis",
+    popular: false,
+  },
+  {
+    name: "Clínica",
+    price: "R$ 247",
+    description: "Para estúdios e pequenas clínicas.",
+    features: [
+      "até 3 profissionais",
+      "até 200 alunos ativos",
+      "avaliação postural",
+      "avaliação dinâmica",
+      "análise por exercício de Pilates",
+      "upload de foto e vídeo",
+      "relatório evolutivo",
+      "dashboard da clínica",
+      "suporte prioritário",
+    ],
+    cta: "Escolher Plano Clínica",
+    popular: true,
+  },
+  {
+    name: "Performance",
+    price: "R$ 497",
+    description: "Para clínicas maiores e equipes.",
+    features: [
+      "até 10 profissionais",
+      "até 500 alunos ativos",
+      "análise por vídeo ampliada",
+      "relatórios personalizados com marca da clínica",
+      "dashboard avançado",
+      "histórico evolutivo",
+      "suporte premium",
+      "onboarding assistido",
+    ],
+    cta: "Falar com especialista",
+    popular: false,
+  },
+  {
+    name: "Piloto Premium",
+    price: "R$ 997",
+    description: "Para clínicas parceiras que querem participar da evolução do Pilates 5.0.",
+    features: [
+      "acesso antecipado a novas funções",
+      "reunião mensal de evolução",
+      "suporte direto",
+      "participação no roadmap",
+      "implantação guiada",
+      "selo Clínica Parceira PilatesVision",
+    ],
+    cta: "Quero ser clínica piloto",
+    popular: false,
+  },
+];
+
 function CTA() {
   return (
-    <section id="precos" className="mx-auto max-w-7xl px-6 py-24">
+    <section className="mx-auto max-w-7xl px-6 py-24">
       <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-surface px-8 py-16 text-center shadow-elevated md:px-16">
         <div className="pointer-events-none absolute inset-0 bg-radial-glow opacity-80" />
         <div className="relative">
@@ -362,6 +511,7 @@ function CTA() {
     </section>
   );
 }
+
 
 function Footer() {
   return (

@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { archiveStudent, updateStudent, useStudent, type StudentStatus } from "@/lib/studentsStore";
 import { useStudentAssessments } from "@/lib/assessmentsStore";
+import { useStudentReports } from "@/lib/reportsStore";
 import { toast } from "sonner";
 import { ClipboardPlus, FileText, Plus } from "lucide-react";
 
@@ -405,6 +406,10 @@ function AlunoDetailPage() {
 
             <div className="mt-10">
               <AssessmentsHistory studentId={student.id} />
+            </div>
+
+            <div className="mt-10">
+              <ReportsHistory studentId={student.id} />
             </div>
           </>
         )}

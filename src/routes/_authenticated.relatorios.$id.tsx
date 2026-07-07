@@ -25,6 +25,8 @@ import {
 } from "@/lib/reportsStore";
 import { useAssessmentResults } from "@/lib/assessmentsStore";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
+import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/relatorios/$id")({
   head: () => ({ meta: [{ title: "Relatório | PilatesVision" }] }),

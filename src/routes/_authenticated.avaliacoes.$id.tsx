@@ -824,7 +824,7 @@ function MovementSection({
                         ? (r.metrics as unknown as AutoMetricsSummary)
                         : null
                     }
-                    onSaved={onChanged}
+                    onSaved={onSaved}
                   />
                 </div>
               )}

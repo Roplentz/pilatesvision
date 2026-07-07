@@ -29,6 +29,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
+import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
+import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -810,6 +812,20 @@ function MovementSection({
               {r.video_url && (
                 <div className="mt-4">
                   <SignedClinicalMedia path={r.video_url} kind="video" />
+                </div>
+              )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <VideoPoseAnalyzer
+                    movementResultId={r.id}
+                    videoPath={r.video_url}
+                    initialSummary={
+                      isAutoMetricsSummary(r.metrics)
+                        ? (r.metrics as unknown as AutoMetricsSummary)
+                        : null
+                    }
+                    onSaved={onSaved}
+                  />
                 </div>
               )}
             </li>

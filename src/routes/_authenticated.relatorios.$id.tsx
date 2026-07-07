@@ -25,6 +25,7 @@ import {
 } from "@/lib/reportsStore";
 import { useAssessmentResults } from "@/lib/assessmentsStore";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
+import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 
 export const Route = createFileRoute("/_authenticated/relatorios/$id")({
   head: () => ({ meta: [{ title: "Relatório | PilatesVision" }] }),
@@ -302,6 +303,9 @@ function RelatorioDetailPage() {
                         {m.movement_name ?? "Movimento"}
                       </div>
                       <SignedClinicalMedia path={m.video_url} kind="video" />
+                      {isAutoMetricsSummary(m.metrics) && (
+                        <AutoMetricsReadOnly summary={m.metrics as unknown as AutoMetricsSummary} />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -467,5 +471,33 @@ function TextareaSection({
         <FieldError message={error} />
       </CardContent>
     </Card>
+  );
+}
+
+function AutoMetricsReadOnly({ summary }: { summary: AutoMetricsSummary }) {
+  return (
+    <div className="rounded-md border border-border/50 bg-card/40 p-3 text-xs">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="font-medium">Estimativa automática (MediaPipe)</span>
+        <span className="rounded border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+          apoio à decisão · requer confirmação clínica · não é diagnóstico
+        </span>
+      </div>
+      <div className="grid gap-1.5 sm:grid-cols-2">
+        <div>Flexão joelho D: {summary.knee_flexion.right.min_deg}°–{summary.knee_flexion.right.max_deg}° (amp. {summary.knee_flexion.right.range_deg}°)</div>
+        <div>Flexão joelho E: {summary.knee_flexion.left.min_deg}°–{summary.knee_flexion.left.max_deg}° (amp. {summary.knee_flexion.left.range_deg}°)</div>
+        <div>Desvio frontal D/E: {summary.knee_frontal_deviation.right_max_abs} / {summary.knee_frontal_deviation.left_max_abs}</div>
+        <div>Inclinação tronco (méd/máx): {summary.trunk_inclination.mean_deg}° / {summary.trunk_inclination.max_deg}°</div>
+        <div>Amplitude vertical quadril: {summary.hip_vertical_amplitude.normalized}</div>
+        <div>Simetria D/E: {summary.symmetry_index}/100</div>
+      </div>
+      {summary.suggestions.length > 0 && (
+        <ul className="mt-2 list-disc pl-4 text-muted-foreground">
+          {summary.suggestions.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

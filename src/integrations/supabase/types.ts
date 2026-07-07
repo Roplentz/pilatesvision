@@ -201,6 +201,7 @@ export type Database = {
       movement_results: {
         Row: {
           amplitude: number | null
+          analysis_status: string | null
           assessment_id: string
           clinic_id: string
           compensations: Json
@@ -208,6 +209,7 @@ export type Database = {
           created_at: string
           estabilidade: number | null
           id: string
+          metrics: Json
           movement_name: string | null
           movements_evaluated: string[] | null
           professional_notes: string | null
@@ -218,6 +220,7 @@ export type Database = {
         }
         Insert: {
           amplitude?: number | null
+          analysis_status?: string | null
           assessment_id: string
           clinic_id: string
           compensations?: Json
@@ -225,6 +228,7 @@ export type Database = {
           created_at?: string
           estabilidade?: number | null
           id?: string
+          metrics?: Json
           movement_name?: string | null
           movements_evaluated?: string[] | null
           professional_notes?: string | null
@@ -235,6 +239,7 @@ export type Database = {
         }
         Update: {
           amplitude?: number | null
+          analysis_status?: string | null
           assessment_id?: string
           clinic_id?: string
           compensations?: Json
@@ -242,6 +247,7 @@ export type Database = {
           created_at?: string
           estabilidade?: number | null
           id?: string
+          metrics?: Json
           movement_name?: string | null
           movements_evaluated?: string[] | null
           professional_notes?: string | null

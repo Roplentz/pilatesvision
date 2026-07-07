@@ -1040,8 +1040,9 @@ function ExerciseSection({
   onSaved: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [apparatus, setApparatus] = useState("");
+  const [namePreset, setNamePreset] = useState<string>(PILATES_EXERCISES[0]);
+  const [nameCustom, setNameCustom] = useState("");
+  const [apparatus, setApparatus] = useState<string>(APPARATUS_OPTIONS[0]);
   const [execution, setExecution] = useState("");
   const [control, setControl] = useState<ControlLevel>("bom");
   const [recommendation, setRecommendation] = useState("");
@@ -1050,6 +1051,7 @@ function ExerciseSection({
   const [severity, setSeverity] = useState<Severity>("leve");
   const [saving, setSaving] = useState(false);
   const [videoPath, setVideoPath] = useState<string | null>(null);
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return;
@@ -1059,30 +1061,35 @@ function ExerciseSection({
   };
 
   const save = async () => {
-    if (!name.trim()) return toast.error("Informe o exercício.");
+    const resolvedName =
+      namePreset === "Exercício livre" ? nameCustom.trim() : namePreset.trim();
+    if (!resolvedName) return toast.error("Informe o exercício.");
     setSaving(true);
     try {
       await insertExerciseResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
         student_id: studentId,
-        exercise_name: name.trim(),
-        apparatus: apparatus.trim() || null,
+        exercise_name: resolvedName,
+        apparatus: apparatus || null,
         execution_notes: execution.trim() || null,
         control_level: control,
         recommendation: recommendation.trim() || null,
         compensations: comps as unknown as never,
         video_url: videoPath,
+        image_url: imagePath,
       });
       toast.success("Registro de exercício salvo.");
       setOpen(false);
-      setName("");
-      setApparatus("");
+      setNamePreset(PILATES_EXERCISES[0]);
+      setNameCustom("");
+      setApparatus(APPARATUS_OPTIONS[0]);
       setExecution("");
       setControl("bom");
       setRecommendation("");
       setComps([]);
       setVideoPath(null);
+      setImagePath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");

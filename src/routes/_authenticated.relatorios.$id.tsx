@@ -269,6 +269,48 @@ function RelatorioDetailPage() {
         rows={3}
       />
 
+      {hasMedia && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Mídia clínica anexada</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {posturalMedia.length > 0 && (
+              <div className="space-y-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Imagens posturais
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {posturalMedia.map((p) => (
+                    <div key={p.id} className="space-y-1">
+                      <div className="text-xs text-muted-foreground">{p.view ?? "—"}</div>
+                      <SignedClinicalMedia path={p.image_url} kind="image" alt={p.view ?? "vista"} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {movementMedia.length > 0 && (
+              <div className="space-y-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Vídeos de movimento
+                </div>
+                <div className="grid gap-4">
+                  {movementMedia.map((m) => (
+                    <div key={m.id} className="space-y-1">
+                      <div className="text-xs text-muted-foreground">
+                        {m.movement_name ?? "Movimento"}
+                      </div>
+                      <SignedClinicalMedia path={m.video_url} kind="video" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card
         className={
           displayErrors.disclaimer_acknowledged

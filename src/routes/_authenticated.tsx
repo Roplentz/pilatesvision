@@ -10,7 +10,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsPlatformAdmin } from "@/hooks/useIsPlatformAdmin";
 import { createClinic, setProfileClinic } from "@/lib/clinicsStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -53,7 +53,7 @@ const menu = [
   { title: "Configurações", url: "/configuracoes", icon: Settings },
 ] as const;
 
-function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
+function AppSidebar({ isPlatformAdmin }: { isPlatformAdmin: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <Sidebar collapsible="icon">
@@ -86,7 +86,7 @@ function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
                   </SidebarMenuItem>
                 );
               })}
-              {isAdmin ? (
+              {isPlatformAdmin ? (
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
@@ -110,7 +110,7 @@ function AppSidebar({ isAdmin }: { isAdmin: boolean }) {
 function AuthedLayout() {
   const { user, loading, signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
-  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { isPlatformAdmin, loading: adminLoading } = useIsPlatformAdmin();
   const navigate = useNavigate();
   const ensuringRef = useRef(false);
 
@@ -125,7 +125,7 @@ function AuthedLayout() {
   // recém-criado que ainda não tenha clinic_id no perfil. Sem onboarding manual.
   useEffect(() => {
     if (loading || profileLoading || adminLoading || !user || !profile) return;
-    if (isAdmin) return;
+    if (isPlatformAdmin) return;
     if (profile.clinic_id) return;
     if (ensuringRef.current) return;
     ensuringRef.current = true;
@@ -148,7 +148,7 @@ function AuthedLayout() {
         toast.error(err instanceof Error ? err.message : "Falha ao inicializar sua conta");
       }
     })();
-  }, [loading, profileLoading, adminLoading, isAdmin, user, profile]);
+  }, [loading, profileLoading, adminLoading, isPlatformAdmin, user, profile]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -165,7 +165,7 @@ function AuthedLayout() {
   }
 
   // Enquanto provisiona a clínica pessoal, mostra um loader curto.
-  if (!isAdmin && profile && !profile.clinic_id) {
+  if (!isPlatformAdmin && profile && !profile.clinic_id) {
     return (
       <div className="grid min-h-screen w-full place-items-center bg-background text-foreground">
         <div className="flex flex-col items-center gap-3 text-sm text-muted-foreground">
@@ -179,7 +179,7 @@ function AuthedLayout() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background text-foreground">
-        <AppSidebar isAdmin={isAdmin} />
+        <AppSidebar isPlatformAdmin={isPlatformAdmin} />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border/60 bg-background/70 px-3 backdrop-blur-xl">
             <SidebarTrigger />

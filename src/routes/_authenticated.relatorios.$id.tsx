@@ -303,6 +303,9 @@ function RelatorioDetailPage() {
                         {m.movement_name ?? "Movimento"}
                       </div>
                       <SignedClinicalMedia path={m.video_url} kind="video" />
+                      {isAutoMetricsSummary(m.metrics) && (
+                        <AutoMetricsReadOnly summary={m.metrics as unknown as AutoMetricsSummary} />
+                      )}
                     </div>
                   ))}
                 </div>

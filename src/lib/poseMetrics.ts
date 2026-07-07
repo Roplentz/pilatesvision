@@ -147,7 +147,13 @@ function stats(values: number[]) {
   return { min, max, mean };
 }
 
-export function summarizeSamples(samples: FrameSample[], durationSeconds: number): AutoMetricsSummary {
+export type AnalysisContext = "squat" | "pilates";
+
+export function summarizeSamples(
+  samples: FrameSample[],
+  durationSeconds: number,
+  context: AnalysisContext = "squat",
+): AutoMetricsSummary {
   const kneeL = stats(samples.map((s) => s.kneeAngleL));
   const kneeR = stats(samples.map((s) => s.kneeAngleR));
   const trunk = stats(samples.map((s) => s.trunkInclination));
@@ -164,11 +170,26 @@ export function summarizeSamples(samples: FrameSample[], durationSeconds: number
   const hipAmp = Number.isFinite(hipY.max - hipY.min) ? hipY.max - hipY.min : 0;
 
   const suggestions: string[] = [];
-  if (valgusR > 0.15) suggestions.push("Possível valgo dinâmico à direita — sugere-se confirmação clínica.");
-  if (valgusL > 0.15) suggestions.push("Possível valgo dinâmico à esquerda — sugere-se confirmação clínica.");
-  if (Math.abs(rangeL - rangeR) > 12) suggestions.push("Assimetria de amplitude de flexão de joelho — sugere-se avaliação bilateral.");
-  if (trunk.max > 45) suggestions.push("Inclinação de tronco acentuada — sugere-se avaliar controle de tronco e quadril.");
-  if (conf.mean < 0.5) suggestions.push("Baixa visibilidade dos marcadores — recomenda-se nova captura com melhor enquadramento.");
+  if (context === "pilates") {
+    if (valgusR > 0.15)
+      suggestions.push("Possível desalinhamento do joelho direito — sugere-se confirmação clínica.");
+    if (valgusL > 0.15)
+      suggestions.push("Possível desalinhamento do joelho esquerdo — sugere-se confirmação clínica.");
+    if (Math.abs(rangeL - rangeR) > 12)
+      suggestions.push("Possível assimetria de movimento entre os lados — sugere-se avaliação bilateral.");
+    if (rangeL > 0 && rangeR > 0 && Math.max(rangeL, rangeR) < 20)
+      suggestions.push("Amplitude de movimento reduzida — sugere-se confirmar objetivo do exercício.");
+    if (trunk.max > 35)
+      suggestions.push("Controle de tronco a confirmar — inclinação acentuada durante a execução.");
+    if (conf.mean < 0.5)
+      suggestions.push("Baixa visibilidade dos marcadores — recomenda-se nova captura com melhor enquadramento.");
+  } else {
+    if (valgusR > 0.15) suggestions.push("Possível valgo dinâmico à direita — sugere-se confirmação clínica.");
+    if (valgusL > 0.15) suggestions.push("Possível valgo dinâmico à esquerda — sugere-se confirmação clínica.");
+    if (Math.abs(rangeL - rangeR) > 12) suggestions.push("Assimetria de amplitude de flexão de joelho — sugere-se avaliação bilateral.");
+    if (trunk.max > 45) suggestions.push("Inclinação de tronco acentuada — sugere-se avaliar controle de tronco e quadril.");
+    if (conf.mean < 0.5) suggestions.push("Baixa visibilidade dos marcadores — recomenda-se nova captura com melhor enquadramento.");
+  }
 
   return {
     engine: "mediapipe-pose-landmarker",

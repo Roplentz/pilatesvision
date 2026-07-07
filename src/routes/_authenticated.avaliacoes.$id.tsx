@@ -436,6 +436,7 @@ function PosturalSection({
   const [severity, setSeverity] = useState<Severity>("leve");
   const [findingNotes, setFindingNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   const addFinding = () => {
     if (!region.trim() || !finding.trim()) {
@@ -472,6 +473,7 @@ function PosturalSection({
         findings: findings as unknown as never,
         score: score ? Number(score) : null,
         professional_notes: notes.trim() || null,
+        image_url: imagePath,
       });
       toast.success("Achado postural salvo.");
       setOpen(false);
@@ -479,6 +481,7 @@ function PosturalSection({
       setScore("");
       setNotes("");
       setFindings([]);
+      setImagePath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");

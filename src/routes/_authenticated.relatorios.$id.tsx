@@ -313,6 +313,29 @@ function RelatorioDetailPage() {
                 </div>
               </div>
             )}
+            {exerciseMedia.length > 0 && (
+              <div className="space-y-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Vídeos de exercícios
+                </div>
+                <div className="grid gap-4">
+                  {exerciseMedia.map((e) => (
+                    <div key={e.id} className="space-y-1">
+                      <div className="text-xs text-muted-foreground">
+                        {e.exercise_name}
+                        {e.apparatus ? ` — ${e.apparatus}` : ""}
+                      </div>
+                      <SignedClinicalMedia path={e.video_url} kind="video" />
+                      {isAutoMetricsSummary(e.metrics) && (
+                        <AutoMetricsReadOnly
+                          summary={e.metrics as unknown as AutoMetricsSummary}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

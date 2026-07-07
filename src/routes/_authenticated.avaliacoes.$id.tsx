@@ -1070,6 +1070,27 @@ function ExerciseSection({
                   Recomendação: {r.recommendation}
                 </p>
               )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia path={r.video_url} kind="video" />
+                </div>
+              )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <VideoPoseAnalyzer
+                    resultId={r.id}
+                    table="exercise_results"
+                    context="pilates"
+                    videoPath={r.video_url}
+                    initialSummary={
+                      isAutoMetricsSummary(r.metrics)
+                        ? (r.metrics as unknown as AutoMetricsSummary)
+                        : null
+                    }
+                    onSaved={onSaved}
+                  />
+                </div>
+              )}
             </li>
           );
         })}

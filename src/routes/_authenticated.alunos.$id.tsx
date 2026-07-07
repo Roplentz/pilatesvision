@@ -498,3 +498,68 @@ function AssessmentsHistory({ studentId }: { studentId: string }) {
     </>
   );
 }
+
+const reportStatusLabel: Record<string, string> = {
+  draft: "Rascunho",
+  finalized: "Finalizado",
+  archived: "Arquivado",
+};
+
+function ReportsHistory({ studentId }: { studentId: string }) {
+  const { reports, loading } = useStudentReports(studentId);
+  return (
+    <>
+      <h2 className="font-display text-xl font-semibold">Relatórios</h2>
+      {loading ? (
+        <div className="mt-4 flex justify-center py-8">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </div>
+      ) : reports.length === 0 ? (
+        <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center text-sm text-muted-foreground">
+          Nenhum relatório gerado. Finalize uma avaliação e clique em "Gerar relatório".
+        </div>
+      ) : (
+        <ul className="mt-4 space-y-2">
+          {reports.map((r) => (
+            <li
+              key={r.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/40 px-5 py-4"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant={r.status === "finalized" ? "default" : "secondary"}
+                    className="text-[10px]"
+                  >
+                    {reportStatusLabel[r.status] ?? r.status}
+                  </Badge>
+                  <Badge variant="outline" className="text-[10px]">
+                    v{r.version}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleDateString("pt-BR")}
+                  </span>
+                </div>
+                <p className="mt-1 truncate text-sm">{r.title ?? "Relatório"}</p>
+                <Link
+                  to="/avaliacoes/$id"
+                  params={{ id: r.assessment_id }}
+                  className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  Avaliação vinculada
+                </Link>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link to="/relatorios/$id" params={{ id: r.id }}>
+                  <Button variant="outline" size="sm">
+                    <FileText className="h-4 w-4" /> Abrir relatório
+                  </Button>
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}

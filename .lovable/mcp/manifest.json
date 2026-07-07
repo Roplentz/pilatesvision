@@ -5,7 +5,9 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://hcoaemgumdbexvmfcnwj.supabase.co/auth/v1",
-    "accepted_audiences": ["authenticated"]
+    "accepted_audiences": [
+      "authenticated"
+    ]
   },
   "mcp": {
     "server": {
@@ -74,7 +76,9 @@
               "type": "string"
             }
           },
-          "required": ["full_name"]
+          "required": [
+            "full_name"
+          ]
         },
         "outputSchema": null
       },
@@ -126,7 +130,9 @@
               "description": "ID da avaliação."
             }
           },
-          "required": ["assessment_id"]
+          "required": [
+            "assessment_id"
+          ]
         },
         "outputSchema": null
       }

@@ -729,7 +729,6 @@ function MovementSection({
   onSaved: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [movementName, setMovementName] = useState("");
   const [movementPreset, setMovementPreset] = useState<string>(FUNCTIONAL_MOVEMENTS[0]);
   const [movementCustom, setMovementCustom] = useState("");
   const [score, setScore] = useState("");
@@ -776,7 +775,6 @@ function MovementSection({
       setOpen(false);
       setMovementPreset(FUNCTIONAL_MOVEMENTS[0]);
       setMovementCustom("");
-      setMovementName("");
       setScore("");
       setNotes("");
       setCompensations([]);

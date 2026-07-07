@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600" role="img" aria-labelledby="title desc">
+  <title id="title">PilatesVision exercise schematic reference sheet</title>
+  <desc id="desc">Prancha esquemática própria com referências visuais simplificadas para exercícios de Pilates.</desc>
+  <style>
+    .bg{fill:#f6f8fb}.card{fill:#ffffff;stroke:#d8dee9;stroke-width:2}.label{font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;fill:#243447}.sub{font-family:Arial,Helvetica,sans-serif;font-size:15px;fill:#607080}.line{fill:none;stroke:#1f2937;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}.thin{fill:none;stroke:#1f2937;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.equip{fill:none;stroke:#009da6;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}.joint{fill:#1f2937}.accent{fill:none;stroke:#009da6;stroke-width:4;stroke-dasharray:8 8}.floor{stroke:#9aa4b2;stroke-width:4}.warn{font-family:Arial,Helvetica,sans-serif;font-size:13px;fill:#7b8a9e}
+  </style>
+  <rect class="bg" x="0" y="0" width="1200" height="1600"/>
+  <text x="60" y="58" class="label" style="font-size:30px">PilatesVision — referências esquemáticas de exercícios</text>
+  <text x="60" y="88" class="sub">Imagens próprias para apoio visual interno. Não substituem demonstração, avaliação ou supervisão profissional.</text>
+
+  <!-- card helper dimensions: x 50/430/810, y 130 + 350 rows -->
+
+  <g id="mat_hundred">
+    <rect class="card" x="50" y="130" width="320" height="300" rx="22"/>
+    <text x="75" y="170" class="label">Cem</text><text x="75" y="194" class="sub">Mat | core + respiração</text>
+    <line x1="85" y1="360" x2="335" y2="360" class="floor"/>
+    <circle cx="148" cy="282" r="18" class="joint"/>
+    <path class="line" d="M165 288 C195 300 220 310 248 313"/>
+    <path class="line" d="M220 310 L295 265"/>
+    <path class="line" d="M220 310 L300 342"/>
+    <path class="thin" d="M198 306 L120 325 M203 318 L125 344"/>
+    <path class="accent" d="M112 320 L112 350 M132 314 L132 354"/>
+    <text x="75" y="404" class="warn">Monitorar: cervical, pelve, altura das pernas</text>
+  </g>
+
+  <g id="mat_roll_up">
+    <rect class="card" x="430" y="130" width="320" height="300" rx="22"/>
+    <text x="455" y="170" class="label">Roll Up</text><text x="455" y="194" class="sub">Mat | mobilidade segmentar</text>
+    <line x1="465" y1="360" x2="715" y2="360" class="floor"/>
+    <circle cx="548" cy="250" r="17" class="joint"/>
+    <path class="line" d="M560 265 C585 290 605 318 625 350"/>
+    <path class="line" d="M622 350 L700 350"/>
+    <path class="thin" d="M574 282 L505 260 M578 286 L514 302"/>
+    <path class="accent" d="M548 280 C575 300 595 328 606 352"/>
+    <text x="455" y="404" class="warn">Monitorar: impulso, flexão coluna, pés</text>
+  </g>
+
+  <g id="mat_pelvic_curl">
+    <rect class="card" x="810" y="130" width="320" height="300" rx="22"/>
+    <text x="835" y="170" class="label">Ponte articulada</text><text x="835" y="194" class="sub">Mat | quadril + coluna</text>
+    <line x1="845" y1="360" x2="1095" y2="360" class="floor"/>
+    <circle cx="898" cy="340" r="16" class="joint"/>
+    <path class="line" d="M915 338 C955 290 1000 290 1040 338"/>
+    <path class="line" d="M1040 338 L1088 360"/>
+    <path class="line" d="M915 338 L870 360"/>
+    <path class="thin" d="M960 298 L930 270 M970 295 L1000 270"/>
+    <path class="accent" d="M915 338 C958 270 1000 270 1040 338"/>
+    <text x="835" y="404" class="warn">Monitorar: simetria pélvica, joelhos, altura</text>
+  </g>
+
+  <g id="mat_swan_prep">
+    <rect class="card" x="50" y="480" width="320" height="300" rx="22"/>
+    <text x="75" y="520" class="label">Swan Prep</text><text x="75" y="544" class="sub">Mat | extensão torácica</text>
+    <line x1="85" y1="710" x2="335" y2="710" class="floor"/>
+    <circle cx="145" cy="646" r="17" class="joint"/>
+    <path class="line" d="M160 655 C200 680 245 695 300 705"/>
+    <path class="thin" d="M190 670 L160 705 M205 677 L185 710"/>
+    <path class="line" d="M265 700 L325 670"/>
+    <path class="accent" d="M165 662 C205 625 250 635 302 675"/>
+    <text x="75" y="754" class="warn">Monitorar: lombar, escápulas, cervical</text>
+  </g>
+
+  <g id="mat_side_kick">
+    <rect class="card" x="430" y="480" width="320" height="300" rx="22"/>
+    <text x="455" y="520" class="label">Side Kick</text><text x="455" y="544" class="sub">Mat | quadril + pelve</text>
+    <line x1="465" y1="710" x2="715" y2="710" class="floor"/>
+    <circle cx="512" cy="663" r="16" class="joint"/>
+    <path class="line" d="M528 670 L610 700"/>
+    <path class="line" d="M610 700 L705 700"/>
+    <path class="line" d="M610 700 L690 635"/>
+    <path class="thin" d="M535 675 L490 700"/>
+    <path class="accent" d="M610 700 C640 650 670 630 700 620"/>
+    <text x="455" y="754" class="warn">Monitorar: rotação pélvica, amplitude, tronco</text>
+  </g>
+
+  <g id="mat_plank">
+    <rect class="card" x="810" y="480" width="320" height="300" rx="22"/>
+    <text x="835" y="520" class="label">Prancha</text><text x="835" y="544" class="sub">Mat | estabilidade global</text>
+    <line x1="845" y1="710" x2="1095" y2="710" class="floor"/>
+    <circle cx="885" cy="635" r="16" class="joint"/>
+    <path class="line" d="M900 642 L1010 672 L1085 710"/>
+    <path class="line" d="M930 650 L875 710"/>
+    <path class="line" d="M1010 672 L1030 710"/>
+    <path class="accent" d="M900 642 L1010 672 L1085 710"/>
+    <text x="835" y="754" class="warn">Monitorar: linha corporal, escápulas, pelve</text>
+  </g>
+
+  <g id="ref_footwork">
+    <rect class="card" x="50" y="830" width="320" height="300" rx="22"/>
+    <text x="75" y="870" class="label">Footwork</text><text x="75" y="894" class="sub">Reformer | MMII</text>
+    <rect x="100" y="1035" width="210" height="18" class="equip" rx="7"/>
+    <line x1="320" y1="945" x2="320" y2="1068" class="equip"/>
+    <circle cx="135" cy="985" r="16" class="joint"/>
+    <path class="line" d="M150 995 L210 1035 L275 1010 L320 965"/>
+    <path class="thin" d="M180 1005 L140 1045"/>
+    <path class="accent" d="M225 1008 L270 1008"/>
+    <text x="75" y="1104" class="warn">Monitorar: valgo, simetria, retorno excêntrico</text>
+  </g>
+
+  <g id="ref_leg_circles">
+    <rect class="card" x="430" y="830" width="320" height="300" rx="22"/>
+    <text x="455" y="870" class="label">Leg Circles</text><text x="455" y="894" class="sub">Reformer | quadril</text>
+    <rect x="480" y="1035" width="210" height="18" class="equip" rx="7"/>
+    <circle cx="525" cy="1002" r="16" class="joint"/>
+    <path class="line" d="M540 1010 L595 1035"/>
+    <path class="line" d="M595 1035 L650 955"/>
+    <path class="line" d="M595 1035 L705 970"/>
+    <ellipse cx="675" cy="965" rx="46" ry="30" class="accent"/>
+    <text x="455" y="1104" class="warn">Monitorar: trajetória, pelve, amplitude</text>
+  </g>
+
+  <g id="ref_scooter">
+    <rect class="card" x="810" y="830" width="320" height="300" rx="22"/>
+    <text x="835" y="870" class="label">Scooter</text><text x="835" y="894" class="sub">Reformer | unilateral</text>
+    <rect x="860" y="1042" width="210" height="18" class="equip" rx="7"/>
+    <circle cx="930" cy="945" r="16" class="joint"/>
+    <path class="line" d="M930 962 L948 1005 L930 1058"/>
+    <path class="line" d="M948 1005 L1020 1048"/>
+    <path class="thin" d="M938 970 L910 1010 M940 972 L965 1010"/>
+    <path class="accent" d="M950 1005 L1020 1048"/>
+    <text x="835" y="1104" class="warn">Monitorar: joelho-pé, pelve, equilíbrio</text>
+  </g>
+
+  <g id="cad_leg_springs">
+    <rect class="card" x="50" y="1180" width="320" height="300" rx="22"/>
+    <text x="75" y="1220" class="label">Leg Springs</text><text x="75" y="1244" class="sub">Cadillac | quadril</text>
+    <line x1="85" y1="1408" x2="335" y2="1408" class="floor"/>
+    <line x1="320" y1="1270" x2="320" y2="1430" class="equip"/>
+    <circle cx="130" cy="1370" r="16" class="joint"/>
+    <path class="line" d="M145 1380 L205 1405"/>
+    <path class="line" d="M205 1405 L280 1320 M205 1405 L300 1362"/>
+    <path class="equip" d="M320 1290 L280 1320 M320 1310 L300 1362"/>
+    <text x="75" y="1454" class="warn">Monitorar: pelve, simetria, retorno das molas</text>
+  </g>
+
+  <g id="chair_footwork">
+    <rect class="card" x="430" y="1180" width="320" height="300" rx="22"/>
+    <text x="455" y="1220" class="label">Chair Footwork</text><text x="455" y="1244" class="sub">Chair | MMII</text>
+    <rect x="520" y="1345" width="120" height="70" class="equip" rx="10"/>
+    <line x1="640" y1="1412" x2="705" y2="1450" class="equip"/>
+    <circle cx="575" cy="1295" r="16" class="joint"/>
+    <path class="line" d="M575 1312 L580 1350"/>
+    <path class="line" d="M580 1350 L635 1405 L700 1450"/>
+    <path class="thin" d="M577 1325 L540 1355 M580 1325 L615 1358"/>
+    <text x="455" y="1454" class="warn">Monitorar: postura, joelhos, controle pedal</text>
+  </g>
+
+  <g id="barrel_swan">
+    <rect class="card" x="810" y="1180" width="320" height="300" rx="22"/>
+    <text x="835" y="1220" class="label">Swan no Barrel</text><text x="835" y="1244" class="sub">Barrel | extensão</text>
+    <path d="M885 1410 C905 1340 1010 1340 1030 1410 Z" class="equip"/>
+    <circle cx="900" cy="1315" r="16" class="joint"/>
+    <path class="line" d="M915 1324 C955 1340 990 1365 1025 1398"/>
+    <path class="line" d="M1000 1378 L1080 1348"/>
+    <path class="thin" d="M940 1340 L900 1378 M945 1344 L930 1395"/>
+    <path class="accent" d="M915 1324 C950 1280 1005 1310 1040 1365"/>
+    <text x="835" y="1454" class="warn">Monitorar: extensão torácica vs lombar</text>
+  </g>
+
+  <text x="60" y="1560" class="sub">PilatesVision v0.1 — arte esquemática própria para documentação e protótipo. Revisar com equipe clínica antes de uso final.</text>
+</svg>

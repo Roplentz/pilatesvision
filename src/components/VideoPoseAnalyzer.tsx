@@ -10,14 +10,17 @@ import {
   sampleFromLandmarks,
   summarizeSamples,
   toJson,
+  type AnalysisContext,
   type AutoMetricsSummary,
   type FrameSample,
   type Landmark,
 } from "@/lib/poseMetrics";
 
 interface Props {
-  movementResultId: string;
+  resultId: string;
   videoPath: string;
+  table?: "movement_results" | "exercise_results";
+  context?: AnalysisContext;
   initialSummary?: AutoMetricsSummary | null;
   onSaved?: () => void;
 }
@@ -27,7 +30,14 @@ const MODEL_URL =
 const WASM_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm";
 const TARGET_FPS = 8;
 
-export function VideoPoseAnalyzer({ movementResultId, videoPath, initialSummary, onSaved }: Props) {
+export function VideoPoseAnalyzer({
+  resultId,
+  videoPath,
+  table = "movement_results",
+  context = "squat",
+  initialSummary,
+  onSaved,
+}: Props) {
   const { url, loading: urlLoading, error: urlError } = useSignedMediaUrl(videoPath);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -101,9 +111,9 @@ export function VideoPoseAnalyzer({ movementResultId, videoPath, initialSummary,
 
       if (samples.length === 0) {
         await supabase
-          .from("movement_results")
+          .from(table)
           .update({ analysis_status: "error" })
-          .eq("id", movementResultId);
+          .eq("id", resultId);
         setEngineError(
           "Nenhum marcador foi detectado no vídeo. Tente uma nova captura com melhor iluminação e enquadramento de corpo inteiro.",
         );
@@ -111,11 +121,11 @@ export function VideoPoseAnalyzer({ movementResultId, videoPath, initialSummary,
         return;
       }
 
-      const built = summarizeSamples(samples, duration);
+      const built = summarizeSamples(samples, duration, context);
       const { error } = await supabase
-        .from("movement_results")
+        .from(table)
         .update({ metrics: toJson(built), analysis_status: "done" })
-        .eq("id", movementResultId);
+        .eq("id", resultId);
       if (error) throw new Error(error.message);
 
       setSummary(built);
@@ -125,9 +135,9 @@ export function VideoPoseAnalyzer({ movementResultId, videoPath, initialSummary,
       const msg = e instanceof Error ? e.message : String(e);
       setEngineError(msg);
       await supabase
-        .from("movement_results")
+        .from(table)
         .update({ analysis_status: "error" })
-        .eq("id", movementResultId)
+        .eq("id", resultId)
         .then(() => undefined);
       toast.error("Falha ao analisar vídeo.");
     } finally {

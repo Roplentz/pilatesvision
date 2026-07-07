@@ -817,7 +817,9 @@ function MovementSection({
               {r.video_url && (
                 <div className="mt-4">
                   <VideoPoseAnalyzer
-                    movementResultId={r.id}
+                    resultId={r.id}
+                    table="movement_results"
+                    context="squat"
                     videoPath={r.video_url}
                     initialSummary={
                       isAutoMetricsSummary(r.metrics)
@@ -966,6 +968,7 @@ function ExerciseSection({
   const [comp, setComp] = useState("");
   const [severity, setSeverity] = useState<Severity>("leve");
   const [saving, setSaving] = useState(false);
+  const [videoPath, setVideoPath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return;
@@ -988,6 +991,7 @@ function ExerciseSection({
         control_level: control,
         recommendation: recommendation.trim() || null,
         compensations: comps as unknown as never,
+        video_url: videoPath,
       });
       toast.success("Registro de exercício salvo.");
       setOpen(false);
@@ -997,6 +1001,7 @@ function ExerciseSection({
       setControl("bom");
       setRecommendation("");
       setComps([]);
+      setVideoPath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");
@@ -1064,6 +1069,27 @@ function ExerciseSection({
                 <p className="mt-3 text-xs text-muted-foreground">
                   Recomendação: {r.recommendation}
                 </p>
+              )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia path={r.video_url} kind="video" />
+                </div>
+              )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <VideoPoseAnalyzer
+                    resultId={r.id}
+                    table="exercise_results"
+                    context="pilates"
+                    videoPath={r.video_url}
+                    initialSummary={
+                      isAutoMetricsSummary(r.metrics)
+                        ? (r.metrics as unknown as AutoMetricsSummary)
+                        : null
+                    }
+                    onSaved={onSaved}
+                  />
+                </div>
               )}
             </li>
           );
@@ -1162,6 +1188,16 @@ function ExerciseSection({
               ))}
             </ul>
           )}
+
+          <ClinicalMediaUploader
+            kind="video"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={videoPath}
+            onUploaded={(p) => setVideoPath(p)}
+            onCleared={() => setVideoPath(null)}
+          />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>

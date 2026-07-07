@@ -36,10 +36,12 @@ function RelatorioDetailPage() {
   const { id } = Route.useParams();
   const router = useRouter();
   const { report, loading, error, reload } = useReport(id);
-  const { postural, movement } = useAssessmentResults(report?.assessment_id ?? null);
+  const { postural, movement, exercise } = useAssessmentResults(report?.assessment_id ?? null);
   const posturalMedia = postural.filter((p) => Boolean(p.image_url));
   const movementMedia = movement.filter((m) => Boolean(m.video_url));
-  const hasMedia = posturalMedia.length > 0 || movementMedia.length > 0;
+  const exerciseMedia = exercise.filter((e) => Boolean(e.video_url));
+  const hasMedia =
+    posturalMedia.length > 0 || movementMedia.length > 0 || exerciseMedia.length > 0;
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<ReportContent>({});
@@ -305,6 +307,29 @@ function RelatorioDetailPage() {
                       <SignedClinicalMedia path={m.video_url} kind="video" />
                       {isAutoMetricsSummary(m.metrics) && (
                         <AutoMetricsReadOnly summary={m.metrics as unknown as AutoMetricsSummary} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {exerciseMedia.length > 0 && (
+              <div className="space-y-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Vídeos de exercícios
+                </div>
+                <div className="grid gap-4">
+                  {exerciseMedia.map((e) => (
+                    <div key={e.id} className="space-y-1">
+                      <div className="text-xs text-muted-foreground">
+                        {e.exercise_name}
+                        {e.apparatus ? ` — ${e.apparatus}` : ""}
+                      </div>
+                      <SignedClinicalMedia path={e.video_url} kind="video" />
+                      {isAutoMetricsSummary(e.metrics) && (
+                        <AutoMetricsReadOnly
+                          summary={e.metrics as unknown as AutoMetricsSummary}
+                        />
                       )}
                     </div>
                   ))}

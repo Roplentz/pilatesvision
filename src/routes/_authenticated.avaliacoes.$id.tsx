@@ -31,6 +31,8 @@ import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
+import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
+import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
 import {
   AlertDialog,
   AlertDialogAction,

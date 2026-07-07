@@ -1103,7 +1103,15 @@ function ExerciseSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Dumbbell className="h-4 w-4 text-primary" />
-          <h3 className="font-display text-lg font-semibold">Avaliação por exercício</h3>
+          <div>
+            <h3 className="font-display text-lg font-semibold">
+              Exercícios Pilates — avaliação da execução dos exercícios do método
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Avaliação clínica da execução do repertório Pilates. Estimativa/apoio à
+              decisão — requer confirmação clínica.
+            </p>
+          </div>
         </div>
         {editable && !open && (
           <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
@@ -1179,6 +1187,15 @@ function ExerciseSection({
                   />
                 </div>
               )}
+              {r.image_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia
+                    path={r.image_url}
+                    kind="image"
+                    alt={`Foto de referência ${r.exercise_name}`}
+                  />
+                </div>
+              )}
             </li>
           );
         })}
@@ -1189,16 +1206,41 @@ function ExerciseSection({
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <Label>Exercício *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1.5" />
+              <Select value={namePreset} onValueChange={setNamePreset}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PILATES_EXERCISES.map((e) => (
+                    <SelectItem key={e} value={e}>
+                      {e}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {namePreset === "Exercício livre" && (
+                <Input
+                  value={nameCustom}
+                  onChange={(e) => setNameCustom(e.target.value)}
+                  placeholder="Nome do exercício"
+                  className="mt-2"
+                />
+              )}
             </div>
             <div>
               <Label>Aparelho</Label>
-              <Input
-                value={apparatus}
-                onChange={(e) => setApparatus(e.target.value)}
-                placeholder="Reformer, Cadillac…"
-                className="mt-1.5"
-              />
+              <Select value={apparatus} onValueChange={setApparatus}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {APPARATUS_OPTIONS.map((a) => (
+                    <SelectItem key={a} value={a}>
+                      {a}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div>
@@ -1285,6 +1327,17 @@ function ExerciseSection({
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
             onCleared={() => setVideoPath(null)}
+          />
+
+          <ClinicalMediaUploader
+            kind="image"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={imagePath}
+            onUploaded={(p) => setImagePath(p)}
+            onCleared={() => setImagePath(null)}
+            label="Foto de referência (opcional)"
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">

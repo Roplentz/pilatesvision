@@ -10,6 +10,7 @@ O objetivo não é automatizar conduta clínica de forma cega. O objetivo é tra
 |---|---|
 | `pilates_methods.md` | Taxonomia dos métodos, escolas, abordagens e equipamentos de Pilates. |
 | `exercise_catalog.csv` | Catálogo estruturado de exercícios para uso em produto, banco de dados e motor de análise. |
+| `exercise_image_map.csv` | Mapa entre cada exercício e a referência visual esquemática disponível. |
 | `decision_support_rules.md` | Regras clínicas, alertas, regressões, progressões e limites éticos do suporte à decisão. |
 | `supabase_schema.sql` | Modelo inicial de tabelas para inserir métodos, exercícios, imagens e regras no Supabase. |
 | `image_reference/pilates_exercise_reference_sheet.svg` | Prancha visual esquemática própria, sem cópia de fotos comerciais. |
@@ -17,10 +18,11 @@ O objetivo não é automatizar conduta clínica de forma cega. O objetivo é tra
 ## Como usar no produto
 
 1. Importar `exercise_catalog.csv` para uma tabela `pilates_exercises` no Supabase.
-2. Associar cada exercício a uma família de método, equipamento, nível e objetivos clínicos.
-3. Usar os campos de métricas visuais para orientar o motor Python/FastAPI com MediaPipe/OpenCV.
-4. Exibir os alertas como apoio, nunca como diagnóstico automático.
-5. Permitir que o profissional aceite, edite ou rejeite qualquer sugestão.
+2. Importar `exercise_image_map.csv` para relacionar exercícios e imagens.
+3. Associar cada exercício a uma família de método, equipamento, nível e objetivos clínicos.
+4. Usar os campos de métricas visuais para orientar o motor Python/FastAPI com MediaPipe/OpenCV.
+5. Exibir os alertas como apoio, nunca como diagnóstico automático.
+6. Permitir que o profissional aceite, edite ou rejeite qualquer sugestão.
 
 ## Regra-mãe
 

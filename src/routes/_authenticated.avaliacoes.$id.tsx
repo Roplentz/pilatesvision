@@ -705,6 +705,7 @@ function MovementSection({
   const [severity, setSeverity] = useState<Severity>("leve");
   const [compNotes, setCompNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [videoPath, setVideoPath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return toast.error("Descreva a compensação.");
@@ -729,6 +730,7 @@ function MovementSection({
         compensations: compensations as unknown as never,
         controle: score ? Number(score) : null,
         professional_notes: notes.trim() || null,
+        video_url: videoPath,
       });
       toast.success("Avaliação dinâmica salva.");
       setOpen(false);
@@ -736,6 +738,7 @@ function MovementSection({
       setScore("");
       setNotes("");
       setCompensations([]);
+      setVideoPath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");

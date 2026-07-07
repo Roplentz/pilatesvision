@@ -15,7 +15,7 @@ const movements = [
   "Lunge",
   "Apoio unipodal",
   "Sentar e levantar",
-  "Single Leg Stretch",
+  "Movimento livre",
 ];
 
 function DinamicaPage() {
@@ -24,9 +24,12 @@ function DinamicaPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
       <header>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Avaliação Dinâmica</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">
+          Avaliação Dinâmica — triagem de movimentos funcionais
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Análise da qualidade do movimento em exercícios funcionais e Pilates.
+          Triagem clínica da qualidade de movimentos funcionais (fora do repertório
+          Pilates). Estimativa de apoio à decisão — requer confirmação clínica.
         </p>
       </header>
 

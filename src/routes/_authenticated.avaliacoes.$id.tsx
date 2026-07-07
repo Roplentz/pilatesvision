@@ -92,6 +92,36 @@ const severityTone: Record<Severity, string> = {
   importante: "bg-red-500/15 text-red-300 border-red-500/30",
 };
 
+const FUNCTIONAL_MOVEMENTS = [
+  "Agachamento",
+  "Ponte",
+  "Lunge",
+  "Apoio unipodal",
+  "Sentar e levantar",
+  "Movimento livre",
+] as const;
+
+const PILATES_EXERCISES = [
+  "Hundred",
+  "Roll Up",
+  "Single Leg Stretch",
+  "Bridge",
+  "Swan",
+  "Side Kick",
+  "Footwork no Reformer",
+  "Squat no Reformer",
+  "Exercício livre",
+] as const;
+
+const APPARATUS_OPTIONS = [
+  "Solo",
+  "Reformer",
+  "Cadillac",
+  "Chair",
+  "Barrel",
+  "Outro",
+] as const;
+
 function AvaliacaoDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
@@ -699,7 +729,8 @@ function MovementSection({
   onSaved: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [movementName, setMovementName] = useState("");
+  const [movementPreset, setMovementPreset] = useState<string>(FUNCTIONAL_MOVEMENTS[0]);
+  const [movementCustom, setMovementCustom] = useState("");
   const [score, setScore] = useState("");
   const [notes, setNotes] = useState("");
   const [compensations, setCompensations] = useState<MovementCompensation[]>([]);
@@ -708,6 +739,7 @@ function MovementSection({
   const [compNotes, setCompNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [videoPath, setVideoPath] = useState<string | null>(null);
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return toast.error("Descreva a compensação.");
@@ -721,26 +753,33 @@ function MovementSection({
   };
 
   const save = async () => {
-    if (!movementName.trim()) return toast.error("Informe o movimento avaliado.");
+    const resolvedName =
+      movementPreset === "Movimento livre"
+        ? movementCustom.trim()
+        : movementPreset.trim();
+    if (!resolvedName) return toast.error("Informe o movimento avaliado.");
     setSaving(true);
     try {
       await insertMovementResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
         student_id: studentId,
-        movement_name: movementName.trim(),
+        movement_name: resolvedName,
         compensations: compensations as unknown as never,
         controle: score ? Number(score) : null,
         professional_notes: notes.trim() || null,
         video_url: videoPath,
+        image_url: imagePath,
       });
       toast.success("Avaliação dinâmica salva.");
       setOpen(false);
-      setMovementName("");
+      setMovementPreset(FUNCTIONAL_MOVEMENTS[0]);
+      setMovementCustom("");
       setScore("");
       setNotes("");
       setCompensations([]);
       setVideoPath(null);
+      setImagePath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");
@@ -754,7 +793,15 @@ function MovementSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
-          <h3 className="font-display text-lg font-semibold">Avaliação dinâmica</h3>
+          <div>
+            <h3 className="font-display text-lg font-semibold">
+              Avaliação Dinâmica — triagem de movimentos funcionais
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Triagem clínica de movimentos funcionais (fora do repertório Pilates).
+              Estimativa/apoio à decisão — requer confirmação clínica.
+            </p>
+          </div>
         </div>
         {editable && !open && (
           <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
@@ -830,6 +877,15 @@ function MovementSection({
                   />
                 </div>
               )}
+              {r.image_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia
+                    path={r.image_url}
+                    kind="image"
+                    alt={`Foto de referência ${r.movement_name ?? ""}`}
+                  />
+                </div>
+              )}
             </li>
           );
         })}
@@ -840,12 +896,26 @@ function MovementSection({
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <Label>Movimento avaliado *</Label>
-              <Input
-                value={movementName}
-                onChange={(e) => setMovementName(e.target.value)}
-                placeholder="Agachamento livre"
-                className="mt-1.5"
-              />
+              <Select value={movementPreset} onValueChange={setMovementPreset}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FUNCTIONAL_MOVEMENTS.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {movementPreset === "Movimento livre" && (
+                <Input
+                  value={movementCustom}
+                  onChange={(e) => setMovementCustom(e.target.value)}
+                  placeholder="Descreva o movimento avaliado"
+                  className="mt-2"
+                />
+              )}
             </div>
             <div>
               <Label>Controle motor (0-100, opcional)</Label>
@@ -927,6 +997,17 @@ function MovementSection({
             onCleared={() => setVideoPath(null)}
           />
 
+          <ClinicalMediaUploader
+            kind="image"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={imagePath}
+            onUploaded={(p) => setImagePath(p)}
+            onCleared={() => setImagePath(null)}
+            label="Foto de referência (opcional)"
+          />
+
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
               Cancelar
@@ -959,8 +1040,9 @@ function ExerciseSection({
   onSaved: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [apparatus, setApparatus] = useState("");
+  const [namePreset, setNamePreset] = useState<string>(PILATES_EXERCISES[0]);
+  const [nameCustom, setNameCustom] = useState("");
+  const [apparatus, setApparatus] = useState<string>(APPARATUS_OPTIONS[0]);
   const [execution, setExecution] = useState("");
   const [control, setControl] = useState<ControlLevel>("bom");
   const [recommendation, setRecommendation] = useState("");
@@ -969,6 +1051,7 @@ function ExerciseSection({
   const [severity, setSeverity] = useState<Severity>("leve");
   const [saving, setSaving] = useState(false);
   const [videoPath, setVideoPath] = useState<string | null>(null);
+  const [imagePath, setImagePath] = useState<string | null>(null);
 
   const addComp = () => {
     if (!comp.trim()) return;
@@ -978,30 +1061,35 @@ function ExerciseSection({
   };
 
   const save = async () => {
-    if (!name.trim()) return toast.error("Informe o exercício.");
+    const resolvedName =
+      namePreset === "Exercício livre" ? nameCustom.trim() : namePreset.trim();
+    if (!resolvedName) return toast.error("Informe o exercício.");
     setSaving(true);
     try {
       await insertExerciseResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
         student_id: studentId,
-        exercise_name: name.trim(),
-        apparatus: apparatus.trim() || null,
+        exercise_name: resolvedName,
+        apparatus: apparatus || null,
         execution_notes: execution.trim() || null,
         control_level: control,
         recommendation: recommendation.trim() || null,
         compensations: comps as unknown as never,
         video_url: videoPath,
+        image_url: imagePath,
       });
       toast.success("Registro de exercício salvo.");
       setOpen(false);
-      setName("");
-      setApparatus("");
+      setNamePreset(PILATES_EXERCISES[0]);
+      setNameCustom("");
+      setApparatus(APPARATUS_OPTIONS[0]);
       setExecution("");
       setControl("bom");
       setRecommendation("");
       setComps([]);
       setVideoPath(null);
+      setImagePath(null);
       onSaved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao salvar.");
@@ -1015,7 +1103,15 @@ function ExerciseSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Dumbbell className="h-4 w-4 text-primary" />
-          <h3 className="font-display text-lg font-semibold">Avaliação por exercício</h3>
+          <div>
+            <h3 className="font-display text-lg font-semibold">
+              Exercícios Pilates — avaliação da execução dos exercícios do método
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Avaliação clínica da execução do repertório Pilates. Estimativa/apoio à
+              decisão — requer confirmação clínica.
+            </p>
+          </div>
         </div>
         {editable && !open && (
           <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
@@ -1091,6 +1187,15 @@ function ExerciseSection({
                   />
                 </div>
               )}
+              {r.image_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia
+                    path={r.image_url}
+                    kind="image"
+                    alt={`Foto de referência ${r.exercise_name}`}
+                  />
+                </div>
+              )}
             </li>
           );
         })}
@@ -1101,16 +1206,41 @@ function ExerciseSection({
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <Label>Exercício *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1.5" />
+              <Select value={namePreset} onValueChange={setNamePreset}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PILATES_EXERCISES.map((e) => (
+                    <SelectItem key={e} value={e}>
+                      {e}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {namePreset === "Exercício livre" && (
+                <Input
+                  value={nameCustom}
+                  onChange={(e) => setNameCustom(e.target.value)}
+                  placeholder="Nome do exercício"
+                  className="mt-2"
+                />
+              )}
             </div>
             <div>
               <Label>Aparelho</Label>
-              <Input
-                value={apparatus}
-                onChange={(e) => setApparatus(e.target.value)}
-                placeholder="Reformer, Cadillac…"
-                className="mt-1.5"
-              />
+              <Select value={apparatus} onValueChange={setApparatus}>
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {APPARATUS_OPTIONS.map((a) => (
+                    <SelectItem key={a} value={a}>
+                      {a}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div>
@@ -1197,6 +1327,17 @@ function ExerciseSection({
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
             onCleared={() => setVideoPath(null)}
+          />
+
+          <ClinicalMediaUploader
+            kind="image"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={imagePath}
+            onUploaded={(p) => setImagePath(p)}
+            onCleared={() => setImagePath(null)}
+            label="Foto de referência (opcional)"
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">

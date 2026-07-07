@@ -143,6 +143,7 @@ export type Database = {
           execution_notes: string | null
           exercise_name: string
           id: string
+          image_url: string | null
           metrics: Json
           recommendation: string | null
           student_id: string
@@ -160,6 +161,7 @@ export type Database = {
           execution_notes?: string | null
           exercise_name: string
           id?: string
+          image_url?: string | null
           metrics?: Json
           recommendation?: string | null
           student_id: string
@@ -177,6 +179,7 @@ export type Database = {
           execution_notes?: string | null
           exercise_name?: string
           id?: string
+          image_url?: string | null
           metrics?: Json
           recommendation?: string | null
           student_id?: string
@@ -218,6 +221,7 @@ export type Database = {
           created_at: string
           estabilidade: number | null
           id: string
+          image_url: string | null
           metrics: Json
           movement_name: string | null
           movements_evaluated: string[] | null
@@ -237,6 +241,7 @@ export type Database = {
           created_at?: string
           estabilidade?: number | null
           id?: string
+          image_url?: string | null
           metrics?: Json
           movement_name?: string | null
           movements_evaluated?: string[] | null
@@ -256,6 +261,7 @@ export type Database = {
           created_at?: string
           estabilidade?: number | null
           id?: string
+          image_url?: string | null
           metrics?: Json
           movement_name?: string | null
           movements_evaluated?: string[] | null

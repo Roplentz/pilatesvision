@@ -59,6 +59,7 @@ import {
   type PosturalView,
   type Severity,
 } from "@/lib/assessmentsStore";
+import { createReportFromAssessment } from "@/lib/reportsStore";
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/$id")({
   component: AvaliacaoDetailPage,
@@ -96,6 +97,7 @@ function AvaliacaoDetailPage() {
 
   const [saving, setSaving] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
+  const [generatingReport, setGeneratingReport] = useState(false);
   const [form, setForm] = useState({
     title: "",
     objective: "",
@@ -146,6 +148,19 @@ function AvaliacaoDetailPage() {
   const showPostural = type === "postural" || type === "complete";
   const showMovement = type === "dynamic" || type === "complete";
   const showExercise = type === "exercise" || type === "complete";
+
+  const generateReport = async () => {
+    setGeneratingReport(true);
+    try {
+      const r = await createReportFromAssessment(assessment.id);
+      toast.success("Relatório pronto para edição.");
+      navigate({ to: "/relatorios/$id", params: { id: r.id } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao gerar relatório.");
+    } finally {
+      setGeneratingReport(false);
+    }
+  };
 
   const saveHeader = async () => {
     setSaving(true);
@@ -371,9 +386,16 @@ function AvaliacaoDetailPage() {
               : "Enquanto rascunho, os campos e achados podem ser editados/adicionados."}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="ghost" size="sm" disabled title="Disponível em breve">
-              <FileText className="h-4 w-4" /> Gerar relatório
-            </Button>
+            {status === "finalized" && (
+              <Button variant="outline" size="sm" onClick={generateReport} disabled={generatingReport}>
+                {generatingReport ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+                Gerar relatório
+              </Button>
+            )}
             {canFinalize && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>

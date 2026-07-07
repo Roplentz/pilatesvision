@@ -3,10 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, ClipboardCheck, FileText, Plus, ArrowRight } from "lucide-react";
-import { useStudents } from "@/lib/studentsStore";
+import { Users, Archive, ClipboardCheck, Plus, ArrowRight } from "lucide-react";
+import { useStudents, useStudentCounts } from "@/lib/studentsStore";
 import { useProfile } from "@/hooks/useProfile";
-import { useClinicCounts } from "@/lib/clinicsStore";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard | PilatesVision" }] }),
@@ -15,15 +14,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function DashboardPage() {
   const { clinicId, loading: profileLoading } = useProfile();
-  const { students, loading: studentsLoading } = useStudents(clinicId);
-  const { counts, loading: countsLoading } = useClinicCounts(clinicId);
+  const { students, loading: studentsLoading } = useStudents(clinicId, { status: "active" });
+  const { counts, loading: countsLoading } = useStudentCounts(clinicId);
 
   const loading = profileLoading || studentsLoading || countsLoading;
 
   const stats = [
-    { label: "Pacientes cadastrados", value: counts.students, icon: Users },
-    { label: "Avaliações criadas", value: counts.assessments, icon: ClipboardCheck },
-    { label: "Relatórios gerados", value: counts.reports, icon: FileText },
+    { label: "Pacientes ativos", value: counts.active, icon: Users },
+    { label: "Pacientes arquivados", value: counts.archived, icon: Archive },
+    { label: "Avaliações (em breve)", value: 0, icon: ClipboardCheck },
   ];
 
   const recent = students.slice(0, 5);

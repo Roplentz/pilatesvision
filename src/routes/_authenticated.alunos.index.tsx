@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Plus, Search, Users } from "lucide-react";
+import { ArrowLeft, Plus, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useStudents } from "@/lib/studentsStore";
-import { useAssessments } from "@/lib/assessmentsStore";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useStudents, type StudentStatus } from "@/lib/studentsStore";
 import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/alunos/")({
@@ -22,31 +21,33 @@ export const Route = createFileRoute("/_authenticated/alunos/")({
   }),
 });
 
-function ageFrom(iso: string | null): number | null {
+function ageFrom(iso: string | null, fallback: number | null): number | null {
+  if (fallback != null) return fallback;
   if (!iso) return null;
   const d = new Date(iso);
   const diff = Date.now() - d.getTime();
   return Math.floor(diff / (365.25 * 24 * 3600 * 1000));
 }
 
+type StatusFilter = StudentStatus | "all";
+
+const statusLabels: Record<StudentStatus, string> = {
+  active: "Ativo",
+  inactive: "Inativo",
+  archived: "Arquivado",
+};
+
 function AlunosListPage() {
   const { clinicId } = useProfile();
-  const { students, loading } = useStudents(clinicId);
-  const { assessments } = useAssessments(clinicId);
+  const [status, setStatus] = useState<StatusFilter>("active");
+  const { students, loading } = useStudents(clinicId, { status });
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return students;
-    return students.filter(
-      (s) =>
-        s.name.toLowerCase().includes(needle) ||
-        s.email?.toLowerCase().includes(needle) ||
-        (s.goals ?? []).some((g) => g.toLowerCase().includes(needle)),
-    );
+    return students.filter((s) => s.name.toLowerCase().includes(needle));
   }, [students, q]);
-
-  const countFor = (id: string) => assessments.filter((a) => a.student_id === id).length;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -60,7 +61,7 @@ function AlunosListPage() {
           </Link>
           <Link to="/alunos/novo">
             <Button variant="hero">
-              <Plus className="h-4 w-4" /> Novo aluno
+              <Plus className="h-4 w-4" /> Novo paciente
             </Button>
           </Link>
         </div>
@@ -72,11 +73,11 @@ function AlunosListPage() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
               <Users className="h-3.5 w-3.5" /> Prontuário digital
             </div>
-            <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">Alunos</h1>
+            <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">Pacientes</h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               {loading
-                ? "Carregando alunos…"
-                : `${students.length} aluno${students.length === 1 ? "" : "s"} cadastrado${students.length === 1 ? "" : "s"} na clínica.`}
+                ? "Carregando pacientes…"
+                : `${students.length} paciente${students.length === 1 ? "" : "s"} ${status === "all" ? "no total" : status === "active" ? "ativo(s)" : status === "inactive" ? "inativo(s)" : "arquivado(s)"} na clínica.`}
             </p>
           </div>
           <div className="relative w-full max-w-sm">
@@ -84,73 +85,103 @@ function AlunosListPage() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nome, e-mail ou objetivo…"
+              placeholder="Buscar por nome…"
               className="pl-9"
             />
           </div>
         </div>
 
-        {filtered.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
-            <p className="text-sm text-muted-foreground">Nenhum aluno encontrado para "{q}".</p>
-          </div>
+        <Tabs value={status} onValueChange={(v) => setStatus(v as StatusFilter)} className="mb-6">
+          <TabsList>
+            <TabsTrigger value="active">Ativos</TabsTrigger>
+            <TabsTrigger value="inactive">Inativos</TabsTrigger>
+            <TabsTrigger value="archived">Arquivados</TabsTrigger>
+            <TabsTrigger value="all">Todos</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {filtered.length === 0 && !loading ? (
+          students.length === 0 && !q ? (
+            <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
+              <Users className="mx-auto h-8 w-8 text-muted-foreground" />
+              <p className="mt-4 text-sm text-muted-foreground">
+                Nenhum paciente {status === "active" ? "ativo " : status === "archived" ? "arquivado " : ""}
+                cadastrado ainda.
+              </p>
+              <Link to="/alunos/novo" className="mt-4 inline-block">
+                <Button variant="hero">
+                  <Plus className="h-4 w-4" /> Cadastrar primeiro paciente
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
+              <p className="text-sm text-muted-foreground">
+                Nenhum paciente encontrado{q ? ` para "${q}"` : ""}.
+              </p>
+            </div>
+          )
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((s, i) => (
-              <motion.div
-                key={s.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-              >
-                <Link
-                  to="/alunos/$id"
-                  params={{ id: s.id }}
-                  className="group block h-full rounded-xl border border-border/60 bg-card/40 p-5 transition hover:border-primary/60 hover:bg-card/60"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
-                        {s.name
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((p) => p[0])
-                          .join("")}
-                      </div>
-                      <div>
-                        <div className="font-medium">{s.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {ageFrom(s.birth_date) ?? "—"} anos · {s.gender ?? "—"}
-                        </div>
-                      </div>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {(s.goals ?? []).slice(0, 2).map((g) => (
-                      <Badge key={g} variant="secondary" className="text-[10px]">
-                        {g}
-                      </Badge>
-                    ))}
-                    {(s.goals ?? []).length > 2 && (
-                      <Badge variant="outline" className="text-[10px]">
-                        +{(s.goals ?? []).length - 2}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3 text-xs text-muted-foreground">
-                    <span>
-                      {s.height_cm ?? "—"} cm · {s.weight_kg ?? "—"} kg
-                    </span>
-                    <span>
-                      {countFor(s.id)} avaliaç{countFor(s.id) === 1 ? "ão" : "ões"}
-                    </span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+          <div className="overflow-x-auto rounded-xl border border-border/60 bg-card/40">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border/60 text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3">Nome</th>
+                    <th className="px-4 py-3">Idade</th>
+                    <th className="px-4 py-3">Queixa principal</th>
+                    <th className="px-4 py-3">Objetivo</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Atualizado</th>
+                    <th className="px-4 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  {filtered.map((s) => {
+                    const age = ageFrom(s.birth_date, s.age);
+                    const st = (s.status as StudentStatus) ?? "active";
+                    return (
+                      <tr key={s.id} className="transition hover:bg-card/60">
+                        <td className="px-4 py-3 font-medium">{s.name}</td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {age != null ? `${age} anos` : "—"}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {s.main_complaint ?? "—"}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {s.goals?.[0] ?? "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge
+                            variant={
+                              st === "active"
+                                ? "default"
+                                : st === "archived"
+                                  ? "outline"
+                                  : "secondary"
+                            }
+                            className="text-[10px]"
+                          >
+                            {statusLabels[st]}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
+                          {new Date(s.updated_at).toLocaleDateString("pt-BR")}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Link
+                            to="/alunos/$id"
+                            params={{ id: s.id }}
+                            className="text-xs font-medium text-primary hover:underline"
+                          >
+                            Abrir perfil
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
           </div>
         )}
       </main>

@@ -807,6 +807,11 @@ function MovementSection({
                   Observação: {r.professional_notes}
                 </p>
               )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia path={r.video_url} kind="video" />
+                </div>
+              )}
             </li>
           );
         })}
@@ -893,6 +898,16 @@ function MovementSection({
               className="mt-1.5"
             />
           </div>
+
+          <ClinicalMediaUploader
+            kind="video"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={videoPath}
+            onUploaded={(p) => setVideoPath(p)}
+            onCleared={() => setVideoPath(null)}
+          />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>

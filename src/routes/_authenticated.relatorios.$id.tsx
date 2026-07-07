@@ -23,6 +23,8 @@ import {
   type ReportFieldKey,
   type ReportValidationErrors,
 } from "@/lib/reportsStore";
+import { useAssessmentResults } from "@/lib/assessmentsStore";
+import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 
 export const Route = createFileRoute("/_authenticated/relatorios/$id")({
   head: () => ({ meta: [{ title: "Relatório | PilatesVision" }] }),
@@ -33,6 +35,10 @@ function RelatorioDetailPage() {
   const { id } = Route.useParams();
   const router = useRouter();
   const { report, loading, error, reload } = useReport(id);
+  const { postural, movement } = useAssessmentResults(report?.assessment_id ?? null);
+  const posturalMedia = postural.filter((p) => Boolean(p.image_url));
+  const movementMedia = movement.filter((m) => Boolean(m.video_url));
+  const hasMedia = posturalMedia.length > 0 || movementMedia.length > 0;
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<ReportContent>({});

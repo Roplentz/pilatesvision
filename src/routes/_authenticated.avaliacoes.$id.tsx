@@ -814,6 +814,20 @@ function MovementSection({
                   <SignedClinicalMedia path={r.video_url} kind="video" />
                 </div>
               )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <VideoPoseAnalyzer
+                    movementResultId={r.id}
+                    videoPath={r.video_url}
+                    initialSummary={
+                      isAutoMetricsSummary(r.metrics)
+                        ? (r.metrics as unknown as AutoMetricsSummary)
+                        : null
+                    }
+                    onSaved={onChanged}
+                  />
+                </div>
+              )}
             </li>
           );
         })}

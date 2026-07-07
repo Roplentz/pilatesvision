@@ -549,6 +549,15 @@ function PosturalSection({
                   Observação do profissional: {r.professional_notes}
                 </p>
               )}
+              {r.image_url && (
+                <div className="mt-4">
+                  <SignedClinicalMedia
+                    path={r.image_url}
+                    kind="image"
+                    alt={`Imagem postural ${viewLabel[r.view ?? ""] ?? r.view ?? ""}`}
+                  />
+                </div>
+              )}
             </li>
           );
         })}
@@ -645,6 +654,16 @@ function PosturalSection({
               placeholder="Descreva contexto, hipóteses e sugestões de suporte à decisão."
             />
           </div>
+
+          <ClinicalMediaUploader
+            kind="image"
+            clinicId={clinicId}
+            studentId={studentId}
+            assessmentId={assessmentId}
+            currentPath={imagePath}
+            onUploaded={(p) => setImagePath(p)}
+            onCleared={() => setImagePath(null)}
+          />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
             <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>

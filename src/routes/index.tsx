@@ -5,6 +5,7 @@ import {
   ArrowRight,
   BarChart3,
   Camera,
+  Check,
   CheckCircle2,
   ScanLine,
   ShieldCheck,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-pilates.jpg";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,11 +73,13 @@ function Landing() {
       <Logos />
       <Features />
       <HowItWorks />
+      <Pricing />
       <CTA />
       <Footer />
     </div>
   );
 }
+
 
 function Nav() {
   return (
@@ -92,7 +96,7 @@ function Nav() {
           <a href="#como-funciona" className="transition hover:text-foreground">
             Como funciona
           </a>
-          <a href="#precos" className="transition hover:text-foreground">
+          <a href="#planos" className="transition hover:text-foreground">
             Planos
           </a>
         </nav>

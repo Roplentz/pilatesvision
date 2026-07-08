@@ -57,7 +57,7 @@ function RelatoriosPage() {
             Documentos consolidados gerados a partir das avaliações.
           </p>
         </div>
-        <Link to="/nova-avaliacao">
+        <Link to="/avaliacoes/nova">
           <Button variant="hero">
             <Plus className="h-4 w-4" /> Nova avaliação
           </Button>
@@ -80,7 +80,7 @@ function RelatoriosPage() {
                 Conclua uma avaliação para gerar o primeiro relatório clínico.
               </p>
             </div>
-            <Link to="/nova-avaliacao">
+            <Link to="/avaliacoes/nova">
               <Button variant="hero">
                 <Plus className="h-4 w-4" /> Nova avaliação
               </Button>

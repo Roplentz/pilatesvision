@@ -184,7 +184,7 @@ function NovaAvaliacao() {
       const now = new Date().toISOString();
       await createAssessment({
         clinic_id: clinicId,
-        student_id: ficha.alunoId,
+        patient_id: ficha.alunoId,
         status: "finalized",
         finalized_at: now,
         type: "complete",

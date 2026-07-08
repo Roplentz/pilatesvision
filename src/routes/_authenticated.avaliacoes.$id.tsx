@@ -366,7 +366,7 @@ function AvaliacaoDetailPage() {
               <PosturalSection
                 assessmentId={assessment.id}
                 clinicId={assessment.clinic_id}
-                studentId={assessment.student_id}
+                studentId={assessment.patient_id}
                 items={postural}
                 editable={isDraft}
                 onSaved={reload}
@@ -378,7 +378,7 @@ function AvaliacaoDetailPage() {
               <MovementSection
                 assessmentId={assessment.id}
                 clinicId={assessment.clinic_id}
-                studentId={assessment.student_id}
+                studentId={assessment.patient_id}
                 items={movement}
                 editable={isDraft}
                 onSaved={reload}
@@ -390,7 +390,7 @@ function AvaliacaoDetailPage() {
               <ExerciseSection
                 assessmentId={assessment.id}
                 clinicId={assessment.clinic_id}
-                studentId={assessment.student_id}
+                studentId={assessment.patient_id}
                 items={exercise}
                 editable={isDraft}
                 onSaved={reload}
@@ -506,7 +506,7 @@ function PosturalSection({
       await insertPosturalResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
-        student_id: studentId,
+        patient_id: studentId,
         view,
         findings: findings as unknown as never,
         score: score ? Number(score) : null,
@@ -769,7 +769,7 @@ function MovementSection({
       await insertMovementResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
-        student_id: studentId,
+        patient_id: studentId,
         movement_name: resolvedName,
         compensations: compensations as unknown as never,
         controle: score ? Number(score) : null,
@@ -1073,7 +1073,7 @@ function ExerciseSection({
       await insertExerciseResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
-        student_id: studentId,
+        patient_id: studentId,
         exercise_name: resolvedName,
         apparatus: apparatus || null,
         execution_notes: execution.trim() || null,

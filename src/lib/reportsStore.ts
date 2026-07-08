@@ -121,7 +121,7 @@ export function useReport(id: string | null | undefined) {
     setError(null);
     supabase
       .from("reports")
-      .select("*, students(name)")
+      .select("*, students:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {

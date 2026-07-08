@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-export type StudentRow = Database["public"]["Tables"]["students"]["Row"];
+export type StudentRow = Database["public"]["Tables"]["patients"]["Row"];
 export type NewStudentInput = Omit<
-  Database["public"]["Tables"]["students"]["Insert"],
+  Database["public"]["Tables"]["patients"]["Insert"],
   "id" | "created_at"
 >;
-export type UpdateStudentInput = Database["public"]["Tables"]["students"]["Update"];
+export type UpdateStudentInput = Database["public"]["Tables"]["patients"]["Update"];
 
 export type StudentStatus = "active" | "inactive" | "archived";
 
@@ -32,7 +32,7 @@ export function useStudents(
     setLoading(true);
     setError(null);
     let query = supabase
-      .from("students")
+      .from("patients")
       .select("*")
       .eq("clinic_id", clinicId)
       .order("updated_at", { ascending: false });
@@ -69,7 +69,7 @@ export function useStudent(id: string | null | undefined) {
     setLoading(true);
     setError(null);
     supabase
-      .from("students")
+      .from("patients")
       .select("*")
       .eq("id", id)
       .maybeSingle()
@@ -89,7 +89,7 @@ export function useStudent(id: string | null | undefined) {
 
 /** Insere um novo aluno. clinic_id deve vir do perfil do usuário logado. */
 export async function createStudent(input: NewStudentInput): Promise<StudentRow> {
-  const { data, error } = await supabase.from("students").insert(input).select("*").single();
+  const { data, error } = await supabase.from("patients").insert(input).select("*").single();
   if (error) throw new Error(error.message);
   return data as StudentRow;
 }
@@ -99,7 +99,7 @@ export async function updateStudent(id: string, patch: UpdateStudentInput): Prom
   const safe: UpdateStudentInput = { ...patch };
   delete (safe as { clinic_id?: string }).clinic_id;
   const { data, error } = await supabase
-    .from("students")
+    .from("patients")
     .update(safe)
     .eq("id", id)
     .select("*")
@@ -110,7 +110,7 @@ export async function updateStudent(id: string, patch: UpdateStudentInput): Prom
 
 /** Arquiva o aluno (soft delete). */
 export async function archiveStudent(id: string): Promise<void> {
-  const { error } = await supabase.from("students").update({ status: "archived" }).eq("id", id);
+  const { error } = await supabase.from("patients").update({ status: "archived" }).eq("id", id);
   if (error) throw new Error(error.message);
 }
 
@@ -130,17 +130,17 @@ export function useStudentCounts(clinicId: string | null | undefined) {
     const load = async () => {
       const [a, i, ar] = await Promise.all([
         supabase
-          .from("students")
+          .from("patients")
           .select("id", { count: "exact", head: true })
           .eq("clinic_id", clinicId)
           .eq("status", "active"),
         supabase
-          .from("students")
+          .from("patients")
           .select("id", { count: "exact", head: true })
           .eq("clinic_id", clinicId)
           .eq("status", "inactive"),
         supabase
-          .from("students")
+          .from("patients")
           .select("id", { count: "exact", head: true })
           .eq("clinic_id", clinicId)
           .eq("status", "archived"),

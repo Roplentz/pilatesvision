@@ -36,7 +36,7 @@ export default defineTool({
       return { content: [{ type: "text", text: "Usuário sem clínica associada." }], isError: true };
     }
     const { data, error } = await client
-      .from("students")
+      .from("patients")
       .insert({ ...input, clinic_id: profile.clinic_id })
       .select()
       .single();

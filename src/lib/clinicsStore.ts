@@ -197,7 +197,7 @@ export function useClinicCounts(clinicId: string | null | undefined) {
     const loadCounts = async () => {
       const [studentsResult, assessmentsResult, reportsResult] = await Promise.all([
         supabase
-          .from("students")
+          .from("patients")
           .select("id", { count: "exact", head: true })
           .eq("clinic_id", clinicId),
         supabase

@@ -60,7 +60,7 @@ export function useAssessments(clinicId: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, students(name)")
+      .select("*, students:patients(name)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
@@ -223,7 +223,7 @@ export function useAssessment(id: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, students(name)")
+      .select("*, students:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {
@@ -300,7 +300,7 @@ export function useStudentAssessments(studentId: string | null | undefined) {
     supabase
       .from("assessments")
       .select("*")
-      .eq("student_id", studentId)
+      .eq("patient_id", studentId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
         if (cancelled) return;

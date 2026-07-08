@@ -35,7 +35,7 @@ function RelatoriosPage() {
     setLoading(true);
     supabase
       .from("reports")
-      .select("id, assessment_id, created_at, students(name), assessments(created_at)")
+      .select("id, assessment_id, created_at, students:patients(name), assessments(created_at)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {

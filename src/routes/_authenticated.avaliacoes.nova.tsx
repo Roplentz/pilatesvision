@@ -59,7 +59,7 @@ function NovaAvaliacaoPage() {
     try {
       const created = await createAssessment({
         clinic_id: clinicId,
-        student_id: studentId,
+        patient_id: studentId,
         professional_id: user?.id ?? null,
         type,
         title: title.trim() || null,

@@ -24,7 +24,9 @@ export type ProfessionalSpecialty =
   | "Osteopatia"
   | "RPG";
 
-export type AssessmentStatus = "draft" | "in_progress" | "completed" | "archived";
+export type AssessmentStatus = "draft" | "in_review" | "finalized";
+
+export type AssessmentType = "postural" | "dynamic" | "exercise" | "complete";
 
 export type AssessmentStage = "ficha" | "postural" | "dinamica" | "exercicios" | "relatorio";
 

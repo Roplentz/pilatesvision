@@ -181,10 +181,13 @@ function NovaAvaliacao() {
     }
     setSaving(true);
     try {
+      const now = new Date().toISOString();
       await createAssessment({
         clinic_id: clinicId,
         student_id: ficha.alunoId,
-        status: "completed",
+        status: "finalized",
+        finalized_at: now,
+        type: "complete",
         current_stage: "relatorio",
         pain_level: ficha.dor,
         observations: ficha.observacoes || null,

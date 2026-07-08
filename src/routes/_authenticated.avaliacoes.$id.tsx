@@ -407,9 +407,13 @@ function AvaliacaoDetailPage() {
               : "Enquanto rascunho, os campos e achados podem ser editados/adicionados."}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="ghost" size="sm" disabled title="Disponível em breve">
-              <FileText className="h-4 w-4" /> Gerar relatório
-            </Button>
+            {status === "finalized" && (
+              <Link to="/relatorios">
+                <Button variant="ghost" size="sm">
+                  <FileText className="h-4 w-4" /> Gerar relatório
+                </Button>
+              </Link>
+            )}
             {canFinalize && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>

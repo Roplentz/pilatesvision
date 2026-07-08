@@ -45,7 +45,7 @@ import {
 const menu = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Alunos", url: "/alunos", icon: Users },
-  { title: "Nova Avaliação", url: "/nova-avaliacao", icon: ClipboardPlus },
+  { title: "Nova Avaliação", url: "/avaliacoes/nova", icon: ClipboardPlus },
   { title: "Avaliação Postural", url: "/avaliacao-postural", icon: ScanLine },
   { title: "Avaliação Dinâmica", url: "/avaliacao-dinamica", icon: Activity },
   { title: "Exercícios Pilates", url: "/exercicios", icon: Dumbbell },

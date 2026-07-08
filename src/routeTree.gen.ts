@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiAnalyzeImageRouteImport } from './routes/api/analyze-image'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
+import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
@@ -74,6 +75,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNovaAvaliacaoRoute =
+  AuthenticatedNovaAvaliacaoRouteImport.update({
+    id: '/nova-avaliacao',
+    path: '/nova-avaliacao',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedExerciciosRoute = AuthenticatedExerciciosRouteImport.update({
   id: '/exercicios',
   path: '/exercicios',
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
+  '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
   '/api/analyze-image': typeof ApiAnalyzeImageRoute
@@ -210,6 +218,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exercicios': typeof AuthenticatedExerciciosRoute
+  '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
   '/api/analyze-image': typeof ApiAnalyzeImageRoute
@@ -238,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
+  '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
   '/api/analyze-image': typeof ApiAnalyzeImageRoute
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/dashboard'
     | '/exercicios'
+    | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
     | '/api/analyze-image'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/dashboard'
     | '/exercicios'
+    | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
     | '/api/analyze-image'
@@ -319,6 +331,7 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/exercicios'
+    | '/_authenticated/nova-avaliacao'
     | '/_authenticated/onboarding'
     | '/_authenticated/relatorios'
     | '/api/analyze-image'
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/nova-avaliacao': {
+      id: '/_authenticated/nova-avaliacao'
+      path: '/nova-avaliacao'
+      fullPath: '/nova-avaliacao'
+      preLoaderRoute: typeof AuthenticatedNovaAvaliacaoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/exercicios': {
@@ -547,6 +567,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
+  AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRouteWithChildren
   AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
@@ -564,6 +585,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
+  AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRouteWithChildren,
   AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,

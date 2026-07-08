@@ -55,11 +55,11 @@ function AvaliacoesListPage() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return assessments.filter((a) => {
-      if (studentFilter !== "all" && a.student_id !== studentFilter) return false;
+      if (studentFilter !== "all" && a.patient_id !== studentFilter) return false;
       if (statusFilter !== "all" && a.status !== statusFilter) return false;
       if (!needle) return true;
       const name =
-        a.students?.name?.toLowerCase() ?? studentMap[a.student_id]?.name.toLowerCase() ?? "";
+        a.students?.name?.toLowerCase() ?? studentMap[a.patient_id]?.name.toLowerCase() ?? "";
       return (
         name.includes(needle) ||
         a.main_complaint?.toLowerCase().includes(needle) ||
@@ -146,7 +146,7 @@ function AvaliacoesListPage() {
         ) : (
           <ul className="space-y-3">
             {filtered.map((a, i) => {
-              const studentName = a.students?.name ?? studentMap[a.student_id]?.name ?? "Aluno";
+              const studentName = a.students?.name ?? studentMap[a.patient_id]?.name ?? "Aluno";
               return (
                 <motion.li
                   key={a.id}

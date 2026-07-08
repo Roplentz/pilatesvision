@@ -28,7 +28,7 @@ export default defineTool({
       return { content: [{ type: "text", text: "Não autenticado" }], isError: true };
     }
     const { data, error } = await sb(ctx)
-      .from("students")
+      .from("patients")
       .select("id, full_name, email, phone, birth_date, created_at")
       .order("created_at", { ascending: false })
       .limit(limit ?? 25);

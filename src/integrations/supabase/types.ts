@@ -28,9 +28,9 @@ export type Database = {
           observations: string | null
           pain_level: number | null
           pain_score: number | null
+          patient_id: string
           professional_id: string | null
           status: string
-          student_id: string
           title: string | null
           type: string
           updated_at: string
@@ -48,9 +48,9 @@ export type Database = {
           observations?: string | null
           pain_level?: number | null
           pain_score?: number | null
+          patient_id: string
           professional_id?: string | null
           status?: string
-          student_id: string
           title?: string | null
           type?: string
           updated_at?: string
@@ -68,9 +68,9 @@ export type Database = {
           observations?: string | null
           pain_level?: number | null
           pain_score?: number | null
+          patient_id?: string
           professional_id?: string | null
           status?: string
-          student_id?: string
           title?: string | null
           type?: string
           updated_at?: string
@@ -85,9 +85,9 @@ export type Database = {
           },
           {
             foreignKeyName: "assessments_student_id_fkey"
-            columns: ["student_id"]
+            columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "students"
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]
@@ -145,8 +145,8 @@ export type Database = {
           id: string
           image_url: string | null
           metrics: Json
+          patient_id: string
           recommendation: string | null
-          student_id: string
           updated_at: string
           video_url: string | null
         }
@@ -163,8 +163,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           metrics?: Json
+          patient_id: string
           recommendation?: string | null
-          student_id: string
           updated_at?: string
           video_url?: string | null
         }
@@ -181,8 +181,8 @@ export type Database = {
           id?: string
           image_url?: string | null
           metrics?: Json
+          patient_id?: string
           recommendation?: string | null
-          student_id?: string
           updated_at?: string
           video_url?: string | null
         }
@@ -203,9 +203,9 @@ export type Database = {
           },
           {
             foreignKeyName: "exercise_results_student_id_fkey"
-            columns: ["student_id"]
+            columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "students"
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]
@@ -225,9 +225,9 @@ export type Database = {
           metrics: Json
           movement_name: string | null
           movements_evaluated: string[] | null
+          patient_id: string | null
           professional_notes: string | null
           simetria: number | null
-          student_id: string | null
           updated_at: string
           video_url: string | null
         }
@@ -245,9 +245,9 @@ export type Database = {
           metrics?: Json
           movement_name?: string | null
           movements_evaluated?: string[] | null
+          patient_id?: string | null
           professional_notes?: string | null
           simetria?: number | null
-          student_id?: string | null
           updated_at?: string
           video_url?: string | null
         }
@@ -265,9 +265,9 @@ export type Database = {
           metrics?: Json
           movement_name?: string | null
           movements_evaluated?: string[] | null
+          patient_id?: string | null
           professional_notes?: string | null
           simetria?: number | null
-          student_id?: string | null
           updated_at?: string
           video_url?: string | null
         }
@@ -288,9 +288,89 @@ export type Database = {
           },
           {
             foreignKeyName: "movement_results_student_id_fkey"
-            columns: ["student_id"]
+            columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "students"
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          birth_date: string | null
+          clinic_id: string
+          clinical_notes: string | null
+          consent_given_at: string | null
+          contraindications: string[] | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          gender: string | null
+          goals: string[] | null
+          height_cm: number | null
+          id: string
+          main_complaint: string | null
+          medical_history: string | null
+          name: string
+          phone: string | null
+          status: string
+          updated_at: string
+          weight_kg: number | null
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          clinic_id: string
+          clinical_notes?: string | null
+          consent_given_at?: string | null
+          contraindications?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          gender?: string | null
+          goals?: string[] | null
+          height_cm?: number | null
+          id?: string
+          main_complaint?: string | null
+          medical_history?: string | null
+          name: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          clinic_id?: string
+          clinical_notes?: string | null
+          consent_given_at?: string | null
+          contraindications?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          gender?: string | null
+          goals?: string[] | null
+          height_cm?: number | null
+          id?: string
+          main_complaint?: string | null
+          medical_history?: string | null
+          name?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
             referencedColumns: ["id"]
           },
         ]
@@ -319,9 +399,9 @@ export type Database = {
           id: string
           image_url: string | null
           image_urls: Json | null
+          patient_id: string | null
           professional_notes: string | null
           score: number | null
-          student_id: string | null
           updated_at: string
           view: string | null
         }
@@ -333,9 +413,9 @@ export type Database = {
           id?: string
           image_url?: string | null
           image_urls?: Json | null
+          patient_id?: string | null
           professional_notes?: string | null
           score?: number | null
-          student_id?: string | null
           updated_at?: string
           view?: string | null
         }
@@ -347,9 +427,9 @@ export type Database = {
           id?: string
           image_url?: string | null
           image_urls?: Json | null
+          patient_id?: string | null
           professional_notes?: string | null
           score?: number | null
-          student_id?: string | null
           updated_at?: string
           view?: string | null
         }
@@ -370,9 +450,9 @@ export type Database = {
           },
           {
             foreignKeyName: "postural_results_student_id_fkey"
-            columns: ["student_id"]
+            columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "students"
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]
@@ -463,10 +543,10 @@ export type Database = {
           created_by: string | null
           finalized_at: string | null
           id: string
+          patient_id: string
           pdf_url: string | null
           plain_text: string | null
           status: string
-          student_id: string
           title: string
           updated_at: string
           version: number
@@ -480,10 +560,10 @@ export type Database = {
           created_by?: string | null
           finalized_at?: string | null
           id?: string
+          patient_id: string
           pdf_url?: string | null
           plain_text?: string | null
           status?: string
-          student_id: string
           title: string
           updated_at?: string
           version?: number
@@ -497,10 +577,10 @@ export type Database = {
           created_by?: string | null
           finalized_at?: string | null
           id?: string
+          patient_id?: string
           pdf_url?: string | null
           plain_text?: string | null
           status?: string
-          student_id?: string
           title?: string
           updated_at?: string
           version?: number
@@ -522,89 +602,9 @@ export type Database = {
           },
           {
             foreignKeyName: "reports_student_id_fkey"
-            columns: ["student_id"]
+            columns: ["patient_id"]
             isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      students: {
-        Row: {
-          age: number | null
-          avatar_url: string | null
-          birth_date: string | null
-          clinic_id: string
-          clinical_notes: string | null
-          consent_given_at: string | null
-          contraindications: string[] | null
-          created_at: string
-          created_by: string | null
-          email: string | null
-          gender: string | null
-          goals: string[] | null
-          height_cm: number | null
-          id: string
-          main_complaint: string | null
-          medical_history: string | null
-          name: string
-          phone: string | null
-          status: string
-          updated_at: string
-          weight_kg: number | null
-        }
-        Insert: {
-          age?: number | null
-          avatar_url?: string | null
-          birth_date?: string | null
-          clinic_id: string
-          clinical_notes?: string | null
-          consent_given_at?: string | null
-          contraindications?: string[] | null
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          gender?: string | null
-          goals?: string[] | null
-          height_cm?: number | null
-          id?: string
-          main_complaint?: string | null
-          medical_history?: string | null
-          name: string
-          phone?: string | null
-          status?: string
-          updated_at?: string
-          weight_kg?: number | null
-        }
-        Update: {
-          age?: number | null
-          avatar_url?: string | null
-          birth_date?: string | null
-          clinic_id?: string
-          clinical_notes?: string | null
-          consent_given_at?: string | null
-          contraindications?: string[] | null
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          gender?: string | null
-          goals?: string[] | null
-          height_cm?: number | null
-          id?: string
-          main_complaint?: string | null
-          medical_history?: string | null
-          name?: string
-          phone?: string | null
-          status?: string
-          updated_at?: string
-          weight_kg?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "students_clinic_id_fkey"
-            columns: ["clinic_id"]
-            isOneToOne: false
-            referencedRelation: "clinics"
+            referencedRelation: "patients"
             referencedColumns: ["id"]
           },
         ]

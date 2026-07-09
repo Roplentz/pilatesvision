@@ -3,10 +3,12 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
+  AlertTriangle,
   ArrowRight,
   CheckCircle2,
   Eye,
   Filter,
+  Info,
   Plus,
   Search,
   Sparkles,
@@ -26,6 +28,16 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { ImageAnalyzer } from "@/components/ImageAnalyzer";
+import {
+  CATEGORY_LABEL,
+  EXERCISE_CATALOG,
+  EXERCISE_SCORE_DOMAINS,
+  LEVEL_LABEL,
+  filterCatalog,
+  type ExerciseCatalogItem,
+  type ExerciseCategory,
+  type ExerciseLevel,
+} from "@/lib/exerciseCatalog";
 
 export const Route = createFileRoute("/_authenticated/exercicios")({
   component: ExerciciosPage,
@@ -35,385 +47,81 @@ export const Route = createFileRoute("/_authenticated/exercicios")({
       {
         name: "description",
         content:
-          "Biblioteca visual de exercícios Pilates com critérios de qualidade, compensações comuns e feedback automatizado por IA.",
+          "Biblioteca de exercícios Pilates com critérios de qualidade, compensações comuns, red flags e métricas de visão — apoio à decisão clínica.",
       },
     ],
   }),
 });
 
-type Categoria = "Mat" | "Reformer" | "Funcional" | "Alongamento";
-type Nivel = "Iniciante" | "Intermediário" | "Avançado";
-type Objetivo = "Core" | "Mobilidade" | "Estabilidade" | "Força" | "Postura" | "Equilíbrio";
-type Vista = "Lateral" | "Frontal" | "Posterior" | "Superior";
+const CATEGORY_OPTIONS: Array<ExerciseCategory | "all"> = [
+  "all",
+  "funcional",
+  "mat",
+  "reformer",
+  "cadillac",
+  "chair",
+  "barrel",
+];
 
-interface Exercise {
-  id: string;
-  nome: string;
-  categoria: Categoria;
-  nivel: Nivel;
-  objetivo: Objetivo;
-  vista: Vista;
-  descricao: string;
-  articulacoes: string[];
-  criterios: string[];
-  compensacoes: string[];
-  feedback: string[];
+const LEVEL_OPTIONS: Array<ExerciseLevel | "all"> = [
+  "all",
+  "basico",
+  "intermediario",
+  "avancado",
+];
+
+function categoryLabel(c: ExerciseCategory | "all"): string {
+  return c === "all" ? "Todas" : CATEGORY_LABEL[c];
 }
 
-const EXERCISES: Exercise[] = [
-  {
-    id: "hundred",
-    nome: "Hundred",
-    categoria: "Mat",
-    nivel: "Intermediário",
-    objetivo: "Core",
-    vista: "Lateral",
-    descricao:
-      "Exercício clássico de ativação do powerhouse. Em decúbito dorsal, eleva-se o tronco e as pernas em tabletop, realizando bombeamento dos braços com respiração coordenada (5 inspirações + 5 expirações × 10).",
-    articulacoes: ["Coluna cervical", "Coluna torácica", "Coxofemoral", "Ombros"],
-    criterios: [
-      "Cabeça alinhada com tronco (sem queixo projetado)",
-      "Escápulas estabilizadas e afastadas das orelhas",
-      "Pelve em retroversão neutra mantida",
-      "Respiração ativa e contínua",
-    ],
-    compensacoes: [
-      "Hiperextensão cervical",
-      "Elevação dos ombros",
-      "Lombar arqueada do solo",
-      "Apneia respiratória",
-    ],
-    feedback: [
-      "Detectado ganho de 12° de flexão torácica controlada",
-      "Cervical estável durante 87% da execução",
-      "Atenção: leve elevação do trapézio superior aos 30s",
-    ],
-  },
-  {
-    id: "roll-up",
-    nome: "Roll Up",
-    categoria: "Mat",
-    nivel: "Intermediário",
-    objetivo: "Mobilidade",
-    vista: "Lateral",
-    descricao:
-      "Articulação vértebra por vértebra da coluna a partir do decúbito dorsal até a flexão sentada, retornando com o mesmo controle. Trabalha mobilidade segmentar e controle excêntrico do core.",
-    articulacoes: ["Coluna lombar", "Coluna torácica", "Coxofemoral"],
-    criterios: [
-      "Sequenciamento vertebral contínuo",
-      "Pés ancorados sem tensão",
-      "Braços alinhados com ombros",
-      "Ritmo constante na subida e descida",
-    ],
-    compensacoes: [
-      "Impulso com pescoço/ombros",
-      "Salto em bloco da lombar",
-      "Pés saindo do solo",
-      "Inversão do padrão respiratório",
-    ],
-    feedback: [
-      "Mobilidade lombar dentro da faixa funcional",
-      "Padrão de descida segmentado em 4 fases consistentes",
-      "Sugestão: reduzir velocidade na transição T8–T12",
-    ],
-  },
-  {
-    id: "single-leg-stretch",
-    nome: "Single Leg Stretch",
-    categoria: "Mat",
-    nivel: "Iniciante",
-    objetivo: "Core",
-    vista: "Superior",
-    descricao:
-      "Em decúbito dorsal com tronco fletido, alterna a flexão de uma perna ao peito enquanto a outra se estende. Foco em dissociação coxofemoral e estabilidade pélvica.",
-    articulacoes: ["Coxofemoral", "Joelho", "Coluna lombar"],
-    criterios: [
-      "Pelve neutra durante a alternância",
-      "Tronco estável sem rotações",
-      "Cabeça apoiada nas mãos sem tração",
-      "Coordenação respiratória 2 tempos",
-    ],
-    compensacoes: [
-      "Báscula pélvica a cada troca",
-      "Tensão cervical excessiva",
-      "Joelho da perna estendida bloqueado",
-    ],
-    feedback: ["Simetria entre lados D/E: 94%", "Estabilidade pélvica acima da média"],
-  },
-  {
-    id: "shoulder-bridge",
-    nome: "Shoulder Bridge",
-    categoria: "Mat",
-    nivel: "Iniciante",
-    objetivo: "Estabilidade",
-    vista: "Lateral",
-    descricao:
-      "Ponte com elevação pélvica articulada, ativando glúteos, isquiotibiais e core posterior. Trabalha extensão de quadril sem hiperextensão lombar.",
-    articulacoes: ["Coxofemoral", "Coluna lombar", "Joelho"],
-    criterios: [
-      "Linha ombro–quadril–joelho",
-      "Glúteos como principal motor",
-      "Pés alinhados à largura do quadril",
-      "Cervical relaxada",
-    ],
-    compensacoes: [
-      "Hiperextensão lombar",
-      "Joelhos em valgo",
-      "Sobrecarga cervical",
-      "Ativação predominante de isquiotibiais",
-    ],
-    feedback: [
-      "Ativação glútea evidente",
-      "Alinhamento joelho-quadril mantido em 92% do movimento",
-    ],
-  },
-  {
-    id: "swan",
-    nome: "Swan",
-    categoria: "Mat",
-    nivel: "Intermediário",
-    objetivo: "Postura",
-    vista: "Lateral",
-    descricao:
-      "Extensão da coluna em decúbito ventral, promovendo abertura torácica e ativação dos extensores. Essencial para contrapor padrões cifóticos.",
-    articulacoes: ["Coluna torácica", "Coluna lombar", "Ombros"],
-    criterios: [
-      "Extensão distribuída ao longo da coluna",
-      "Escápulas em depressão e adução",
-      "Cervical em continuidade com a torácica",
-      "Pubis em contato com o solo",
-    ],
-    compensacoes: [
-      "Extensão concentrada na lombar",
-      "Elevação dos ombros",
-      "Hiperextensão cervical",
-    ],
-    feedback: [
-      "Distribuição da extensão melhorada vs. baseline",
-      "Atenção: ainda há predominância lombar (~38%)",
-    ],
-  },
-  {
-    id: "swimming",
-    nome: "Swimming",
-    categoria: "Mat",
-    nivel: "Avançado",
-    objetivo: "Estabilidade",
-    vista: "Superior",
-    descricao:
-      "Em decúbito ventral, alternar a elevação de braço e perna contralaterais em ritmo dinâmico, mantendo o core estabilizado e a coluna alongada.",
-    articulacoes: ["Coxofemoral", "Ombro", "Coluna lombar"],
-    criterios: [
-      "Tronco estável sem rotações",
-      "Olhar para o solo (cervical neutra)",
-      "Amplitude controlada",
-      "Respiração rítmica",
-    ],
-    compensacoes: [
-      "Rotação compensatória do tronco",
-      "Hiperextensão cervical",
-      "Quebra do padrão cruzado",
-    ],
-    feedback: [
-      "Padrão cruzado consistente em 88% das repetições",
-      "Leve rotação do tronco para o lado direito",
-    ],
-  },
-  {
-    id: "squat",
-    nome: "Squat",
-    categoria: "Funcional",
-    nivel: "Iniciante",
-    objetivo: "Força",
-    vista: "Frontal",
-    descricao:
-      "Agachamento funcional integrado ao repertório Pilates. Trabalha cadeia posterior, controle de tronco e alinhamento de joelhos.",
-    articulacoes: ["Tornozelo", "Joelho", "Coxofemoral", "Coluna"],
-    criterios: [
-      "Joelhos alinhados aos pés",
-      "Tronco com curvatura natural",
-      "Distribuição de peso no médio-pé",
-      "Descida controlada",
-    ],
-    compensacoes: [
-      "Joelhos em valgo",
-      "Anteriorização do tronco excessiva",
-      "Elevação dos calcanhares",
-      "Báscula pélvica anterior",
-    ],
-    feedback: [
-      "Alinhamento joelho-pé dentro do tolerável (±4°)",
-      "Profundidade média: 92° de flexão de joelho",
-    ],
-  },
-  {
-    id: "lunge",
-    nome: "Lunge",
-    categoria: "Funcional",
-    nivel: "Intermediário",
-    objetivo: "Equilíbrio",
-    vista: "Lateral",
-    descricao:
-      "Avanço unipodal com descida controlada do joelho posterior. Desafia o equilíbrio dinâmico e a estabilidade do core sob carga assimétrica.",
-    articulacoes: ["Joelho", "Coxofemoral", "Tornozelo"],
-    criterios: [
-      "Joelho da frente sobre o tornozelo",
-      "Tronco vertical",
-      "Pelve nivelada",
-      "Descida controlada",
-    ],
-    compensacoes: [
-      "Joelho ultrapassando o pé",
-      "Inclinação lateral do tronco",
-      "Queda pélvica contralateral",
-    ],
-    feedback: ["Simetria D/E: 89%", "Leve queda pélvica esquerda detectada"],
-  },
-  {
-    id: "spine-stretch",
-    nome: "Spine Stretch",
-    categoria: "Alongamento",
-    nivel: "Iniciante",
-    objetivo: "Mobilidade",
-    vista: "Lateral",
-    descricao:
-      "Sentado com pernas estendidas, articula flexão da coluna em direção aos pés, promovendo alongamento da cadeia posterior e mobilidade torácica.",
-    articulacoes: ["Coluna torácica", "Coluna lombar", "Coxofemoral"],
-    criterios: [
-      "Flexão articulada vértebra a vértebra",
-      "Ísquios ancorados",
-      "Cervical em continuidade",
-      "Braços paralelos ao solo",
-    ],
-    compensacoes: [
-      "Flexão concentrada nos quadris",
-      "Cabeça projetada à frente",
-      "Curvatura em bloco",
-    ],
-    feedback: ["Sequenciamento melhorado em 18% vs. baseline", "Mobilidade torácica funcional"],
-  },
-  {
-    id: "cat-stretch",
-    nome: "Cat Stretch",
-    categoria: "Alongamento",
-    nivel: "Iniciante",
-    objetivo: "Mobilidade",
-    vista: "Lateral",
-    descricao:
-      "Em quatro apoios, alterna flexão e extensão da coluna em movimento fluido. Excelente para mobilidade segmentar e consciência corporal.",
-    articulacoes: ["Coluna inteira", "Ombros", "Coxofemoral"],
-    criterios: [
-      "Movimento iniciado pela pelve",
-      "Distribuição harmônica entre segmentos",
-      "Ombros estabilizados",
-      "Respiração sincronizada",
-    ],
-    compensacoes: [
-      "Concentração do movimento em um segmento",
-      "Cotovelos hiperestendidos",
-      "Respiração superficial",
-    ],
-    feedback: ["Fluidez do movimento alta", "Boa amplitude torácica"],
-  },
-  {
-    id: "mermaid",
-    nome: "Mermaid",
-    categoria: "Mat",
-    nivel: "Intermediário",
-    objetivo: "Mobilidade",
-    vista: "Frontal",
-    descricao:
-      "Sentado lateralmente, realiza inclinação lateral da coluna com braço estendido acima da cabeça, alongando cadeia lateral e abrindo caixa torácica.",
-    articulacoes: ["Coluna torácica", "Coluna lombar", "Ombro"],
-    criterios: [
-      "Ísquio contralateral ancorado",
-      "Alongamento contínuo até a ponta dos dedos",
-      "Sem rotação do tronco",
-      "Cervical alinhada",
-    ],
-    compensacoes: [
-      "Rotação compensatória",
-      "Elevação do ombro de apoio",
-      "Perda do contato isquial",
-    ],
-    feedback: ["Amplitude lateral simétrica", "Atenção: ombro de apoio elevado ~2cm"],
-  },
-  {
-    id: "side-kicks",
-    nome: "Side Kicks",
-    categoria: "Mat",
-    nivel: "Intermediário",
-    objetivo: "Estabilidade",
-    vista: "Lateral",
-    descricao:
-      "Deitado de lado, realiza chutes anteroposteriores com a perna superior mantendo o tronco absolutamente estável. Trabalha estabilidade lombo-pélvica e mobilidade de quadril.",
-    articulacoes: ["Coxofemoral", "Coluna lombar"],
-    criterios: [
-      "Tronco imóvel",
-      "Pelve empilhada",
-      "Pé em flexão na ida, ponta na volta",
-      "Amplitude funcional",
-    ],
-    compensacoes: ["Báscula pélvica posterior", "Rotação do tronco", "Encurtamento da amplitude"],
-    feedback: ["Estabilidade pélvica 91% do tempo", "Amplitude D > E em ~8°"],
-  },
-];
+function levelLabel(l: ExerciseLevel | "all"): string {
+  return l === "all" ? "Todos" : LEVEL_LABEL[l];
+}
 
-const CATEGORIAS: Categoria[] = ["Mat", "Reformer", "Funcional", "Alongamento"];
-const NIVEIS: Nivel[] = ["Iniciante", "Intermediário", "Avançado"];
-const OBJETIVOS: Objetivo[] = [
-  "Core",
-  "Mobilidade",
-  "Estabilidade",
-  "Força",
-  "Postura",
-  "Equilíbrio",
-];
-
-function nivelColor(n: Nivel) {
-  switch (n) {
-    case "Iniciante":
+function levelColor(l: ExerciseLevel | null): string {
+  switch (l) {
+    case "basico":
       return "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
-    case "Intermediário":
+    case "intermediario":
       return "bg-amber-500/15 text-amber-300 border-amber-500/30";
-    case "Avançado":
+    case "avancado":
       return "bg-rose-500/15 text-rose-300 border-rose-500/30";
+    default:
+      return "bg-muted/40 text-muted-foreground border-border/60";
   }
+}
+
+function itemKey(it: ExerciseCatalogItem): string {
+  return it.id ?? `${it.category}-${it.name}`;
 }
 
 function ExerciciosPage() {
   const [query, setQuery] = useState("");
-  const [categoria, setCategoria] = useState<Categoria | "Todas">("Todas");
-  const [nivel, setNivel] = useState<Nivel | "Todos">("Todos");
-  const [objetivo, setObjetivo] = useState<Objetivo | "Todos">("Todos");
-  const [selected, setSelected] = useState<Exercise | null>(null);
+  const [category, setCategory] = useState<ExerciseCategory | "all">("all");
+  const [level, setLevel] = useState<ExerciseLevel | "all">("all");
+  const [selected, setSelected] = useState<ExerciseCatalogItem | null>(null);
   const [prescritos, setPrescritos] = useState<string[]>([]);
 
-  const filtered = useMemo(() => {
-    return EXERCISES.filter((e) => {
-      if (categoria !== "Todas" && e.categoria !== categoria) return false;
-      if (nivel !== "Todos" && e.nivel !== nivel) return false;
-      if (objetivo !== "Todos" && e.objetivo !== objetivo) return false;
-      if (query && !e.nome.toLowerCase().includes(query.toLowerCase())) return false;
-      return true;
-    });
-  }, [query, categoria, nivel, objetivo]);
+  const filtered = useMemo(
+    () => filterCatalog(EXERCISE_CATALOG, { query, category, level }),
+    [query, category, level],
+  );
 
   const limparFiltros = () => {
-    setCategoria("Todas");
-    setNivel("Todos");
-    setObjetivo("Todos");
+    setCategory("all");
+    setLevel("all");
     setQuery("");
   };
 
-  const adicionarPrescricao = (ex: Exercise) => {
-    if (prescritos.includes(ex.id)) {
-      toast.info(`${ex.nome} já está na prescrição`);
+  const adicionarPrescricao = (ex: ExerciseCatalogItem) => {
+    const key = itemKey(ex);
+    if (prescritos.includes(key)) {
+      toast.info(`${ex.name} já está na prescrição`);
       return;
     }
-    setPrescritos((p) => [...p, ex.id]);
-    toast.success(`${ex.nome} adicionado à prescrição`, {
-      description: "Visível no plano do aluno atual.",
+    setPrescritos((p) => [...p, key]);
+    toast.success(`${ex.name} adicionado à prescrição`, {
+      description: "Confirmação profissional necessária antes da execução.",
     });
   };
 
@@ -431,7 +139,7 @@ function ExerciciosPage() {
                 Biblioteca de Exercícios
               </h1>
               <p className="text-xs text-muted-foreground">
-                Repertório Pilates com análise clínica assistida por IA
+                Repertório Pilates — apoio à decisão clínica
               </p>
             </div>
           </div>
@@ -444,6 +152,15 @@ function ExerciciosPage() {
       </header>
 
       <main className="container mx-auto px-6 py-10">
+        {/* Clinical disclaimer */}
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-border/50 bg-card/40 p-4 text-xs text-muted-foreground">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <p>
+            O PilatesVision organiza indicadores e sugestões de apoio. A seleção
+            final do exercício deve ser confirmada pelo profissional.
+          </p>
+        </div>
+
         {/* Filters */}
         <section className="mb-8 rounded-2xl border border-border/60 bg-card/40 backdrop-blur-sm p-5">
           <div className="flex items-center gap-2 mb-4">
@@ -459,34 +176,28 @@ function ExerciciosPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto_auto]">
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto]">
             <div className="relative">
               <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar exercício..."
+                placeholder="Buscar por nome, aparelho, método ou objetivo..."
                 className="pl-9"
               />
             </div>
 
             <FilterGroup
               label="Categoria"
-              options={["Todas", ...CATEGORIAS]}
-              value={categoria}
-              onChange={(v) => setCategoria(v as Categoria | "Todas")}
+              options={CATEGORY_OPTIONS.map((c) => ({ value: c, label: categoryLabel(c) }))}
+              value={category}
+              onChange={(v) => setCategory(v as ExerciseCategory | "all")}
             />
             <FilterGroup
               label="Nível"
-              options={["Todos", ...NIVEIS]}
-              value={nivel}
-              onChange={(v) => setNivel(v as Nivel | "Todos")}
-            />
-            <FilterGroup
-              label="Objetivo"
-              options={["Todos", ...OBJETIVOS]}
-              value={objetivo}
-              onChange={(v) => setObjetivo(v as Objetivo | "Todos")}
+              options={LEVEL_OPTIONS.map((l) => ({ value: l, label: levelLabel(l) }))}
+              value={level}
+              onChange={(v) => setLevel(v as ExerciseLevel | "all")}
             />
           </div>
         </section>
@@ -503,7 +214,7 @@ function ExerciciosPage() {
           <AnimatePresence mode="popLayout">
             {filtered.map((ex, idx) => (
               <motion.div
-                key={ex.id}
+                key={itemKey(ex)}
                 layout
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -512,7 +223,7 @@ function ExerciciosPage() {
               >
                 <ExerciseCard
                   ex={ex}
-                  selected={prescritos.includes(ex.id)}
+                  selected={prescritos.includes(itemKey(ex))}
                   onOpen={() => setSelected(ex)}
                 />
               </motion.div>
@@ -538,76 +249,158 @@ function ExerciciosPage() {
               <SheetHeader className="mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="outline" className="border-primary/40 text-primary">
-                    {selected.categoria}
+                    {CATEGORY_LABEL[selected.category]}
                   </Badge>
-                  <Badge variant="outline" className={nivelColor(selected.nivel)}>
-                    {selected.nivel}
-                  </Badge>
-                  <Badge variant="outline" className="border-border">
-                    {selected.objetivo}
-                  </Badge>
+                  {selected.level && (
+                    <Badge variant="outline" className={levelColor(selected.level)}>
+                      {LEVEL_LABEL[selected.level]}
+                    </Badge>
+                  )}
+                  {selected.equipment && (
+                    <Badge variant="outline" className="border-border">
+                      {selected.equipment}
+                    </Badge>
+                  )}
                 </div>
                 <SheetTitle className="font-display text-2xl tracking-tight">
-                  {selected.nome}
+                  {selected.name}
+                  {selected.namePt && selected.namePt !== selected.name && (
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">
+                      · {selected.namePt}
+                    </span>
+                  )}
                 </SheetTitle>
                 <SheetDescription className="text-base leading-relaxed">
-                  {selected.descricao}
+                  {selected.primaryGoal
+                    ? `Objetivo clínico: ${selected.primaryGoal}.`
+                    : "Exercício do repertório PilatesVision."}
+                  {selected.position && (
+                    <>
+                      {" "}
+                      Posição: {selected.position}.
+                    </>
+                  )}
                 </SheetDescription>
               </SheetHeader>
 
               <div className="space-y-6">
-                <DetailBlock
-                  icon={<Activity className="h-4 w-4" />}
-                  title="Articulações analisadas"
-                >
-                  <div className="flex flex-wrap gap-2">
-                    {selected.articulacoes.map((a) => (
-                      <Badge key={a} variant="secondary" className="font-normal">
-                        {a}
-                      </Badge>
-                    ))}
-                  </div>
-                </DetailBlock>
+                {selected.clinicalFocus && (
+                  <DetailBlock icon={<Activity className="h-4 w-4" />} title="Foco clínico">
+                    <p className="text-sm text-muted-foreground">{selected.clinicalFocus}</p>
+                  </DetailBlock>
+                )}
 
-                <DetailBlock
-                  icon={<CheckCircle2 className="h-4 w-4 text-emerald-400" />}
-                  title="Critérios de qualidade"
-                >
-                  <ul className="space-y-2">
-                    {selected.criterios.map((c) => (
-                      <li key={c} className="flex gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
-                        <span>{c}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </DetailBlock>
+                {selected.methodFamily && (
+                  <DetailBlock icon={<Target className="h-4 w-4" />} title="Família/método">
+                    <p className="text-sm text-muted-foreground">{selected.methodFamily}</p>
+                  </DetailBlock>
+                )}
 
-                <DetailBlock
-                  icon={<Target className="h-4 w-4 text-rose-400" />}
-                  title="Compensações comuns"
-                >
-                  <ul className="space-y-2">
-                    {selected.compensacoes.map((c) => (
-                      <li key={c} className="flex gap-2 text-sm">
-                        <ArrowRight className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
-                        <span className="text-muted-foreground">{c}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </DetailBlock>
+                {selected.execution && (
+                  <DetailBlock
+                    icon={<CheckCircle2 className="h-4 w-4 text-emerald-400" />}
+                    title="Execução"
+                  >
+                    <p className="text-sm text-muted-foreground">{selected.execution}</p>
+                  </DetailBlock>
+                )}
 
-                <DetailBlock
-                  icon={<TrendingUp className="h-4 w-4 text-primary" />}
-                  title="Feedback automático (IA)"
-                >
-                  <div className="rounded-xl border border-primary/25 bg-primary/5 p-4 space-y-2">
-                    {selected.feedback.map((f) => (
-                      <div key={f} className="flex gap-2 text-sm">
-                        <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                        <span>{f}</span>
-                      </div>
-                    ))}
+                {selected.keyCues && selected.keyCues.length > 0 && (
+                  <DetailBlock
+                    icon={<CheckCircle2 className="h-4 w-4 text-emerald-400" />}
+                    title="Cues principais"
+                  >
+                    <ul className="space-y-2">
+                      {selected.keyCues.map((c) => (
+                        <li key={c} className="flex gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                          <span>{c}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </DetailBlock>
+                )}
+
+                {selected.visionMetrics && selected.visionMetrics.length > 0 && (
+                  <DetailBlock
+                    icon={<TrendingUp className="h-4 w-4 text-primary" />}
+                    title="Métricas de visão"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {selected.visionMetrics.map((m) => (
+                        <Badge key={m} variant="secondary" className="font-normal">
+                          {m}
+                        </Badge>
+                      ))}
+                    </div>
+                  </DetailBlock>
+                )}
+
+                {selected.commonCompensations && selected.commonCompensations.length > 0 && (
+                  <DetailBlock
+                    icon={<Target className="h-4 w-4 text-rose-400" />}
+                    title="Compensações comuns (alertas)"
+                  >
+                    <ul className="space-y-2">
+                      {selected.commonCompensations.map((c) => (
+                        <li key={c} className="flex gap-2 text-sm">
+                          <ArrowRight className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
+                          <span className="text-muted-foreground">{c}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </DetailBlock>
+                )}
+
+                {selected.redFlags && selected.redFlags.length > 0 && (
+                  <DetailBlock
+                    icon={<AlertTriangle className="h-4 w-4 text-rose-400" />}
+                    title="Red flags"
+                  >
+                    <div className="rounded-xl border border-rose-500/25 bg-rose-500/5 p-4 space-y-2">
+                      {selected.redFlags.map((f) => (
+                        <div key={f} className="flex gap-2 text-sm">
+                          <AlertTriangle className="h-4 w-4 text-rose-400 mt-0.5 shrink-0" />
+                          <span>{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </DetailBlock>
+                )}
+
+                {(selected.regression || selected.progression) && (
+                  <DetailBlock icon={<Activity className="h-4 w-4" />} title="Regressão / Progressão">
+                    <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                      {selected.regression && (
+                        <div className="rounded-lg border border-border/50 bg-background/40 p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                            Regressão
+                          </div>
+                          <div>{selected.regression}</div>
+                        </div>
+                      )}
+                      {selected.progression && (
+                        <div className="rounded-lg border border-border/50 bg-background/40 p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                            Progressão
+                          </div>
+                          <div>{selected.progression}</div>
+                        </div>
+                      )}
+                    </div>
+                  </DetailBlock>
+                )}
+
+                <DetailBlock icon={<TrendingUp className="h-4 w-4 text-primary" />} title="Domínios de score">
+                  <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
+                    <ul className="space-y-1.5 text-sm">
+                      {(selected.scoreDomains ?? EXERCISE_SCORE_DOMAINS).map((d) => (
+                        <li key={d.key} className="flex justify-between gap-3">
+                          <span>{d.label}</span>
+                          <span className="text-muted-foreground">{d.weight}%</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </DetailBlock>
 
@@ -617,24 +410,30 @@ function ExerciciosPage() {
                 >
                   <ImageAnalyzer
                     mode="exercicio"
-                    context={`Exercício: ${selected.nome} (${selected.categoria}, vista ${selected.vista}). Critérios: ${selected.criterios.join("; ")}.`}
-                    label={`Execução · ${selected.nome}`}
+                    context={`Exercício: ${selected.name} (${CATEGORY_LABEL[selected.category]}${selected.equipment ? `, ${selected.equipment}` : ""}). Cues: ${(selected.keyCues ?? []).join("; ")}.`}
+                    label={`Execução · ${selected.name}`}
                     compact
                   />
                 </DetailBlock>
 
+                {selected.safetyNote && (
+                  <p className="text-[11px] text-muted-foreground">{selected.safetyNote}</p>
+                )}
+
                 <div className="flex items-center gap-3 pt-4 border-t border-border/60">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Eye className="h-3.5 w-3.5" />
-                    Vista ideal: <span className="text-foreground">{selected.vista}</span>
+                    Apoio à decisão — confirme com o profissional.
                   </div>
                   <Button
                     onClick={() => adicionarPrescricao(selected)}
                     className="ml-auto"
-                    variant={prescritos.includes(selected.id) ? "secondary" : "default"}
+                    variant={prescritos.includes(itemKey(selected)) ? "secondary" : "default"}
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    {prescritos.includes(selected.id) ? "Já prescrito" : "Adicionar à prescrição"}
+                    {prescritos.includes(itemKey(selected))
+                      ? "Já prescrito"
+                      : "Adicionar à prescrição"}
                   </Button>
                 </div>
               </div>
@@ -653,7 +452,7 @@ function FilterGroup({
   onChange,
 }: {
   label: string;
-  options: string[];
+  options: Array<{ value: string; label: string }>;
   value: string;
   onChange: (v: string) => void;
 }) {
@@ -664,18 +463,18 @@ function FilterGroup({
       </div>
       <div className="flex flex-wrap gap-1.5">
         {options.map((opt) => {
-          const active = value === opt;
+          const active = value === opt.value;
           return (
             <button
-              key={opt}
-              onClick={() => onChange(opt)}
+              key={opt.value}
+              onClick={() => onChange(opt.value)}
               className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
                 active
                   ? "bg-primary text-primary-foreground border-primary shadow-[0_0_20px_-5px_hsl(var(--primary))]"
                   : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
               }`}
             >
-              {opt}
+              {opt.label}
             </button>
           );
         })}
@@ -689,10 +488,18 @@ function ExerciseCard({
   selected,
   onOpen,
 }: {
-  ex: Exercise;
+  ex: ExerciseCatalogItem;
   selected: boolean;
   onOpen: () => void;
 }) {
+  const displayEquipment = ex.equipment ?? (ex.apparatus === "—" ? "Sem equipamento" : ex.apparatus);
+  const initials = ex.name
+    .split(" ")
+    .map((w) => w[0])
+    .filter(Boolean)
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
   return (
     <div className="group relative h-full rounded-2xl border border-border/60 bg-card/50 backdrop-blur-sm p-5 hover:border-primary/40 hover:bg-card/70 transition-all duration-300 flex flex-col">
       {selected && (
@@ -707,11 +514,7 @@ function ExerciseCard({
       <div className="relative h-32 -mx-5 -mt-5 mb-4 rounded-t-2xl overflow-hidden bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border-b border-border/60">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="font-display text-5xl font-bold text-primary/30 group-hover:text-primary/50 transition-colors">
-            {ex.nome
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .slice(0, 2)}
+            {initials}
           </div>
         </div>
         <div className="absolute bottom-2 left-3 flex gap-1.5">
@@ -719,39 +522,69 @@ function ExerciseCard({
             variant="outline"
             className="border-border/60 bg-background/60 backdrop-blur text-[10px]"
           >
-            <Eye className="h-2.5 w-2.5 mr-1" /> {ex.vista}
+            <Eye className="h-2.5 w-2.5 mr-1" /> {displayEquipment}
           </Badge>
         </div>
       </div>
 
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="font-display text-lg font-semibold leading-tight">{ex.nome}</h3>
+        <h3 className="font-display text-lg font-semibold leading-tight">{ex.name}</h3>
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
         <Badge variant="outline" className="border-primary/40 text-primary text-[10px]">
-          {ex.categoria}
+          {CATEGORY_LABEL[ex.category]}
         </Badge>
-        <Badge variant="outline" className={`text-[10px] ${nivelColor(ex.nivel)}`}>
-          {ex.nivel}
-        </Badge>
-        <Badge variant="outline" className="border-border text-[10px]">
-          {ex.objetivo}
-        </Badge>
+        {ex.level && (
+          <Badge variant="outline" className={`text-[10px] ${levelColor(ex.level)}`}>
+            {LEVEL_LABEL[ex.level]}
+          </Badge>
+        )}
+        {ex.primaryGoal && (
+          <Badge variant="outline" className="border-border text-[10px]">
+            {ex.primaryGoal.length > 32 ? `${ex.primaryGoal.slice(0, 30)}…` : ex.primaryGoal}
+          </Badge>
+        )}
       </div>
 
+      {ex.clinicalFocus && (
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+          Foco: {ex.clinicalFocus}
+        </p>
+      )}
+
       <div className="mt-auto pt-3 border-t border-border/40 space-y-2">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-          Compensações comuns
-        </div>
-        <ul className="text-xs text-muted-foreground space-y-0.5">
-          {ex.compensacoes.slice(0, 2).map((c) => (
-            <li key={c} className="flex gap-1.5">
-              <span className="text-rose-400/70">•</span>
-              <span className="line-clamp-1">{c}</span>
-            </li>
-          ))}
-        </ul>
+        {ex.visionMetrics && ex.visionMetrics.length > 0 && (
+          <>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Métricas de visão
+            </div>
+            <ul className="text-xs text-muted-foreground space-y-0.5">
+              {ex.visionMetrics.slice(0, 2).map((m) => (
+                <li key={m} className="flex gap-1.5">
+                  <span className="text-primary/70">•</span>
+                  <span className="line-clamp-1">{m}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {ex.redFlags && ex.redFlags.length > 0 && (
+          <>
+            <div className="text-[11px] uppercase tracking-wider text-rose-400/80 pt-1">
+              Red flags
+            </div>
+            <ul className="text-xs text-muted-foreground space-y-0.5">
+              {ex.redFlags.slice(0, 2).map((r) => (
+                <li key={r} className="flex gap-1.5">
+                  <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0 text-rose-400/70" />
+                  <span className="line-clamp-1">{r}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <Button variant="outline" size="sm" onClick={onOpen} className="w-full mt-3 group/btn">
           Ver detalhes

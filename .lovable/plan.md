@@ -1,0 +1,1 @@
+Teste de permissão recebido. Em plan mode não executo edições nem comandos de estado; apenas exploro o código e apresento planos. Aguardando instrução real para elaborar um plano.

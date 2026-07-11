@@ -545,6 +545,88 @@ export type Database = {
         }
         Relationships: []
       }
+      pose_captures: {
+        Row: {
+          assessment_id: string
+          clinic_id: string
+          created_at: string
+          duration_ms: number
+          engine: string
+          engine_version: string
+          exercise_key: string | null
+          exercise_label: string | null
+          fps: number
+          frame_count: number
+          id: string
+          landmarks: Json
+          notes: string | null
+          orientation: string
+          patient_id: string
+          quality: Json
+          updated_at: string
+        }
+        Insert: {
+          assessment_id: string
+          clinic_id: string
+          created_at?: string
+          duration_ms?: number
+          engine?: string
+          engine_version?: string
+          exercise_key?: string | null
+          exercise_label?: string | null
+          fps?: number
+          frame_count?: number
+          id?: string
+          landmarks?: Json
+          notes?: string | null
+          orientation?: string
+          patient_id: string
+          quality?: Json
+          updated_at?: string
+        }
+        Update: {
+          assessment_id?: string
+          clinic_id?: string
+          created_at?: string
+          duration_ms?: number
+          engine?: string
+          engine_version?: string
+          exercise_key?: string | null
+          exercise_label?: string | null
+          fps?: number
+          frame_count?: number
+          id?: string
+          landmarks?: Json
+          notes?: string | null
+          orientation?: string
+          patient_id?: string
+          quality?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pose_captures_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pose_captures_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pose_captures_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       postural_results: {
         Row: {
           assessment_id: string

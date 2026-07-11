@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 
-export const Route = createFileRoute("/_authenticated/relatorios")({
+export const Route = createFileRoute("/_authenticated/relatorios/")({
   head: () => ({ meta: [{ title: "Relatórios | PilatesVision" }] }),
   component: RelatoriosPage,
 });

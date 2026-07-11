@@ -328,6 +328,38 @@ function AuthPage() {
               </div>
             )}
 
+            {isSignup && (
+              <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-border/60 bg-background/60 accent-primary"
+                  required
+                  aria-label="Li e aceito a Política de Privacidade e os Termos de Uso"
+                />
+                <span>
+                  Li e aceito a{" "}
+                  <Link
+                    to="/privacidade"
+                    target="_blank"
+                    className="underline underline-offset-2 hover:text-foreground"
+                  >
+                    Política de Privacidade
+                  </Link>{" "}
+                  e os{" "}
+                  <Link
+                    to="/termos"
+                    target="_blank"
+                    className="underline underline-offset-2 hover:text-foreground"
+                  >
+                    Termos de Uso
+                  </Link>
+                  .
+                </span>
+              </label>
+            )}
+
             <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -342,13 +374,13 @@ function AuthPage() {
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Ao continuar você concorda com nossos{" "}
-            <a href="#" className="underline-offset-2 hover:text-foreground hover:underline">
+            <Link to="/termos" className="underline-offset-2 hover:text-foreground hover:underline">
               Termos
-            </a>{" "}
+            </Link>{" "}
             e{" "}
-            <a href="#" className="underline-offset-2 hover:text-foreground hover:underline">
+            <Link to="/privacidade" className="underline-offset-2 hover:text-foreground hover:underline">
               Política de Privacidade
-            </a>
+            </Link>
             .
           </p>
         </motion.div>

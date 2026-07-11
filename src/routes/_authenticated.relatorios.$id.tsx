@@ -228,6 +228,9 @@ function RelatorioDetailPage() {
             )}
             {editable && (
               <>
+                <Button variant="outline" size="sm" onClick={handlePreviewPdf}>
+                  <FileDown className="h-4 w-4" /> Prévia PDF
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"

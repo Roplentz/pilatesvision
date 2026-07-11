@@ -4,6 +4,8 @@ import {
   AlertCircle,
   ArrowLeft,
   CheckCircle2,
+  Download,
+  FileDown,
   Loader2,
   Lock,
   Plus,
@@ -35,6 +37,7 @@ import {
   type Severity,
 } from "@/lib/reportsStore";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
+import { exportReportPdf, getReportPdfSignedUrl } from "@/lib/reportPdf";
 
 export const Route = createFileRoute("/_authenticated/relatorios/$id")({
   head: () => ({ meta: [{ title: "Relatório | PilatesVision" }] }),
@@ -50,6 +53,8 @@ function RelatorioDetailPage() {
   const [json, setJson] = useState<ReportJson>(() => normalizeReportJson(null));
   const [saving, setSaving] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [openingPdf, setOpeningPdf] = useState(false);
 
   useEffect(() => {
     if (!report) return;
@@ -59,6 +64,41 @@ function RelatorioDetailPage() {
 
   const isFinalized = report?.status === "finalized";
   const editable = !isFinalized;
+  const pdfStoragePath =
+    ((report as unknown as { pdf_storage_path?: string | null } | null)?.pdf_storage_path) ?? null;
+
+  async function handleExportPdf() {
+    if (!report) return;
+    setExportingPdf(true);
+    try {
+      await exportReportPdf({
+        reportId: report.id,
+        clinicId: report.clinic_id,
+        version: report.version,
+        title,
+        json,
+      });
+      toast.success("PDF exportado e salvo no acervo clínico.");
+      reload();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao exportar PDF.");
+    } finally {
+      setExportingPdf(false);
+    }
+  }
+
+  async function handleOpenPdf() {
+    if (!pdfStoragePath) return;
+    setOpeningPdf(true);
+    try {
+      const url = await getReportPdfSignedUrl(pdfStoragePath, 300);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao abrir PDF.");
+    } finally {
+      setOpeningPdf(false);
+    }
+  }
 
   function patch(patchFn: (j: ReportJson) => ReportJson) {
     setJson((j) => patchFn(j));
@@ -142,6 +182,38 @@ function RelatorioDetailPage() {
             <Button variant="ghost" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4" /> Imprimir
             </Button>
+            {isFinalized && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportPdf}
+                  disabled={exportingPdf}
+                >
+                  {exportingPdf ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileDown className="h-4 w-4" />
+                  )}
+                  {pdfStoragePath ? "Regerar PDF" : "Exportar PDF"}
+                </Button>
+                {pdfStoragePath && (
+                  <Button
+                    variant="hero"
+                    size="sm"
+                    onClick={handleOpenPdf}
+                    disabled={openingPdf}
+                  >
+                    {openingPdf ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                    Baixar PDF
+                  </Button>
+                )}
+              </>
+            )}
             {editable && (
               <>
                 <Button

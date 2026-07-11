@@ -17,9 +17,9 @@
     },
     "tools": [
       {
-        "name": "list_students",
-        "title": "Listar alunos",
-        "description": "Lista os alunos cadastrados na clínica do usuário autenticado.",
+        "name": "list_patients",
+        "title": "Listar pacientes",
+        "description": "Lista os pacientes cadastrados na clínica do usuário autenticado.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -30,7 +30,7 @@
           "type": "object",
           "properties": {
             "limit": {
-              "description": "Máximo de alunos a retornar (padrão 25).",
+              "description": "Máximo de pacientes a retornar (padrão 25).",
               "type": "integer",
               "minimum": 1,
               "maximum": 100
@@ -40,9 +40,9 @@
         "outputSchema": null
       },
       {
-        "name": "create_student",
-        "title": "Cadastrar aluno",
-        "description": "Cria um novo aluno na clínica do usuário autenticado.",
+        "name": "create_patient",
+        "title": "Cadastrar paciente",
+        "description": "Cria um novo paciente na clínica do usuário autenticado.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,
@@ -55,7 +55,7 @@
             "full_name": {
               "type": "string",
               "minLength": 1,
-              "description": "Nome completo do aluno."
+              "description": "Nome completo do paciente."
             },
             "email": {
               "description": "E-mail de contato.",

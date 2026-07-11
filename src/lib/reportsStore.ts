@@ -4,7 +4,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 
 export type ReportRow = Database["public"]["Tables"]["reports"]["Row"];
 export type ReportWithRelations = ReportRow & {
-  students: { name: string } | null;
+  patient: { name: string } | null;
 };
 
 export type ReportContent = {
@@ -121,7 +121,7 @@ export function useReport(id: string | null | undefined) {
     setError(null);
     supabase
       .from("reports")
-      .select("*, students:patients(name)")
+      .select("*, patient:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {
@@ -172,7 +172,7 @@ export async function finalizeReport(
     .update({
       title,
       content: content as unknown as Json,
-      status: "finalized",
+      status: "completed",
       finalized_at: now,
       updated_at: now,
     })

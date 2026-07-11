@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 export type AssessmentRow = Database["public"]["Tables"]["assessments"]["Row"];
-export type AssessmentWithStudent = AssessmentRow & {
-  students: { name: string } | null;
+export type AssessmentWithPatient = AssessmentRow & {
+  patient: { name: string } | null;
 };
 export type NewAssessmentInput = Omit<
   Database["public"]["Tables"]["assessments"]["Insert"],
@@ -18,8 +18,17 @@ export type ExerciseResultRow = Database["public"]["Tables"]["exercise_results"]
 export type PrescribedExerciseRow = Database["public"]["Tables"]["prescribed_exercises"]["Row"];
 export type ReportRow = Database["public"]["Tables"]["reports"]["Row"];
 
-export type AssessmentType = "postural" | "dynamic" | "exercise" | "complete";
-export type AssessmentStatus = "draft" | "in_review" | "finalized";
+export type AssessmentType =
+  | "postural_static"
+  | "dynamic"
+  | "pilates_exercise"
+  | "follow_up";
+export type AssessmentStatus =
+  | "draft"
+  | "processing"
+  | "review"
+  | "completed"
+  | "archived";
 
 export type PosturalView = "anterior" | "posterior" | "right_lateral" | "left_lateral";
 export type Severity = "leve" | "moderada" | "importante";
@@ -45,7 +54,7 @@ export type ExerciseCompensation = {
 
 /** Lista avaliações de uma clínica, incluindo o nome do aluno relacionado. */
 export function useAssessments(clinicId: string | null | undefined) {
-  const [assessments, setAssessments] = useState<AssessmentWithStudent[]>([]);
+  const [assessments, setAssessments] = useState<AssessmentWithPatient[]>([]);
   const [loading, setLoading] = useState<boolean>(Boolean(clinicId));
   const [error, setError] = useState<Error | null>(null);
 
@@ -60,13 +69,13 @@ export function useAssessments(clinicId: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, students:patients(name)")
+      .select("*, patient:patients(name)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) setError(new Error(error.message));
-        else setAssessments((data ?? []) as unknown as AssessmentWithStudent[]);
+        else setAssessments((data ?? []) as unknown as AssessmentWithPatient[]);
         setLoading(false);
       });
     return () => {
@@ -99,12 +108,12 @@ export async function updateAssessment(
   return data as AssessmentRow;
 }
 
-/** Finaliza avaliação: status='finalized' e finalized_at=now(). */
+/** Finaliza avaliação: status='completed' e finalized_at=now(). */
 export async function finalizeAssessment(id: string): Promise<AssessmentRow> {
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("assessments")
-    .update({ status: "finalized", finalized_at: now, updated_at: now })
+    .update({ status: "completed", finalized_at: now, updated_at: now })
     .eq("id", id)
     .select("*")
     .single();
@@ -208,7 +217,7 @@ export function useAssessmentResults(assessmentId: string | null | undefined) {
 
 /** Busca uma avaliação pelo id, com o nome do aluno. */
 export function useAssessment(id: string | null | undefined) {
-  const [assessment, setAssessment] = useState<AssessmentWithStudent | null>(null);
+  const [assessment, setAssessment] = useState<AssessmentWithPatient | null>(null);
   const [loading, setLoading] = useState<boolean>(Boolean(id));
   const [error, setError] = useState<Error | null>(null);
 
@@ -223,13 +232,13 @@ export function useAssessment(id: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, students:patients(name)")
+      .select("*, patient:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) setError(new Error(error.message));
-        else setAssessment((data as unknown as AssessmentWithStudent | null) ?? null);
+        else setAssessment((data as unknown as AssessmentWithPatient | null) ?? null);
         setLoading(false);
       });
     return () => {
@@ -285,12 +294,12 @@ export function useAssessmentExtras(assessmentId: string | null | undefined) {
 }
 
 /** Lista avaliações de um aluno específico. */
-export function useStudentAssessments(studentId: string | null | undefined) {
+export function usePatientAssessments(patientId: string | null | undefined) {
   const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(Boolean(studentId));
+  const [loading, setLoading] = useState<boolean>(Boolean(patientId));
 
   useEffect(() => {
-    if (!studentId) {
+    if (!patientId) {
       setAssessments([]);
       setLoading(false);
       return;
@@ -300,7 +309,7 @@ export function useStudentAssessments(studentId: string | null | undefined) {
     supabase
       .from("assessments")
       .select("*")
-      .eq("patient_id", studentId)
+      .eq("patient_id", patientId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
         if (cancelled) return;
@@ -310,7 +319,7 @@ export function useStudentAssessments(studentId: string | null | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [studentId]);
+  }, [patientId]);
 
   return { assessments, loading };
 }

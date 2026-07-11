@@ -58,7 +58,7 @@ function RelatorioDetailPage() {
     setAttemptedFinalize(false);
   }, [report]);
 
-  const isFinalized = report?.status === "finalized";
+  const isFinalized = report?.status === "completed";
   const liveErrors = useMemo(
     () => validateReportForFinalization(title, content),
     [title, content],
@@ -144,7 +144,7 @@ function RelatorioDetailPage() {
           </Link>
           <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight">Relatório clínico</h1>
           <p className="text-sm text-muted-foreground">
-            Paciente: {report.students?.name ?? "—"} · Versão {report.version}
+            Paciente: {report.patient?.name ?? "—"} · Versão {report.version}
           </p>
         </div>
         <div className="flex items-center gap-2">

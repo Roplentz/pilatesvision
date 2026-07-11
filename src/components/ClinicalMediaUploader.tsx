@@ -12,7 +12,7 @@ import {
 interface Props {
   kind: MediaKind;
   clinicId: string;
-  studentId: string;
+  patientId: string;
   assessmentId: string;
   currentPath?: string | null;
   disabled?: boolean;
@@ -24,7 +24,7 @@ interface Props {
 export function ClinicalMediaUploader({
   kind,
   clinicId,
-  studentId,
+  patientId,
   assessmentId,
   currentPath,
   disabled,
@@ -54,7 +54,7 @@ export function ClinicalMediaUploader({
       const { path } = await uploadClinicalMedia({
         file,
         clinicId,
-        studentId,
+        patientId,
         assessmentId,
         kind,
       });

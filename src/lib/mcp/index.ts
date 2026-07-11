@@ -1,6 +1,6 @@
 import { auth, defineMcp } from "@lovable.dev/mcp-js";
-import listStudents from "./tools/list-students";
-import createStudent from "./tools/create-student";
+import listPatients from "./tools/list-patients";
+import createPatient from "./tools/create-patient";
 import listAssessments from "./tools/list-assessments";
 import getAssessment from "./tools/get-assessment";
 
@@ -18,5 +18,5 @@ export default defineMcp({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [listStudents, createStudent, listAssessments, getAssessment],
+  tools: [listPatients, createPatient, listAssessments, getAssessment],
 });

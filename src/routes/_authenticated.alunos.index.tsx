@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useStudents, type StudentStatus } from "@/lib/studentsStore";
+import { usePatients, type PatientStatus } from "@/lib/patientsStore";
 import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/alunos/")({
@@ -29,9 +29,9 @@ function ageFrom(iso: string | null, fallback: number | null): number | null {
   return Math.floor(diff / (365.25 * 24 * 3600 * 1000));
 }
 
-type StatusFilter = StudentStatus | "all";
+type StatusFilter = PatientStatus | "all";
 
-const statusLabels: Record<StudentStatus, string> = {
+const statusLabels: Record<PatientStatus, string> = {
   active: "Ativo",
   inactive: "Inativo",
   archived: "Arquivado",
@@ -40,14 +40,14 @@ const statusLabels: Record<StudentStatus, string> = {
 function AlunosListPage() {
   const { clinicId } = useProfile();
   const [status, setStatus] = useState<StatusFilter>("active");
-  const { students, loading } = useStudents(clinicId, { status });
+  const { patients, loading } = usePatients(clinicId, { status });
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return students;
-    return students.filter((s) => s.name.toLowerCase().includes(needle));
-  }, [students, q]);
+    if (!needle) return patients;
+    return patients.filter((s) => s.name.toLowerCase().includes(needle));
+  }, [patients, q]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -77,7 +77,7 @@ function AlunosListPage() {
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               {loading
                 ? "Carregando pacientes…"
-                : `${students.length} paciente${students.length === 1 ? "" : "s"} ${status === "all" ? "no total" : status === "active" ? "ativo(s)" : status === "inactive" ? "inativo(s)" : "arquivado(s)"} na clínica.`}
+                : `${patients.length} paciente${patients.length === 1 ? "" : "s"} ${status === "all" ? "no total" : status === "active" ? "ativo(s)" : status === "inactive" ? "inativo(s)" : "arquivado(s)"} na clínica.`}
             </p>
           </div>
           <div className="relative w-full max-w-sm">
@@ -101,7 +101,7 @@ function AlunosListPage() {
         </Tabs>
 
         {filtered.length === 0 && !loading ? (
-          students.length === 0 && !q ? (
+          patients.length === 0 && !q ? (
             <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-12 text-center">
               <Users className="mx-auto h-8 w-8 text-muted-foreground" />
               <p className="mt-4 text-sm text-muted-foreground">
@@ -139,7 +139,7 @@ function AlunosListPage() {
               <tbody className="divide-y divide-border/40">
                 {filtered.map((s) => {
                   const age = ageFrom(s.birth_date, s.age);
-                  const st = (s.status as StudentStatus) ?? "active";
+                  const st = (s.status as PatientStatus) ?? "active";
                   return (
                     <tr key={s.id} className="transition hover:bg-card/60">
                       <td className="px-4 py-3 font-medium">{s.name}</td>

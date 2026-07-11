@@ -15,7 +15,7 @@ type ReportRow = {
   id: string;
   assessment_id: string;
   created_at: string;
-  students: { name: string } | null;
+  patient: { name: string } | null;
   assessments: { created_at: string } | null;
 };
 
@@ -35,7 +35,7 @@ function RelatoriosPage() {
     setLoading(true);
     supabase
       .from("reports")
-      .select("id, assessment_id, created_at, students:patients(name), assessments(created_at)")
+      .select("id, assessment_id, created_at, patient:patients(name), assessments(created_at)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
@@ -107,7 +107,7 @@ function RelatoriosPage() {
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-primary" />
                     <div>
-                      <div className="font-medium">{r.students?.name ?? "Aluno"}</div>
+                      <div className="font-medium">{r.patient?.name ?? "Aluno"}</div>
                       <div className="text-xs text-muted-foreground">
                         {new Date(date).toLocaleDateString("pt-BR")}
                       </div>

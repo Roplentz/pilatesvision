@@ -53,22 +53,22 @@ function sanitizeFileName(name: string): string {
   return ext ? `${base}.${ext}` : base;
 }
 
-/** Constrói o path obrigatório: {clinicId}/{studentId}/{assessmentId}/{arquivo} */
+/** Constrói o path obrigatório: {clinicId}/{patientId}/{assessmentId}/{arquivo} */
 export function buildClinicalMediaPath(params: {
   clinicId: string;
-  studentId: string;
+  patientId: string;
   assessmentId: string;
   fileName: string;
 }): string {
   const stamp = Date.now();
   const safe = sanitizeFileName(params.fileName);
-  return `${params.clinicId}/${params.studentId}/${params.assessmentId}/${stamp}-${safe}`;
+  return `${params.clinicId}/${params.patientId}/${params.assessmentId}/${stamp}-${safe}`;
 }
 
 export async function uploadClinicalMedia(params: {
   file: File;
   clinicId: string;
-  studentId: string;
+  patientId: string;
   assessmentId: string;
   kind: MediaKind;
 }): Promise<{ path: string }> {
@@ -76,7 +76,7 @@ export async function uploadClinicalMedia(params: {
   if (!v.ok) throw new Error(v.error);
   const path = buildClinicalMediaPath({
     clinicId: params.clinicId,
-    studentId: params.studentId,
+    patientId: params.patientId,
     assessmentId: params.assessmentId,
     fileName: params.file.name,
   });

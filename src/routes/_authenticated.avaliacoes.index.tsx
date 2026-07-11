@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAssessments } from "@/lib/assessmentsStore";
-import { useStudents } from "@/lib/studentsStore";
+import { usePatients } from "@/lib/patientsStore";
 import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/")({
@@ -31,42 +31,44 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/")({
 
 const statusLabel: Record<string, string> = {
   draft: "Rascunho",
-  in_review: "Em revisão",
-  finalized: "Finalizada",
+  review: "Em revisão",
+  processing: "Processando",
+  archived: "Arquivada",
+  completed: "Finalizada",
 };
 
 const typeLabel: Record<string, string> = {
-  postural: "Postural",
+  postural_static: "Postural",
   dynamic: "Dinâmica",
-  exercise: "Por exercício",
-  complete: "Completa",
+  pilates_exercise: "Por exercício",
+  follow_up: "Completa",
 };
 
 function AvaliacoesListPage() {
   const { clinicId, loading: profileLoading } = useProfile();
   const { assessments, loading: assessmentsLoading } = useAssessments(clinicId);
-  const { students } = useStudents(clinicId);
+  const { patients } = usePatients(clinicId);
   const [q, setQ] = useState("");
-  const [studentFilter, setStudentFilter] = useState<string>("all");
+  const [patientFilter, setPatientFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const studentMap = useMemo(() => Object.fromEntries(students.map((s) => [s.id, s])), [students]);
+  const patientMap = useMemo(() => Object.fromEntries(patients.map((s) => [s.id, s])), [patients]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return assessments.filter((a) => {
-      if (studentFilter !== "all" && a.patient_id !== studentFilter) return false;
+      if (patientFilter !== "all" && a.patient_id !== patientFilter) return false;
       if (statusFilter !== "all" && a.status !== statusFilter) return false;
       if (!needle) return true;
       const name =
-        a.students?.name?.toLowerCase() ?? studentMap[a.patient_id]?.name.toLowerCase() ?? "";
+        a.patient?.name?.toLowerCase() ?? patientMap[a.patient_id]?.name.toLowerCase() ?? "";
       return (
         name.includes(needle) ||
         a.main_complaint?.toLowerCase().includes(needle) ||
         (a.goals ?? []).some((g) => g.toLowerCase().includes(needle))
       );
     });
-  }, [assessments, q, studentFilter, statusFilter, studentMap]);
+  }, [assessments, q, patientFilter, statusFilter, patientMap]);
 
   const loading = profileLoading || assessmentsLoading;
 
@@ -109,13 +111,13 @@ function AvaliacoesListPage() {
               className="pl-9"
             />
           </div>
-          <Select value={studentFilter} onValueChange={setStudentFilter}>
+          <Select value={patientFilter} onValueChange={setPatientFilter}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Aluno" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os alunos</SelectItem>
-              {students.map((s) => (
+              {patients.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   {s.name}
                 </SelectItem>
@@ -129,8 +131,8 @@ function AvaliacoesListPage() {
             <SelectContent>
               <SelectItem value="all">Todos os status</SelectItem>
               <SelectItem value="draft">Rascunho</SelectItem>
-              <SelectItem value="in_review">Em revisão</SelectItem>
-              <SelectItem value="finalized">Finalizada</SelectItem>
+              <SelectItem value="review">Em revisão</SelectItem>
+              <SelectItem value="completed">Finalizada</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -146,7 +148,7 @@ function AvaliacoesListPage() {
         ) : (
           <ul className="space-y-3">
             {filtered.map((a, i) => {
-              const studentName = a.students?.name ?? studentMap[a.patient_id]?.name ?? "Aluno";
+              const patientName = a.patient?.name ?? patientMap[a.patient_id]?.name ?? "Aluno";
               return (
                 <motion.li
                   key={a.id}
@@ -161,14 +163,14 @@ function AvaliacoesListPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
-                        {studentName
+                        {patientName
                           .split(" ")
                           .slice(0, 2)
                           .map((p) => p[0])
                           .join("")}
                       </div>
                       <div>
-                        <div className="font-medium">{studentName}</div>
+                        <div className="font-medium">{patientName}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">
                           {new Date(a.created_at).toLocaleDateString("pt-BR")} ·{" "}
                           {typeLabel[a.type] ?? a.type} · Dor {a.pain_score ?? a.pain_level ?? 0}/10
@@ -177,7 +179,7 @@ function AvaliacoesListPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge
-                        variant={a.status === "finalized" ? "default" : "secondary"}
+                        variant={a.status === "completed" ? "default" : "secondary"}
                         className="text-[11px]"
                       >
                         {statusLabel[a.status] ?? a.status}

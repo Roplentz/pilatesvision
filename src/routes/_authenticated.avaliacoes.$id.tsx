@@ -1205,11 +1205,21 @@ function ExerciseSection({
                     <div className="text-xs text-muted-foreground">Aparelho: {r.apparatus}</div>
                   )}
                 </div>
-                {r.control_level && (
-                  <Badge variant="outline" className="text-[11px]">
-                    Controle: {r.control_level}
-                  </Badge>
-                )}
+                <div className="flex flex-wrap gap-1.5">
+                  {r.control_level && (
+                    <Badge variant="outline" className="text-[11px]">
+                      Controle: {r.control_level}
+                    </Badge>
+                  )}
+                  {typeof r.support_level === "number" && (
+                    <Badge
+                      variant="outline"
+                      className={`text-[11px] ${SUPPORT_LEVEL_OPTIONS[r.support_level as 0 | 1 | 2 | 3]?.tone ?? ""}`}
+                    >
+                      Suporte {r.support_level}
+                    </Badge>
+                  )}
+                </div>
               </div>
               {r.execution_notes && (
                 <p className="mt-3 text-sm text-muted-foreground">{r.execution_notes}</p>

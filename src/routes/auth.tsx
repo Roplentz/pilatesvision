@@ -40,6 +40,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [forgotSent, setForgotSent] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const destination =
     search.redirect && search.redirect.startsWith("/") ? search.redirect : "/dashboard";
@@ -111,6 +112,10 @@ function AuthPage() {
     const name = String(formData.get("name") ?? "").trim();
     if (!email || !password) {
       toast.error("Informe e-mail e senha.");
+      return;
+    }
+    if (isSignup && !acceptTerms) {
+      toast.error("Você precisa aceitar a Política de Privacidade e os Termos de Uso.");
       return;
     }
     setLoading(true);

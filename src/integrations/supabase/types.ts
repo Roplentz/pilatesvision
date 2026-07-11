@@ -295,6 +295,73 @@ export type Database = {
           },
         ]
       }
+      patient_consents: {
+        Row: {
+          accepted_at: string | null
+          clinic_id: string
+          consent_ai_support: boolean
+          consent_image_use: boolean
+          consent_lgpd: boolean
+          consent_text: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          patient_id: string
+          responsible_professional_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          clinic_id: string
+          consent_ai_support?: boolean
+          consent_image_use?: boolean
+          consent_lgpd?: boolean
+          consent_text?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          patient_id: string
+          responsible_professional_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          clinic_id?: string
+          consent_ai_support?: boolean
+          consent_image_use?: boolean
+          consent_lgpd?: boolean
+          consent_text?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          patient_id?: string
+          responsible_professional_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_consents_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_consents_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_consents_responsible_professional_id_fkey"
+            columns: ["responsible_professional_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           age: number | null

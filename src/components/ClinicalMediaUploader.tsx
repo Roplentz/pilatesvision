@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Film, ImageIcon, Loader2, UploadCloud, X } from "lucide-react";
+import { Film, ImageIcon, Loader2, ShieldAlert, UploadCloud, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   acceptAttrFor,
@@ -19,6 +19,10 @@ interface Props {
   onUploaded: (path: string) => void | Promise<void>;
   onCleared?: () => void;
   label?: string;
+  /** Se false/undefined, o upload fica bloqueado por falta de consentimento de uso de imagem. */
+  consentImageUse?: boolean;
+  /** Rota do paciente para o profissional registrar/atualizar o consentimento. */
+  patientHref?: string;
 }
 
 export function ClinicalMediaUploader({
@@ -31,6 +35,8 @@ export function ClinicalMediaUploader({
   onUploaded,
   onCleared,
   label,
+  consentImageUse,
+  patientHref,
 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -41,8 +47,16 @@ export function ClinicalMediaUploader({
   const defaultLabel =
     kind === "video" ? "Vídeo do movimento (opcional)" : "Imagem postural (opcional)";
 
+  const consentBlocked = !consentImageUse;
+
   async function handleFile(file: File) {
     setError(null);
+    if (consentBlocked) {
+      setError(
+        "Registre o consentimento de uso de imagem antes de anexar mídia clínica.",
+      );
+      return;
+    }
     const v = validateMediaFile(file, kind);
     if (!v.ok) {
       setError(v.error);
@@ -106,6 +120,28 @@ export function ClinicalMediaUploader({
             </div>
           )}
 
+          {consentBlocked && (
+            <div
+              role="status"
+              className="mt-2 flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-2.5 py-2 text-xs text-amber-600 dark:text-amber-300"
+            >
+              <ShieldAlert className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <div>
+                  Registre o consentimento de uso de imagem antes de anexar mídia clínica.
+                </div>
+                {patientHref && (
+                  <a
+                    href={patientHref}
+                    className="inline-flex items-center gap-1 font-medium underline underline-offset-2"
+                  >
+                    Registrar consentimento
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
           {error && (
             <p role="alert" className="mt-2 text-xs text-destructive">
               {error}
@@ -128,7 +164,7 @@ export function ClinicalMediaUploader({
               type="button"
               variant="outline"
               size="sm"
-              disabled={disabled || uploading}
+              disabled={disabled || uploading || consentBlocked}
               onClick={() => inputRef.current?.click()}
             >
               {uploading ? (

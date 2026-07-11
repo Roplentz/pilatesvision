@@ -43,6 +43,7 @@ import {
   type PosturalResultRow,
 } from "@/lib/assessmentsStore";
 import { usePatientReports, ASSESSMENT_TYPE_LABEL } from "@/lib/reportsStore";
+import { PatientConsentCard } from "@/components/PatientConsentCard";
 import { toast } from "sonner";
 import { ClipboardPlus, FileText, Plus } from "lucide-react";
 
@@ -407,6 +408,15 @@ function AlunoDetailPage() {
                 <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">
                   {patient.clinical_notes}
                 </p>
+              </div>
+            )}
+
+            {patient.clinic_id && (
+              <div className="mt-6">
+                <PatientConsentCard
+                  patientId={patient.id}
+                  clinicId={patient.clinic_id}
+                />
               </div>
             )}
 

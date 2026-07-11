@@ -29,6 +29,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
+import { usePatientConsent } from "@/lib/patientConsentsStore";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
@@ -208,6 +209,10 @@ function AvaliacaoDetailPage() {
   const showPostural = type === "postural_static" || type === "follow_up";
   const showMovement = type === "dynamic" || type === "follow_up";
   const showExercise = type === "pilates_exercise" || type === "follow_up";
+
+  const { consent } = usePatientConsent(assessment.patient_id);
+  const consentImageUse = Boolean(consent?.consent_image_use);
+  const patientHref = `/alunos/${assessment.patient_id}#consentimento`;
 
   const saveHeader = async () => {
     setSaving(true);
@@ -396,6 +401,8 @@ function AvaliacaoDetailPage() {
                 items={postural}
                 editable={isDraft}
                 onSaved={reload}
+                consentImageUse={consentImageUse}
+                patientHref={patientHref}
               />
             </TabsContent>
           )}
@@ -408,6 +415,8 @@ function AvaliacaoDetailPage() {
                 items={movement}
                 editable={isDraft}
                 onSaved={reload}
+                consentImageUse={consentImageUse}
+                patientHref={patientHref}
               />
             </TabsContent>
           )}
@@ -420,6 +429,8 @@ function AvaliacaoDetailPage() {
                 items={exercise}
                 editable={isDraft}
                 onSaved={reload}
+                consentImageUse={consentImageUse}
+                patientHref={patientHref}
               />
             </TabsContent>
           )}
@@ -478,6 +489,8 @@ function PosturalSection({
   items,
   editable,
   onSaved,
+  consentImageUse,
+  patientHref,
 }: {
   assessmentId: string;
   clinicId: string;
@@ -485,6 +498,8 @@ function PosturalSection({
   items: PosturalResultRow[];
   editable: boolean;
   onSaved: () => void;
+  consentImageUse: boolean;
+  patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<PosturalView>("anterior");
@@ -723,6 +738,8 @@ function PosturalSection({
             currentPath={imagePath}
             onUploaded={(p) => setImagePath(p)}
             onCleared={() => setImagePath(null)}
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
@@ -748,6 +765,8 @@ function MovementSection({
   items,
   editable,
   onSaved,
+  consentImageUse,
+  patientHref,
 }: {
   assessmentId: string;
   clinicId: string;
@@ -755,6 +774,8 @@ function MovementSection({
   items: MovementResultRow[];
   editable: boolean;
   onSaved: () => void;
+  consentImageUse: boolean;
+  patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [movementPreset, setMovementPreset] = useState<string>(FUNCTIONAL_MOVEMENTS[0]);
@@ -1021,6 +1042,8 @@ function MovementSection({
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
             onCleared={() => setVideoPath(null)}
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <ClinicalMediaUploader
@@ -1032,6 +1055,8 @@ function MovementSection({
             onUploaded={(p) => setImagePath(p)}
             onCleared={() => setImagePath(null)}
             label="Foto de referência (opcional)"
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
@@ -1057,6 +1082,8 @@ function ExerciseSection({
   items,
   editable,
   onSaved,
+  consentImageUse,
+  patientHref,
 }: {
   assessmentId: string;
   clinicId: string;
@@ -1064,6 +1091,8 @@ function ExerciseSection({
   items: ExerciseResultRow[];
   editable: boolean;
   onSaved: () => void;
+  consentImageUse: boolean;
+  patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [namePreset, setNamePreset] = useState<string>(PILATES_EXERCISES[0]);
@@ -1359,6 +1388,8 @@ function ExerciseSection({
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
             onCleared={() => setVideoPath(null)}
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <ClinicalMediaUploader
@@ -1370,6 +1401,8 @@ function ExerciseSection({
             onUploaded={(p) => setImagePath(p)}
             onCleared={() => setImagePath(null)}
             label="Foto de referência (opcional)"
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">

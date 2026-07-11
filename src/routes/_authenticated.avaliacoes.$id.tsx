@@ -585,6 +585,11 @@ function PosturalSection({
         )}
       </div>
 
+      <p className="text-xs text-muted-foreground">
+        Registro observacional (assimetria, anteriorização, desalinhamento). Ferramenta de
+        apoio à decisão — confirmar clinicamente. Não constitui diagnóstico.
+      </p>
+
       {items.length === 0 && !open && (
         <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center text-sm text-muted-foreground">
           Nenhuma vista registrada.

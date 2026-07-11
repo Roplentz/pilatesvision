@@ -17,7 +17,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthResetRouteImport } from './routes/auth.reset'
-import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
@@ -28,6 +27,7 @@ import { Route as AuthenticatedAvaliacaoDinamicaRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as AuthenticatedRelatoriosIndexRouteImport } from './routes/_authenticated.relatorios.index'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
 import { Route as AuthenticatedRelatoriosIdRouteImport } from './routes/_authenticated.relatorios.$id'
@@ -76,11 +76,6 @@ const AuthResetRoute = AuthResetRouteImport.update({
   id: '/reset',
   path: '/reset',
   getParentRoute: () => AuthRoute,
-} as any)
-const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
@@ -138,6 +133,12 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedRelatoriosIndexRoute =
+  AuthenticatedRelatoriosIndexRouteImport.update({
+    id: '/relatorios/',
+    path: '/relatorios/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAvaliacoesIndexRoute =
   AuthenticatedAvaliacoesIndexRouteImport.update({
     id: '/avaliacoes/',
@@ -152,9 +153,9 @@ const AuthenticatedAlunosIndexRoute =
   } as any)
 const AuthenticatedRelatoriosIdRoute =
   AuthenticatedRelatoriosIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedRelatoriosRoute,
+    id: '/relatorios/$id',
+    path: '/relatorios/$id',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAvaliacoesNovaRoute =
   AuthenticatedAvaliacoesNovaRouteImport.update({
@@ -207,7 +208,6 @@ export interface FileRoutesByFullPath {
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
   '/auth/reset': typeof AuthResetRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -218,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/relatorios/$id': typeof AuthenticatedRelatoriosIdRoute
   '/alunos/': typeof AuthenticatedAlunosIndexRoute
   '/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
+  '/relatorios/': typeof AuthenticatedRelatoriosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,7 +237,6 @@ export interface FileRoutesByTo {
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
   '/auth/reset': typeof AuthResetRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -247,6 +247,7 @@ export interface FileRoutesByTo {
   '/relatorios/$id': typeof AuthenticatedRelatoriosIdRoute
   '/alunos': typeof AuthenticatedAlunosIndexRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesIndexRoute
+  '/relatorios': typeof AuthenticatedRelatoriosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -267,7 +268,6 @@ export interface FileRoutesById {
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
   '/auth/reset': typeof AuthResetRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -278,6 +278,7 @@ export interface FileRoutesById {
   '/_authenticated/relatorios/$id': typeof AuthenticatedRelatoriosIdRoute
   '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
   '/_authenticated/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
+  '/_authenticated/relatorios/': typeof AuthenticatedRelatoriosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -298,7 +299,6 @@ export interface FileRouteTypes {
     | '/exercicios'
     | '/nova-avaliacao'
     | '/onboarding'
-    | '/relatorios'
     | '/auth/reset'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -309,6 +309,7 @@ export interface FileRouteTypes {
     | '/relatorios/$id'
     | '/alunos/'
     | '/avaliacoes/'
+    | '/relatorios/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -327,7 +328,6 @@ export interface FileRouteTypes {
     | '/exercicios'
     | '/nova-avaliacao'
     | '/onboarding'
-    | '/relatorios'
     | '/auth/reset'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -338,6 +338,7 @@ export interface FileRouteTypes {
     | '/relatorios/$id'
     | '/alunos'
     | '/avaliacoes'
+    | '/relatorios'
   id:
     | '__root__'
     | '/'
@@ -357,7 +358,6 @@ export interface FileRouteTypes {
     | '/_authenticated/exercicios'
     | '/_authenticated/nova-avaliacao'
     | '/_authenticated/onboarding'
-    | '/_authenticated/relatorios'
     | '/auth/reset'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -368,6 +368,7 @@ export interface FileRouteTypes {
     | '/_authenticated/relatorios/$id'
     | '/_authenticated/alunos/'
     | '/_authenticated/avaliacoes/'
+    | '/_authenticated/relatorios/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -442,13 +443,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_authenticated/relatorios': {
-      id: '/_authenticated/relatorios'
-      path: '/relatorios'
-      fullPath: '/relatorios'
-      preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -519,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/relatorios/': {
+      id: '/_authenticated/relatorios/'
+      path: '/relatorios'
+      fullPath: '/relatorios/'
+      preLoaderRoute: typeof AuthenticatedRelatoriosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/avaliacoes/': {
       id: '/_authenticated/avaliacoes/'
       path: '/avaliacoes'
@@ -535,10 +536,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/relatorios/$id': {
       id: '/_authenticated/relatorios/$id'
-      path: '/$id'
+      path: '/relatorios/$id'
       fullPath: '/relatorios/$id'
       preLoaderRoute: typeof AuthenticatedRelatoriosIdRouteImport
-      parentRoute: typeof AuthenticatedRelatoriosRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/avaliacoes/nova': {
       id: '/_authenticated/avaliacoes/nova'
@@ -585,20 +586,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedRelatoriosRouteChildren {
-  AuthenticatedRelatoriosIdRoute: typeof AuthenticatedRelatoriosIdRoute
-}
-
-const AuthenticatedRelatoriosRouteChildren: AuthenticatedRelatoriosRouteChildren =
-  {
-    AuthenticatedRelatoriosIdRoute: AuthenticatedRelatoriosIdRoute,
-  }
-
-const AuthenticatedRelatoriosRouteWithChildren =
-  AuthenticatedRelatoriosRoute._addFileChildren(
-    AuthenticatedRelatoriosRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAvaliacaoDinamicaRoute: typeof AuthenticatedAvaliacaoDinamicaRoute
@@ -608,13 +595,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRouteWithChildren
   AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
   AuthenticatedAlunosNovoRoute: typeof AuthenticatedAlunosNovoRoute
   AuthenticatedAvaliacoesIdRoute: typeof AuthenticatedAvaliacoesIdRoute
   AuthenticatedAvaliacoesNovaRoute: typeof AuthenticatedAvaliacoesNovaRoute
+  AuthenticatedRelatoriosIdRoute: typeof AuthenticatedRelatoriosIdRoute
   AuthenticatedAlunosIndexRoute: typeof AuthenticatedAlunosIndexRoute
   AuthenticatedAvaliacoesIndexRoute: typeof AuthenticatedAvaliacoesIndexRoute
+  AuthenticatedRelatoriosIndexRoute: typeof AuthenticatedRelatoriosIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -626,13 +614,14 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRouteWithChildren,
   AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,
   AuthenticatedAlunosNovoRoute: AuthenticatedAlunosNovoRoute,
   AuthenticatedAvaliacoesIdRoute: AuthenticatedAvaliacoesIdRoute,
   AuthenticatedAvaliacoesNovaRoute: AuthenticatedAvaliacoesNovaRoute,
+  AuthenticatedRelatoriosIdRoute: AuthenticatedRelatoriosIdRoute,
   AuthenticatedAlunosIndexRoute: AuthenticatedAlunosIndexRoute,
   AuthenticatedAvaliacoesIndexRoute: AuthenticatedAvaliacoesIndexRoute,
+  AuthenticatedRelatoriosIndexRoute: AuthenticatedRelatoriosIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

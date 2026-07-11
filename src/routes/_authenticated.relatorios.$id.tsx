@@ -58,7 +58,7 @@ function RelatorioDetailPage() {
     setAttemptedFinalize(false);
   }, [report]);
 
-  const isFinalized = report?.status === "finalized";
+  const isFinalized = report?.status === "completed";
   const liveErrors = useMemo(
     () => validateReportForFinalization(title, content),
     [title, content],

@@ -31,15 +31,17 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/")({
 
 const statusLabel: Record<string, string> = {
   draft: "Rascunho",
-  in_review: "Em revisão",
-  finalized: "Finalizada",
+  review: "Em revisão",
+  processing: "Processando",
+  archived: "Arquivada",
+  completed: "Finalizada",
 };
 
 const typeLabel: Record<string, string> = {
-  postural: "Postural",
+  postural_static: "Postural",
   dynamic: "Dinâmica",
-  exercise: "Por exercício",
-  complete: "Completa",
+  pilates_exercise: "Por exercício",
+  follow_up: "Completa",
 };
 
 function AvaliacoesListPage() {
@@ -129,8 +131,8 @@ function AvaliacoesListPage() {
             <SelectContent>
               <SelectItem value="all">Todos os status</SelectItem>
               <SelectItem value="draft">Rascunho</SelectItem>
-              <SelectItem value="in_review">Em revisão</SelectItem>
-              <SelectItem value="finalized">Finalizada</SelectItem>
+              <SelectItem value="review">Em revisão</SelectItem>
+              <SelectItem value="completed">Finalizada</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -177,7 +179,7 @@ function AvaliacoesListPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge
-                        variant={a.status === "finalized" ? "default" : "secondary"}
+                        variant={a.status === "completed" ? "default" : "secondary"}
                         className="text-[11px]"
                       >
                         {statusLabel[a.status] ?? a.status}

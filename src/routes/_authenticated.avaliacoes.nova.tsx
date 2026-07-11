@@ -29,10 +29,10 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
 });
 
 const typeOptions: { value: AssessmentType; label: string; hint: string }[] = [
-  { value: "postural", label: "Postural", hint: "Análise estática por vistas" },
+  { value: "postural_static", label: "Postural", hint: "Análise estática por vistas" },
   { value: "dynamic", label: "Dinâmica", hint: "Movimento e compensações" },
-  { value: "exercise", label: "Por exercício", hint: "Execução em aparelhos" },
-  { value: "complete", label: "Completa", hint: "Postural + dinâmica + exercícios" },
+  { value: "pilates_exercise", label: "Por exercício", hint: "Execução em aparelhos" },
+  { value: "follow_up", label: "Completa", hint: "Postural + dinâmica + exercícios" },
 ];
 
 function NovaAvaliacaoPage() {
@@ -43,7 +43,7 @@ function NovaAvaliacaoPage() {
   const { patients, loading: patientsLoading } = usePatients(clinicId);
 
   const [patientId, setPatientId] = useState(search.patientId ?? "");
-  const [type, setType] = useState<AssessmentType>("postural");
+  const [type, setType] = useState<AssessmentType>("postural_static");
   const [title, setTitle] = useState("");
   const [objective, setObjective] = useState("");
   const [mainComplaint, setMainComplaint] = useState("");

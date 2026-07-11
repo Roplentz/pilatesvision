@@ -172,7 +172,7 @@ export async function finalizeReport(
     .update({
       title,
       content: content as unknown as Json,
-      status: "finalized",
+      status: "completed",
       finalized_at: now,
       updated_at: now,
     })

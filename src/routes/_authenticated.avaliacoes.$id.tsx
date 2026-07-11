@@ -73,14 +73,16 @@ export const Route = createFileRoute("/_authenticated/avaliacoes/$id")({
 
 const statusLabel: Record<string, string> = {
   draft: "Rascunho",
-  in_review: "Em revisão",
-  finalized: "Finalizada",
+  review: "Em revisão",
+  processing: "Processando",
+  archived: "Arquivada",
+  completed: "Finalizada",
 };
 const typeLabel: Record<string, string> = {
-  postural: "Postural",
+  postural_static: "Postural",
   dynamic: "Dinâmica",
-  exercise: "Por exercício",
-  complete: "Completa",
+  pilates_exercise: "Por exercício",
+  follow_up: "Completa",
 };
 const viewLabel: Record<string, string> = {
   anterior: "Vista anterior",
@@ -176,12 +178,12 @@ function AvaliacaoDetailPage() {
 
   const status = assessment.status as AssessmentStatus;
   const type = assessment.type as AssessmentType;
-  const isDraft = status === "draft" || status === "in_review";
-  const canFinalize = status !== "finalized";
+  const isDraft = status === "draft" || status === "review";
+  const canFinalize = status !== "completed";
 
-  const showPostural = type === "postural" || type === "complete";
-  const showMovement = type === "dynamic" || type === "complete";
-  const showExercise = type === "exercise" || type === "complete";
+  const showPostural = type === "postural_static" || type === "follow_up";
+  const showMovement = type === "dynamic" || type === "follow_up";
+  const showExercise = type === "pilates_exercise" || type === "follow_up";
 
   const saveHeader = async () => {
     setSaving(true);
@@ -249,7 +251,7 @@ function AvaliacaoDetailPage() {
           </Link>
           <div className="flex items-center gap-2">
             <Badge
-              variant={status === "finalized" ? "default" : "secondary"}
+              variant={status === "completed" ? "default" : "secondary"}
               className="text-[11px]"
             >
               {statusLabel[status] ?? status}
@@ -402,12 +404,12 @@ function AvaliacaoDetailPage() {
         {/* Ações */}
         <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/40 p-5">
           <div className="text-xs text-muted-foreground">
-            {status === "finalized"
+            {status === "completed"
               ? "Avaliação finalizada — o registro é somente leitura."
               : "Enquanto rascunho, os campos e achados podem ser editados/adicionados."}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {status === "finalized" && (
+            {status === "completed" && (
               <Link to="/relatorios">
                 <Button variant="ghost" size="sm">
                   <FileText className="h-4 w-4" /> Gerar relatório

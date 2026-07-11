@@ -415,14 +415,16 @@ function AlunoDetailPage() {
 
 const asmtStatusLabel: Record<string, string> = {
   draft: "Rascunho",
-  in_review: "Em revisão",
-  finalized: "Finalizada",
+  review: "Em revisão",
+  processing: "Processando",
+  archived: "Arquivada",
+  completed: "Finalizada",
 };
 const asmtTypeLabel: Record<string, string> = {
-  postural: "Postural",
+  postural_static: "Postural",
   dynamic: "Dinâmica",
-  exercise: "Por exercício",
-  complete: "Completa",
+  pilates_exercise: "Por exercício",
+  follow_up: "Completa",
 };
 
 function AssessmentsHistory({ patientId }: { patientId: string }) {
@@ -461,7 +463,7 @@ function AssessmentsHistory({ patientId }: { patientId: string }) {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge
-                      variant={a.status === "finalized" ? "default" : "secondary"}
+                      variant={a.status === "completed" ? "default" : "secondary"}
                       className="text-[10px]"
                     >
                       {asmtStatusLabel[a.status] ?? a.status}

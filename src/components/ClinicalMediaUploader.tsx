@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Film, ImageIcon, Loader2, ShieldAlert, UploadCloud, X } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
   acceptAttrFor,
@@ -132,12 +131,12 @@ export function ClinicalMediaUploader({
                   Registre o consentimento de uso de imagem antes de anexar mídia clínica.
                 </div>
                 {patientHref && (
-                  <Link
-                    to={patientHref}
+                  <a
+                    href={patientHref}
                     className="inline-flex items-center gap-1 font-medium underline underline-offset-2"
                   >
                     Registrar consentimento
-                  </Link>
+                  </a>
                 )}
               </div>
             </div>

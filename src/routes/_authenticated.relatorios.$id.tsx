@@ -1,31 +1,40 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, Printer, ShieldCheck } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  Lock,
+  Plus,
+  Printer,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  ASSESSMENT_TYPE_LABEL,
   REPORT_DISCLAIMER,
-  REPORT_REQUIRED_FIELDS,
-  ReportValidationError,
+  SEVERITY_LABEL,
+  SUPPORT_LEVEL_LABEL,
   finalizeReport,
-  reportFieldLabel,
+  normalizeReportJson,
   updateReport,
   useReport,
-  validateReportForFinalization,
-  type ReportContent,
-  type ReportFieldKey,
-  type ReportValidationErrors,
+  type DynamicFindingJson,
+  type ExerciseFindingJson,
+  type InitialPlanItemJson,
+  type PosturalFindingJson,
+  type ReportJson,
+  type Severity,
 } from "@/lib/reportsStore";
-import { useAssessmentResults } from "@/lib/assessmentsStore";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
-import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 
 export const Route = createFileRoute("/_authenticated/relatorios/$id")({
   head: () => ({ meta: [{ title: "Relatório | PilatesVision" }] }),
@@ -36,46 +45,30 @@ function RelatorioDetailPage() {
   const { id } = Route.useParams();
   const router = useRouter();
   const { report, loading, error, reload } = useReport(id);
-  const { postural, movement, exercise } = useAssessmentResults(report?.assessment_id ?? null);
-  const posturalMedia = postural.filter((p) => Boolean(p.image_url));
-  const movementMedia = movement.filter((m) => Boolean(m.video_url));
-  const exerciseMedia = exercise.filter((e) => Boolean(e.video_url));
-  const hasMedia =
-    posturalMedia.length > 0 || movementMedia.length > 0 || exerciseMedia.length > 0;
 
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState<ReportContent>({});
+  const [json, setJson] = useState<ReportJson>(() => normalizeReportJson(null));
   const [saving, setSaving] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
-  const [attemptedFinalize, setAttemptedFinalize] = useState(false);
-  const [errors, setErrors] = useState<ReportValidationErrors>({});
 
   useEffect(() => {
     if (!report) return;
     setTitle(report.title ?? "");
-    setContent((report.content as ReportContent | null) ?? {});
-    setErrors({});
-    setAttemptedFinalize(false);
+    setJson(normalizeReportJson(report.content));
   }, [report]);
 
-  const isFinalized = report?.status === "completed";
-  const liveErrors = useMemo(
-    () => validateReportForFinalization(title, content),
-    [title, content],
-  );
-  const displayErrors: ReportValidationErrors = attemptedFinalize ? liveErrors : errors;
-  const missingCount = Object.keys(liveErrors).length;
-  const canFinalize = missingCount === 0 && !isFinalized;
+  const isFinalized = report?.status === "finalized";
+  const editable = !isFinalized;
 
-  function setField<K extends keyof ReportContent>(key: K, value: ReportContent[K]) {
-    setContent((c) => ({ ...c, [key]: value }));
+  function patch(patchFn: (j: ReportJson) => ReportJson) {
+    setJson((j) => patchFn(j));
   }
 
   async function handleSaveDraft() {
     if (!report) return;
     setSaving(true);
     try {
-      await updateReport(report.id, { title, content });
+      await updateReport(report.id, { title, content: json });
       toast.success("Rascunho salvo.");
       reload();
     } catch (e) {
@@ -87,27 +80,13 @@ function RelatorioDetailPage() {
 
   async function handleFinalize() {
     if (!report) return;
-    setAttemptedFinalize(true);
-    const v = validateReportForFinalization(title, content);
-    setErrors(v);
-    if (Object.keys(v).length > 0) {
-      toast.error("Preencha todos os campos obrigatórios antes de finalizar.");
-      const first = document.querySelector<HTMLElement>("[data-report-error='true']");
-      first?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
     setFinalizing(true);
     try {
-      await finalizeReport(report.id, title, content);
+      await finalizeReport(report.id, title, json);
       toast.success("Relatório finalizado.");
       reload();
     } catch (e) {
-      if (e instanceof ReportValidationError) {
-        setErrors(e.errors);
-        toast.error("Existem campos obrigatórios pendentes.");
-      } else {
-        toast.error(e instanceof Error ? e.message : "Falha ao finalizar.");
-      }
+      toast.error(e instanceof Error ? e.message : "Falha ao finalizar.");
     } finally {
       setFinalizing(false);
     }
@@ -135,394 +114,943 @@ function RelatorioDetailPage() {
     );
   }
 
+  const clinicName = json.clinic.name || "Clínica";
+  const assessmentType =
+    ASSESSMENT_TYPE_LABEL[json.assessment.type] ?? json.assessment.type ?? "Avaliação";
+
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-6 py-8 print:max-w-none print:px-0 print:py-0">
-      <header className="flex items-start justify-between gap-4 print:hidden">
-        <div>
-          <Link to="/relatorios" className="text-xs text-muted-foreground hover:text-foreground">
-            ← Relatórios
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Barra fixa de ações — some no print */}
+      <div className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur print:hidden">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-6 py-3">
+          <Link
+            to="/relatorios"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Relatórios
           </Link>
-          <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight">Relatório clínico</h1>
-          <p className="text-sm text-muted-foreground">
-            Paciente: {report.patient?.name ?? "—"} · Versão {report.version}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {isFinalized ? (
-            <Badge className="gap-1 bg-emerald-500/15 text-emerald-500">
-              <CheckCircle2 className="h-3 w-3" /> Finalizado
-            </Badge>
-          ) : (
-            <Badge variant="outline">Rascunho</Badge>
-          )}
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer className="h-4 w-4" /> Imprimir / PDF
-          </Button>
-        </div>
-      </header>
-
-      {!isFinalized && attemptedFinalize && missingCount > 0 && (
-        <Alert variant="destructive" data-report-error="true">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>
-            {missingCount} campo{missingCount === 1 ? "" : "s"} obrigatório
-            {missingCount === 1 ? "" : "s"} pendente{missingCount === 1 ? "" : "s"}
-          </AlertTitle>
-          <AlertDescription>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
-              {REPORT_REQUIRED_FIELDS.filter((k) => liveErrors[k]).map((k) => (
-                <li key={k}>
-                  <span className="font-medium">{reportFieldLabel(k)}:</span> {liveErrors[k]}
-                </li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Identificação</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <FieldLabel required htmlFor="title" error={displayErrors.title}>
-            Título do relatório
-          </FieldLabel>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            disabled={isFinalized}
-            aria-invalid={Boolean(displayErrors.title)}
-            className={displayErrors.title ? "border-destructive focus-visible:ring-destructive" : ""}
-            data-report-error={displayErrors.title ? "true" : undefined}
-          />
-          <FieldError message={displayErrors.title} />
-        </CardContent>
-      </Card>
-
-      <TextareaSection
-        id="summary"
-        label="Resumo clínico"
-        placeholder="Síntese objetiva do quadro atual e contexto da avaliação."
-        value={content.summary ?? ""}
-        onChange={(v) => setField("summary", v)}
-        disabled={isFinalized}
-        error={displayErrors.summary}
-        rows={4}
-      />
-      <TextareaSection
-        id="postural_findings"
-        label="Achados posturais"
-        placeholder="Descreva assimetrias, alinhamentos e desvios observados por vista."
-        value={content.postural_findings ?? ""}
-        onChange={(v) => setField("postural_findings", v)}
-        disabled={isFinalized}
-        error={displayErrors.postural_findings}
-        rows={4}
-      />
-      <TextareaSection
-        id="dynamic_findings"
-        label="Achados dinâmicos"
-        placeholder="Compensações, controle motor, amplitudes observadas em movimento."
-        value={content.dynamic_findings ?? ""}
-        onChange={(v) => setField("dynamic_findings", v)}
-        disabled={isFinalized}
-        error={displayErrors.dynamic_findings}
-        rows={4}
-      />
-      <TextareaSection
-        id="exercise_findings"
-        label="Achados por exercício"
-        placeholder="Comportamento durante exercícios específicos avaliados."
-        value={content.exercise_findings ?? ""}
-        onChange={(v) => setField("exercise_findings", v)}
-        disabled={isFinalized}
-        error={displayErrors.exercise_findings}
-        rows={4}
-      />
-      <TextareaSection
-        id="recommendations"
-        label="Recomendações clínicas"
-        placeholder="Sugestões de conduta, cuidados, contraindicações relativas."
-        value={content.recommendations ?? ""}
-        onChange={(v) => setField("recommendations", v)}
-        disabled={isFinalized}
-        error={displayErrors.recommendations}
-        rows={4}
-      />
-      <TextareaSection
-        id="plan"
-        label="Plano de acompanhamento"
-        placeholder="Frequência sugerida, reavaliações, marcos esperados."
-        value={content.plan ?? ""}
-        onChange={(v) => setField("plan", v)}
-        disabled={isFinalized}
-        error={displayErrors.plan}
-        rows={4}
-      />
-      <TextareaSection
-        id="professional_notes"
-        label="Notas do profissional responsável"
-        placeholder="Considerações clínicas adicionais do fisioterapeuta."
-        value={content.professional_notes ?? ""}
-        onChange={(v) => setField("professional_notes", v)}
-        disabled={isFinalized}
-        error={displayErrors.professional_notes}
-        rows={3}
-      />
-
-      {hasMedia && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Mídia clínica anexada</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {posturalMedia.length > 0 && (
-              <div className="space-y-3">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Imagens posturais
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {posturalMedia.map((p) => (
-                    <div key={p.id} className="space-y-1">
-                      <div className="text-xs text-muted-foreground">{p.view ?? "—"}</div>
-                      <SignedClinicalMedia path={p.image_url} kind="image" alt={p.view ?? "vista"} />
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <div className="flex items-center gap-2">
+            {isFinalized ? (
+              <Badge className="gap-1 bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/15">
+                <Lock className="h-3 w-3" /> Finalizado
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="gap-1">
+                Rascunho editável
+              </Badge>
             )}
-            {movementMedia.length > 0 && (
-              <div className="space-y-3">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Vídeos de movimento
-                </div>
-                <div className="grid gap-4">
-                  {movementMedia.map((m) => (
-                    <div key={m.id} className="space-y-1">
-                      <div className="text-xs text-muted-foreground">
-                        {m.movement_name ?? "Movimento"}
-                      </div>
-                      <SignedClinicalMedia path={m.video_url} kind="video" />
-                      {isAutoMetricsSummary(m.metrics) && (
-                        <AutoMetricsReadOnly summary={m.metrics as unknown as AutoMetricsSummary} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <Button variant="ghost" size="sm" onClick={() => window.print()}>
+              <Printer className="h-4 w-4" /> Imprimir
+            </Button>
+            {editable && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSaveDraft}
+                  disabled={saving || finalizing}
+                >
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
+                </Button>
+                <Button
+                  variant="hero"
+                  size="sm"
+                  onClick={handleFinalize}
+                  disabled={saving || finalizing}
+                >
+                  {finalizing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
+                  Finalizar
+                </Button>
+              </>
             )}
-            {exerciseMedia.length > 0 && (
-              <div className="space-y-3">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Vídeos de exercícios
-                </div>
-                <div className="grid gap-4">
-                  {exerciseMedia.map((e) => (
-                    <div key={e.id} className="space-y-1">
-                      <div className="text-xs text-muted-foreground">
-                        {e.exercise_name}
-                        {e.apparatus ? ` — ${e.apparatus}` : ""}
-                      </div>
-                      <SignedClinicalMedia path={e.video_url} kind="video" />
-                      {isAutoMetricsSummary(e.metrics) && (
-                        <AutoMetricsReadOnly
-                          summary={e.metrics as unknown as AutoMetricsSummary}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      <Card
-        className={
-          displayErrors.disclaimer_acknowledged
-            ? "border-destructive"
-            : "border-primary/30 bg-primary/5"
-        }
-        data-report-error={displayErrors.disclaimer_acknowledged ? "true" : undefined}
-      >
-        <CardHeader className="flex flex-row items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-primary" />
-          <CardTitle className="text-base">Disclaimer clínico</CardTitle>
-          <span className="text-destructive" aria-hidden="true">
-            *
-          </span>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">{REPORT_DISCLAIMER}</p>
-          <label className="flex items-start gap-3 text-sm">
-            <Checkbox
-              checked={Boolean(content.disclaimer_acknowledged)}
-              disabled={isFinalized}
-              onCheckedChange={(v) => setField("disclaimer_acknowledged", v === true)}
-              aria-invalid={Boolean(displayErrors.disclaimer_acknowledged)}
-            />
-            <span>
-              Confirmo, como profissional responsável, que revisei os achados e assumo a
-              responsabilidade clínica deste relatório.
-            </span>
-          </label>
-          <FieldError message={displayErrors.disclaimer_acknowledged} />
-        </CardContent>
-      </Card>
-
-      <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-background/95 p-3 shadow-lg backdrop-blur print:hidden">
-        <div className="text-xs text-muted-foreground">
-          {isFinalized ? (
-            <span className="flex items-center gap-1 text-emerald-500">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Relatório finalizado — edição bloqueada.
-            </span>
-          ) : missingCount === 0 ? (
-            <span className="flex items-center gap-1 text-emerald-500">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Pronto para finalizar.
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-destructive">
-              <AlertCircle className="h-3.5 w-3.5" /> {missingCount} campo
-              {missingCount === 1 ? "" : "s"} obrigatório{missingCount === 1 ? "" : "s"} pendente
-              {missingCount === 1 ? "" : "s"}.
-            </span>
-          )}
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleSaveDraft}
-            disabled={saving || finalizing || isFinalized}
-          >
-            {saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar rascunho
-          </Button>
-          <Button
-            variant="hero"
-            onClick={handleFinalize}
-            disabled={finalizing || isFinalized || !canFinalize}
-            aria-disabled={!canFinalize}
-            title={
-              !canFinalize && !isFinalized
-                ? "Preencha todos os campos obrigatórios para finalizar."
-                : undefined
-            }
-          >
-            {finalizing && <Loader2 className="h-4 w-4 animate-spin" />} Finalizar relatório
-          </Button>
+          </div>
         </div>
       </div>
+
+      {/* Página premium */}
+      <article className="mx-auto max-w-4xl px-6 py-10 print:max-w-none print:px-10 print:py-8">
+        {/* 1 · Cabeçalho / Identidade */}
+        <header className="flex flex-col gap-6 border-b border-border/70 pb-8 md:flex-row md:items-end md:justify-between">
+          <div className="flex items-center gap-4">
+            {json.clinic.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={json.clinic.logo_url}
+                alt={clinicName}
+                className="h-14 w-14 rounded-lg object-cover ring-1 ring-border"
+              />
+            ) : (
+              <div className="grid h-14 w-14 place-items-center rounded-lg bg-primary/10 text-primary">
+                <span className="font-display text-xl font-semibold">
+                  {clinicName.slice(0, 1)}
+                </span>
+              </div>
+            )}
+            <div>
+              <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                {clinicName}
+              </div>
+              <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight md:text-4xl">
+                {isFinalized ? title || "Relatório clínico" : "Relatório clínico — rascunho"}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {assessmentType} · {formatDate(json.assessment.date)}
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-1 text-right text-xs text-muted-foreground md:min-w-[220px]">
+            <ClinicHeaderField
+              label="Profissional"
+              value={json.clinic.professional}
+              editable={editable}
+              onChange={(v) =>
+                patch((j) => ({ ...j, clinic: { ...j.clinic, professional: v } }))
+              }
+            />
+            <ClinicHeaderField
+              label="Registro (CREFITO/CREF)"
+              value={json.clinic.professional_license}
+              editable={editable}
+              onChange={(v) =>
+                patch((j) => ({ ...j, clinic: { ...j.clinic, professional_license: v } }))
+              }
+            />
+          </div>
+        </header>
+
+        {!editable && (
+          <div className="mt-8 print:hidden">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled
+              className="max-w-xl"
+            />
+          </div>
+        )}
+        {editable && (
+          <div className="mt-8">
+            <Label htmlFor="report-title" className="text-xs uppercase tracking-wider text-muted-foreground">
+              Título do relatório
+            </Label>
+            <Input
+              id="report-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="mt-1 max-w-xl"
+            />
+          </div>
+        )}
+
+        {/* 2 · Dados do paciente */}
+        <Section number="02" title="Dados do paciente">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FieldInline
+              label="Nome"
+              value={json.patient.full_name}
+              editable={editable}
+              onChange={(v) => patch((j) => ({ ...j, patient: { ...j.patient, full_name: v } }))}
+            />
+            <FieldInline
+              label="Idade"
+              value={String(json.patient.age || "")}
+              editable={editable}
+              onChange={(v) =>
+                patch((j) => ({ ...j, patient: { ...j.patient, age: Number(v) || 0 } }))
+              }
+              suffix="anos"
+            />
+            <FieldInline
+              label="Sexo"
+              value={json.patient.sex}
+              editable={editable}
+              onChange={(v) => patch((j) => ({ ...j, patient: { ...j.patient, sex: v } }))}
+            />
+            <FieldInline
+              label="Ocupação"
+              value={json.patient.occupation ?? ""}
+              editable={editable}
+              onChange={(v) => patch((j) => ({ ...j, patient: { ...j.patient, occupation: v } }))}
+            />
+            <div className="sm:col-span-2">
+              <FieldInline
+                label="Objetivo principal do paciente"
+                value={json.patient.main_goal}
+                editable={editable}
+                onChange={(v) =>
+                  patch((j) => ({ ...j, patient: { ...j.patient, main_goal: v } }))
+                }
+              />
+            </div>
+          </div>
+        </Section>
+
+        {/* 3 · Dados da avaliação */}
+        <Section number="03" title="Dados da avaliação">
+          <dl className="grid gap-4 text-sm sm:grid-cols-3">
+            <DefItem term="Data" desc={formatDate(json.assessment.date)} />
+            <DefItem term="Profissional" desc={json.clinic.professional || "—"} />
+            <DefItem term="Tipo" desc={assessmentType} />
+          </dl>
+        </Section>
+
+        {/* 4 · Objetivo da avaliação */}
+        <Section number="04" title="Objetivo da avaliação">
+          <EditableText
+            editable={editable}
+            value={json.objective}
+            rows={2}
+            placeholder="Ex.: Reduzir dor lombar em 8 semanas mantendo prática regular de Pilates."
+            onChange={(v) => patch((j) => ({ ...j, objective: v }))}
+          />
+        </Section>
+
+        {/* 5 · Resumo clínico */}
+        <Section number="05" title="Resumo clínico">
+          <EditableText
+            editable={editable}
+            value={json.clinical_summary}
+            rows={5}
+            placeholder="Síntese objetiva do quadro atual e contexto da avaliação."
+            onChange={(v) => patch((j) => ({ ...j, clinical_summary: v }))}
+          />
+        </Section>
+
+        {/* 6 · Achados posturais */}
+        {(json.postural_findings.length > 0 || editable) && (
+          <Section number="06" title="Achados posturais observáveis">
+            <PosturalFindingsEditor
+              items={json.postural_findings}
+              editable={editable}
+              onChange={(items) =>
+                patch((j) => ({ ...j, postural_findings: items }))
+              }
+            />
+            <SectionFootnote>
+              Achados observados em imagem estática; sujeitos a confirmação clínica presencial.
+            </SectionFootnote>
+          </Section>
+        )}
+
+        {/* 7 · Achados dinâmicos */}
+        {(json.dynamic_findings.length > 0 || editable) && (
+          <Section number="07" title="Achados dinâmicos">
+            <DynamicFindingsEditor
+              items={json.dynamic_findings}
+              editable={editable}
+              onChange={(items) => patch((j) => ({ ...j, dynamic_findings: items }))}
+            />
+            <SectionFootnote>Análise dependente de confirmação profissional.</SectionFootnote>
+          </Section>
+        )}
+
+        {/* 8 · Exercícios avaliados */}
+        {(json.exercise_findings.length > 0 || editable) && (
+          <Section number="08" title="Exercícios avaliados">
+            <ExerciseFindingsEditor
+              items={json.exercise_findings}
+              editable={editable}
+              onChange={(items) => patch((j) => ({ ...j, exercise_findings: items }))}
+            />
+          </Section>
+        )}
+
+        {/* 9 · Recomendações */}
+        {(json.recommendations.length > 0 || editable) && (
+          <Section number="09" title="Recomendações">
+            <StringListEditor
+              items={json.recommendations}
+              editable={editable}
+              placeholder="Priorizar mobilidade de quadril antes de progredir carga."
+              onChange={(items) => patch((j) => ({ ...j, recommendations: items }))}
+            />
+          </Section>
+        )}
+
+        {/* 10 · Plano inicial sugerido */}
+        {(json.initial_plan.length > 0 || editable) && (
+          <Section number="10" title="Plano inicial sugerido">
+            <InitialPlanEditor
+              items={json.initial_plan}
+              editable={editable}
+              onChange={(items) => patch((j) => ({ ...j, initial_plan: items }))}
+            />
+            <SectionFootnote>
+              Plano inicial sugerido, a ajustar conforme resposta, dor e evolução.
+            </SectionFootnote>
+          </Section>
+        )}
+
+        {/* 11 · Observações do profissional (omitida se vazio e finalizado) */}
+        {(json.professional_notes.trim().length > 0 || editable) && (
+          <Section number="11" title="Observações do profissional">
+            <EditableText
+              editable={editable}
+              value={json.professional_notes}
+              rows={4}
+              placeholder="Considerações clínicas adicionais do profissional responsável."
+              onChange={(v) => patch((j) => ({ ...j, professional_notes: v }))}
+            />
+          </Section>
+        )}
+
+        {/* 12 · Disclaimer clínico (sempre) */}
+        <section className="mt-12 rounded-xl border border-primary/25 bg-primary/[0.04] p-6">
+          <div className="flex items-center gap-2 text-primary">
+            <ShieldCheck className="h-4 w-4" />
+            <span className="text-xs font-semibold uppercase tracking-[0.18em]">
+              12 · Disclaimer clínico
+            </span>
+          </div>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {REPORT_DISCLAIMER}
+          </p>
+        </section>
+
+        {/* Rodapé de página */}
+        <footer className="mt-10 border-t border-border/60 pt-6 text-center text-xs text-muted-foreground">
+          {clinicName} · Relatório de apoio à decisão profissional
+        </footer>
+      </article>
     </div>
   );
 }
 
-function FieldLabel({
-  htmlFor,
-  required,
+/* -------------------------------------------------------------------------
+ *  Section wrappers
+ * -----------------------------------------------------------------------*/
+
+function Section({
+  number,
+  title,
   children,
-  error,
 }: {
-  htmlFor: string;
-  required?: boolean;
+  number: string;
+  title: string;
   children: React.ReactNode;
-  error?: string;
 }) {
   return (
-    <Label htmlFor={htmlFor} className={error ? "text-destructive" : undefined}>
-      {children}
-      {required && (
-        <span className="ml-1 text-destructive" aria-hidden="true">
-          *
+    <section className="mt-12 break-inside-avoid">
+      <div className="mb-4 flex items-baseline gap-3">
+        <span className="font-display text-xs font-medium uppercase tracking-[0.24em] text-primary">
+          {number}
         </span>
-      )}
-    </Label>
+        <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
+      </div>
+      {children}
+    </section>
   );
 }
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
+function SectionFootnote({ children }: { children: React.ReactNode }) {
   return (
-    <p role="alert" className="mt-1 flex items-center gap-1 text-xs text-destructive">
-      <AlertCircle className="h-3 w-3" /> {message}
-    </p>
+    <p className="mt-3 text-xs italic text-muted-foreground">{children}</p>
   );
 }
 
-function TextareaSection({
-  id,
+function DefItem({ term, desc }: { term: string; desc: string }) {
+  return (
+    <div>
+      <dt className="text-xs uppercase tracking-wide text-muted-foreground">{term}</dt>
+      <dd className="mt-0.5 text-sm">{desc || "—"}</dd>
+    </div>
+  );
+}
+
+function FieldInline({
   label,
-  placeholder,
   value,
+  editable,
   onChange,
-  disabled,
-  error,
-  rows,
+  suffix,
 }: {
-  id: ReportFieldKey;
   label: string;
-  placeholder: string;
   value: string;
+  editable: boolean;
   onChange: (v: string) => void;
-  disabled: boolean;
-  error?: string;
-  rows: number;
+  suffix?: string;
 }) {
   return (
-    <Card
-      className={error ? "border-destructive" : undefined}
-      data-report-error={error ? "true" : undefined}
-    >
-      <CardHeader>
-        <CardTitle className="flex items-center gap-1 text-base">
-          {label}
-          <span className="text-destructive" aria-hidden="true">
-            *
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <Textarea
-          id={id}
+    <div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      {editable ? (
+        <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          disabled={disabled}
-          rows={rows}
-          aria-invalid={Boolean(error)}
-          className={error ? "border-destructive focus-visible:ring-destructive" : ""}
+          className="mt-1"
         />
-        <FieldError message={error} />
-      </CardContent>
-    </Card>
-  );
-}
-
-function AutoMetricsReadOnly({ summary }: { summary: AutoMetricsSummary }) {
-  return (
-    <div className="rounded-md border border-border/50 bg-card/40 p-3 text-xs">
-      <div className="mb-2 flex items-center gap-2">
-        <span className="font-medium">Estimativa automática (MediaPipe)</span>
-        <span className="rounded border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-          apoio à decisão · requer confirmação clínica · não é diagnóstico
-        </span>
-      </div>
-      <div className="grid gap-1.5 sm:grid-cols-2">
-        <div>Flexão joelho D: {summary.knee_flexion.right.min_deg}°–{summary.knee_flexion.right.max_deg}° (amp. {summary.knee_flexion.right.range_deg}°)</div>
-        <div>Flexão joelho E: {summary.knee_flexion.left.min_deg}°–{summary.knee_flexion.left.max_deg}° (amp. {summary.knee_flexion.left.range_deg}°)</div>
-        <div>Desvio frontal D/E: {summary.knee_frontal_deviation.right_max_abs} / {summary.knee_frontal_deviation.left_max_abs}</div>
-        <div>Inclinação tronco (méd/máx): {summary.trunk_inclination.mean_deg}° / {summary.trunk_inclination.max_deg}°</div>
-        <div>Amplitude vertical quadril: {summary.hip_vertical_amplitude.normalized}</div>
-        <div>Simetria D/E: {summary.symmetry_index}/100</div>
-      </div>
-      {summary.suggestions.length > 0 && (
-        <ul className="mt-2 list-disc pl-4 text-muted-foreground">
-          {summary.suggestions.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ul>
+      ) : (
+        <div className="mt-1 text-sm">
+          {value || "—"}
+          {value && suffix ? <span className="ml-1 text-muted-foreground">{suffix}</span> : null}
+        </div>
       )}
     </div>
   );
+}
+
+function ClinicHeaderField({
+  label,
+  value,
+  editable,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  editable: boolean;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-col items-end gap-1">
+      <span className="text-[10px] uppercase tracking-widest">{label}</span>
+      {editable ? (
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 max-w-[220px] text-right text-sm"
+          placeholder="—"
+        />
+      ) : (
+        <span className="text-sm text-foreground">{value || "—"}</span>
+      )}
+    </div>
+  );
+}
+
+function EditableText({
+  editable,
+  value,
+  onChange,
+  rows,
+  placeholder,
+}: {
+  editable: boolean;
+  value: string;
+  onChange: (v: string) => void;
+  rows: number;
+  placeholder?: string;
+}) {
+  if (!editable) {
+    return (
+      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+        {value || "—"}
+      </p>
+    );
+  }
+  return (
+    <Textarea
+      value={value}
+      rows={rows}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
+/* -------------------------------------------------------------------------
+ *  Postural findings editor
+ * -----------------------------------------------------------------------*/
+
+function PosturalFindingsEditor({
+  items,
+  editable,
+  onChange,
+}: {
+  items: PosturalFindingJson[];
+  editable: boolean;
+  onChange: (items: PosturalFindingJson[]) => void;
+}) {
+  function update(idx: number, patch: Partial<PosturalFindingJson>) {
+    onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function remove(idx: number) {
+    onChange(items.filter((_, i) => i !== idx));
+  }
+  function add() {
+    onChange([
+      ...items,
+      { body_region: "", description: "", severity: "moderate" as Severity },
+    ]);
+  }
+  if (items.length === 0 && !editable) return <EmptyLine />;
+  return (
+    <div className="space-y-3">
+      {items.map((item, idx) => (
+        <div
+          key={idx}
+          className="rounded-lg border border-border/60 bg-card/30 p-4"
+        >
+          <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+            <FieldInline
+              label="Região corporal"
+              value={item.body_region}
+              editable={editable}
+              onChange={(v) => update(idx, { body_region: v })}
+            />
+            <div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Severidade
+              </div>
+              {editable ? (
+                <select
+                  value={item.severity}
+                  onChange={(e) =>
+                    update(idx, { severity: e.target.value as Severity })
+                  }
+                  className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="low">Leve</option>
+                  <option value="moderate">Moderada</option>
+                  <option value="high">Importante</option>
+                </select>
+              ) : (
+                <SeverityBadge severity={item.severity} />
+              )}
+            </div>
+            {editable && (
+              <div className="flex items-end">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => remove(idx)}
+                  aria-label="Remover achado"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+          <div className="mt-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Descrição observável
+            </div>
+            {editable ? (
+              <Textarea
+                value={item.description}
+                rows={2}
+                onChange={(e) => update(idx, { description: e.target.value })}
+                placeholder="Ex.: leve báscula pélvica anterior à direita, sugere ajuste na estabilização lombopélvica."
+              />
+            ) : (
+              <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/90">
+                {item.description || "—"}
+              </p>
+            )}
+          </div>
+          {item.image_url && (
+            <div className="mt-3 max-w-xs">
+              <SignedClinicalMedia path={item.image_url} kind="image" alt={item.body_region} />
+            </div>
+          )}
+        </div>
+      ))}
+      {editable && (
+        <Button variant="outline" size="sm" onClick={add}>
+          <Plus className="h-4 w-4" /> Adicionar achado postural
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function SeverityBadge({ severity }: { severity: Severity }) {
+  const color =
+    severity === "high"
+      ? "bg-red-500/10 text-red-600"
+      : severity === "moderate"
+        ? "bg-amber-500/10 text-amber-600"
+        : "bg-emerald-500/10 text-emerald-600";
+  return (
+    <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${color}`}>
+      {SEVERITY_LABEL[severity]}
+    </span>
+  );
+}
+
+/* -------------------------------------------------------------------------
+ *  Dynamic findings editor
+ * -----------------------------------------------------------------------*/
+
+function DynamicFindingsEditor({
+  items,
+  editable,
+  onChange,
+}: {
+  items: DynamicFindingJson[];
+  editable: boolean;
+  onChange: (items: DynamicFindingJson[]) => void;
+}) {
+  function update(idx: number, patch: Partial<DynamicFindingJson>) {
+    onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function remove(idx: number) {
+    onChange(items.filter((_, i) => i !== idx));
+  }
+  function add() {
+    onChange([...items, { movement: "", compensations: [], quality_score: 0 }]);
+  }
+  if (items.length === 0 && !editable) return <EmptyLine />;
+  return (
+    <div className="space-y-4">
+      {items.map((item, idx) => (
+        <div key={idx} className="rounded-lg border border-border/60 bg-card/30 p-4">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <FieldInline
+              label="Movimento"
+              value={item.movement}
+              editable={editable}
+              onChange={(v) => update(idx, { movement: v })}
+            />
+            {editable && (
+              <div className="flex items-end">
+                <Button variant="ghost" size="icon" onClick={() => remove(idx)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+          <div className="mt-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Indicador de qualidade de movimento — apoio à decisão
+            </div>
+            <div className="mt-2 flex items-center gap-3">
+              <div className="h-2 flex-1 rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70"
+                  style={{ width: `${Math.max(0, Math.min(100, item.quality_score))}%` }}
+                />
+              </div>
+              {editable ? (
+                <Input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={item.quality_score}
+                  onChange={(e) =>
+                    update(idx, { quality_score: Number(e.target.value) || 0 })
+                  }
+                  className="w-20"
+                />
+              ) : (
+                <span className="w-12 text-right text-sm tabular-nums">
+                  {item.quality_score}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="mt-3">
+            <StringListEditor
+              label="Compensações observadas"
+              items={item.compensations}
+              editable={editable}
+              placeholder="Ex.: valgo de joelho na fase excêntrica"
+              onChange={(v) => update(idx, { compensations: v })}
+            />
+          </div>
+          <div className="mt-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Notas
+            </div>
+            {editable ? (
+              <Textarea
+                value={item.notes ?? ""}
+                rows={2}
+                onChange={(e) => update(idx, { notes: e.target.value })}
+              />
+            ) : (
+              <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/90">
+                {item.notes || "—"}
+              </p>
+            )}
+          </div>
+        </div>
+      ))}
+      {editable && (
+        <Button variant="outline" size="sm" onClick={add}>
+          <Plus className="h-4 w-4" /> Adicionar movimento
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------
+ *  Exercise findings editor
+ * -----------------------------------------------------------------------*/
+
+function ExerciseFindingsEditor({
+  items,
+  editable,
+  onChange,
+}: {
+  items: ExerciseFindingJson[];
+  editable: boolean;
+  onChange: (items: ExerciseFindingJson[]) => void;
+}) {
+  function update(idx: number, patch: Partial<ExerciseFindingJson>) {
+    onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function remove(idx: number) {
+    onChange(items.filter((_, i) => i !== idx));
+  }
+  function add() {
+    onChange([
+      ...items,
+      { exercise: "", support_level: 1, observations: [], suggested_cues: [] },
+    ]);
+  }
+  if (items.length === 0 && !editable) return <EmptyLine />;
+  return (
+    <div className="space-y-4">
+      {items.map((item, idx) => (
+        <div key={idx} className="rounded-lg border border-border/60 bg-card/30 p-4">
+          <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+            <FieldInline
+              label="Exercício"
+              value={item.exercise}
+              editable={editable}
+              onChange={(v) => update(idx, { exercise: v })}
+            />
+            {editable && (
+              <div className="flex items-end">
+                <Button variant="ghost" size="icon" onClick={() => remove(idx)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+          <div className="mt-3">
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">
+              Nível de suporte sugerido
+            </div>
+            {editable ? (
+              <select
+                value={item.support_level}
+                onChange={(e) =>
+                  update(idx, {
+                    support_level: Number(e.target.value) as 0 | 1 | 2 | 3,
+                  })
+                }
+                className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {[0, 1, 2, 3].map((n) => (
+                  <option key={n} value={n}>
+                    {n} · {SUPPORT_LEVEL_LABEL[n as 0 | 1 | 2 | 3]}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="mt-1 text-sm">
+                <span className="mr-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                  {item.support_level}
+                </span>
+                {SUPPORT_LEVEL_LABEL[item.support_level]}
+              </p>
+            )}
+          </div>
+          <div className="mt-3">
+            <StringListEditor
+              label="Observações de execução"
+              items={item.observations}
+              editable={editable}
+              placeholder="Ex.: perda de neutralidade lombar na descida"
+              onChange={(v) => update(idx, { observations: v })}
+            />
+          </div>
+          <div className="mt-3">
+            <StringListEditor
+              label="Cues sugeridos"
+              items={item.suggested_cues ?? []}
+              editable={editable}
+              placeholder="Ex.: 'ombros longe das orelhas'"
+              onChange={(v) => update(idx, { suggested_cues: v })}
+            />
+          </div>
+        </div>
+      ))}
+      {editable && (
+        <Button variant="outline" size="sm" onClick={add}>
+          <Plus className="h-4 w-4" /> Adicionar exercício
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------
+ *  Initial plan editor
+ * -----------------------------------------------------------------------*/
+
+function InitialPlanEditor({
+  items,
+  editable,
+  onChange,
+}: {
+  items: InitialPlanItemJson[];
+  editable: boolean;
+  onChange: (items: InitialPlanItemJson[]) => void;
+}) {
+  function update(idx: number, patch: Partial<InitialPlanItemJson>) {
+    onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function remove(idx: number) {
+    onChange(items.filter((_, i) => i !== idx));
+  }
+  function add() {
+    onChange([...items, { exercise: "", sets: 3, reps: 10, notes: "" }]);
+  }
+  if (items.length === 0 && !editable) return <EmptyLine />;
+  return (
+    <div className="space-y-3">
+      <div className="hidden gap-3 text-xs uppercase tracking-wide text-muted-foreground sm:grid sm:grid-cols-[1.6fr_0.5fr_0.5fr_1.6fr_auto]">
+        <span>Exercício</span>
+        <span>Séries</span>
+        <span>Reps</span>
+        <span>Notas</span>
+        <span />
+      </div>
+      {items.map((item, idx) => (
+        <div
+          key={idx}
+          className="grid gap-3 rounded-lg border border-border/60 bg-card/30 p-3 sm:grid-cols-[1.6fr_0.5fr_0.5fr_1.6fr_auto] sm:items-center sm:p-2"
+        >
+          {editable ? (
+            <Input
+              value={item.exercise}
+              onChange={(e) => update(idx, { exercise: e.target.value })}
+              placeholder="Exercício"
+            />
+          ) : (
+            <span className="text-sm font-medium">{item.exercise || "—"}</span>
+          )}
+          {editable ? (
+            <Input
+              type="number"
+              min={0}
+              value={item.sets}
+              onChange={(e) => update(idx, { sets: Number(e.target.value) || 0 })}
+            />
+          ) : (
+            <span className="text-sm">{item.sets || "—"}</span>
+          )}
+          {editable ? (
+            <Input
+              type="number"
+              min={0}
+              value={item.reps}
+              onChange={(e) => update(idx, { reps: Number(e.target.value) || 0 })}
+            />
+          ) : (
+            <span className="text-sm">{item.reps || "—"}</span>
+          )}
+          {editable ? (
+            <Input
+              value={item.notes ?? ""}
+              onChange={(e) => update(idx, { notes: e.target.value })}
+              placeholder="Ajustes / cuidados"
+            />
+          ) : (
+            <span className="text-sm text-muted-foreground">{item.notes || "—"}</span>
+          )}
+          {editable && (
+            <Button variant="ghost" size="icon" onClick={() => remove(idx)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      ))}
+      {editable && (
+        <Button variant="outline" size="sm" onClick={add}>
+          <Plus className="h-4 w-4" /> Adicionar exercício
+        </Button>
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------
+ *  Reusable string-list editor
+ * -----------------------------------------------------------------------*/
+
+function StringListEditor({
+  items,
+  editable,
+  onChange,
+  placeholder,
+  label,
+}: {
+  items: string[];
+  editable: boolean;
+  onChange: (items: string[]) => void;
+  placeholder?: string;
+  label?: string;
+}) {
+  const clean = useMemo(() => items.filter((s) => s.trim().length > 0), [items]);
+  function update(idx: number, value: string) {
+    onChange(items.map((it, i) => (i === idx ? value : it)));
+  }
+  function remove(idx: number) {
+    onChange(items.filter((_, i) => i !== idx));
+  }
+  function add() {
+    onChange([...items, ""]);
+  }
+  if (!editable) {
+    if (clean.length === 0) return <EmptyLine />;
+    return (
+      <div>
+        {label && (
+          <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
+            {label}
+          </div>
+        )}
+        <ul className="list-disc space-y-1 pl-5 text-sm text-foreground/90">
+          {clean.map((c, i) => (
+            <li key={i}>{c}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+  return (
+    <div>
+      {label && (
+        <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
+          {label}
+        </div>
+      )}
+      <div className="space-y-2">
+        {items.map((it, idx) => (
+          <div key={idx} className="flex gap-2">
+            <Input
+              value={it}
+              placeholder={placeholder}
+              onChange={(e) => update(idx, e.target.value)}
+            />
+            <Button variant="ghost" size="icon" onClick={() => remove(idx)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+        <Button variant="outline" size="sm" onClick={add}>
+          <Plus className="h-4 w-4" /> Adicionar
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function EmptyLine() {
+  return <p className="text-sm italic text-muted-foreground">Sem registros nesta seção.</p>;
+}
+
+function formatDate(value: string): string {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 }

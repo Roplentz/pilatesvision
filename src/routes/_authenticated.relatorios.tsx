@@ -15,6 +15,8 @@ type ReportRow = {
   id: string;
   assessment_id: string;
   created_at: string;
+  status: string;
+  title: string;
   patient: { name: string } | null;
   assessments: { created_at: string } | null;
 };
@@ -35,7 +37,7 @@ function RelatoriosPage() {
     setLoading(true);
     supabase
       .from("reports")
-      .select("id, assessment_id, created_at, patient:patients(name), assessments(created_at)")
+      .select("id, assessment_id, created_at, status, title, patient:patients(name), assessments(created_at)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
@@ -100,16 +102,17 @@ function RelatoriosPage() {
               return (
                 <Link
                   key={r.id}
-                  to="/avaliacoes/$id"
-                  params={{ id: r.assessment_id }}
+                  to="/relatorios/$id"
+                  params={{ id: r.id }}
                   className="group flex items-center justify-between rounded-lg border border-border/60 bg-card/40 p-4 transition hover:border-primary/60 hover:bg-card/60"
                 >
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-primary" />
                     <div>
-                      <div className="font-medium">{r.patient?.name ?? "Aluno"}</div>
+                      <div className="font-medium">{r.title || r.patient?.name || "Relatório"}</div>
                       <div className="text-xs text-muted-foreground">
-                        {new Date(date).toLocaleDateString("pt-BR")}
+                        {r.patient?.name ?? "—"} · {new Date(date).toLocaleDateString("pt-BR")}
+                        {r.status === "finalized" ? " · Finalizado" : " · Rascunho"}
                       </div>
                     </div>
                   </div>

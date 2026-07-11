@@ -436,16 +436,27 @@ const asmtTypeLabel: Record<string, string> = {
 
 function AssessmentsHistory({ patientId }: { patientId: string }) {
   const { assessments, loading } = usePatientAssessments(patientId);
+  const { reports, loading: loadingReports } = usePatientReports(patientId);
+  const reportByAssessment = new Map(reports.map((r) => [r.assessment_id, r]));
+  const latestTwo = assessments.slice(0, 2);
   return (
     <>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl font-semibold">Avaliações</h2>
+        <h2 className="font-display text-xl font-semibold">Histórico evolutivo</h2>
         <Link to="/avaliacoes/nova" search={{ patientId }}>
           <Button variant="hero" size="sm">
             <ClipboardPlus className="h-4 w-4" /> Nova avaliação
           </Button>
         </Link>
       </div>
+
+      {latestTwo.length >= 2 && (
+        <EvolutionComparison a={latestTwo[0]} b={latestTwo[1]} />
+      )}
+
+      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        Avaliações
+      </h3>
       {loading ? (
         <div className="mt-4 flex justify-center py-8">
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -462,6 +473,7 @@ function AssessmentsHistory({ patientId }: { patientId: string }) {
               a.objective?.trim() ||
               a.main_complaint?.trim() ||
               "Sem resumo informado.";
+            const rep = reportByAssessment.get(a.id);
             return (
               <li
                 key={a.id}
@@ -490,15 +502,168 @@ function AssessmentsHistory({ patientId }: { patientId: string }) {
                       Abrir avaliação
                     </Button>
                   </Link>
-                  <Button variant="ghost" size="sm" disabled title="Disponível em breve">
-                    <FileText className="h-4 w-4" /> Gerar relatório
-                  </Button>
+                  {rep ? (
+                    <Link to="/relatorios/$id" params={{ id: rep.id }}>
+                      <Button variant="ghost" size="sm">
+                        <FileText className="h-4 w-4" />{" "}
+                        {rep.status === "finalized" ? "Abrir relatório" : "Continuar rascunho"}
+                      </Button>
+                    </Link>
+                  ) : null}
                 </div>
               </li>
             );
           })}
         </ul>
       )}
+
+      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        Relatórios
+      </h3>
+      {loadingReports ? (
+        <div className="mt-4 flex justify-center py-8">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </div>
+      ) : reports.length === 0 ? (
+        <div className="mt-4 rounded-xl border border-dashed border-border/60 bg-card/30 p-6 text-center text-sm text-muted-foreground">
+          Nenhum relatório gerado. Finalize uma avaliação e gere o relatório.
+        </div>
+      ) : (
+        <ul className="mt-4 space-y-2">
+          {reports.map((r) => (
+            <li
+              key={r.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/40 px-5 py-4"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant={r.status === "finalized" ? "default" : "secondary"}
+                    className="text-[10px]"
+                  >
+                    {r.status === "finalized" ? "Finalizado" : "Rascunho"}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(r.created_at).toLocaleDateString("pt-BR")}
+                  </span>
+                </div>
+                <p className="mt-1 truncate text-sm">{r.title ?? "Relatório clínico"}</p>
+              </div>
+              <Link to="/relatorios/$id" params={{ id: r.id }}>
+                <Button variant="outline" size="sm">
+                  <FileText className="h-4 w-4" /> Abrir
+                </Button>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
+  );
+}
+
+/* ============================ Comparação evolutiva ============================ */
+
+function avgQuality(movs: MovementResultRow[]): number | null {
+  const scores: number[] = [];
+  for (const m of movs) {
+    const vals = [m.controle, m.estabilidade, m.simetria, m.amplitude].filter(
+      (v): v is number => typeof v === "number",
+    );
+    if (vals.length === 0) continue;
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    scores.push(avg > 10 ? avg : avg * 10);
+  }
+  if (scores.length === 0) return null;
+  return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+}
+
+function topFindings(postural: PosturalResultRow | null, movement: MovementResultRow | null): string[] {
+  const out: string[] = [];
+  if (postural?.findings && Array.isArray(postural.findings)) {
+    for (const f of postural.findings as Array<{ region?: string; finding?: string }>) {
+      const label = [f.region, f.finding].filter(Boolean).join(" — ");
+      if (label) out.push(label);
+    }
+  }
+  if (movement?.compensations && Array.isArray(movement.compensations)) {
+    for (const c of movement.compensations as Array<{ movement?: string; compensation?: string }>) {
+      const label = [c.movement, c.compensation].filter(Boolean).join(" — ");
+      if (label) out.push(label);
+    }
+  }
+  return out.slice(0, 5);
+}
+
+function EvolutionComparison({ a, b }: { a: AssessmentRow; b: AssessmentRow }) {
+  return (
+    <div className="mt-6 rounded-xl border border-border/60 bg-card/40 p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Comparação das duas avaliações mais recentes
+        </h3>
+        <span className="text-xs text-muted-foreground">Leitura observacional — sem valor diagnóstico</span>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <ComparisonColumn label="Mais recente" assessment={a} />
+        <ComparisonColumn label="Anterior" assessment={b} />
+      </div>
+    </div>
+  );
+}
+
+function ComparisonColumn({ label, assessment }: { label: string; assessment: AssessmentRow }) {
+  const { postural, movement, prescribed, report } = useAssessmentExtras(assessment.id);
+  const score = avgQuality(movement ? [movement] : []);
+  const findings = topFindings(postural, movement);
+  const recs = prescribed.length
+    ? prescribed.map((p) => p.name).filter(Boolean).slice(0, 5)
+    : [];
+  return (
+    <div className="rounded-lg border border-border/50 bg-background/40 p-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          {new Date(assessment.created_at).toLocaleDateString("pt-BR")}
+        </span>
+      </div>
+      <p className="mt-1 text-sm font-medium">
+        {ASSESSMENT_TYPE_LABEL[assessment.type] ?? assessment.type}
+      </p>
+      <div className="mt-3 text-xs text-muted-foreground">Score geral (observacional)</div>
+      <p className="text-lg font-semibold">{score != null ? `${score}/100` : "—"}</p>
+
+      <div className="mt-3 text-xs text-muted-foreground">Principais achados observados</div>
+      {findings.length ? (
+        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm">
+          {findings.map((f, i) => (
+            <li key={i}>{f}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">—</p>
+      )}
+
+      <div className="mt-3 text-xs text-muted-foreground">Recomendações anteriores</div>
+      {recs.length ? (
+        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm">
+          {recs.map((r, i) => (
+            <li key={i}>{r}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">—</p>
+      )}
+
+      {report ? (
+        <Link to="/relatorios/$id" params={{ id: report.id }} className="mt-3 inline-block">
+          <Button variant="ghost" size="sm">
+            <FileText className="h-4 w-4" /> Abrir relatório
+          </Button>
+        </Link>
+      ) : null}
+    </div>
   );
 }

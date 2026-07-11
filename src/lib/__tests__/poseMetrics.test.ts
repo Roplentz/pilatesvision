@@ -24,24 +24,29 @@ function synthLandmarks(hipY: number, kneeAngle: number): Landmark[] {
   lms[12] = { x: 0.58, y: 0.30, visibility: 0.9 };
   lms[23] = { x: 0.44, y: hipY, visibility: 0.9 };
   lms[24] = { x: 0.56, y: hipY, visibility: 0.9 };
-  // Joelho: coloca a diferentes distâncias verticais para simular ângulo.
-  // Aproximação: ângulo = função inversa do quanto o joelho está "encolhido".
-  const kneeOffset = (kneeAngle / 180) * 0.15 + 0.05;
-  lms[25] = { x: 0.44, y: hipY + kneeOffset, visibility: 0.9 };
-  lms[26] = { x: 0.56, y: hipY + kneeOffset, visibility: 0.9 };
-  lms[27] = { x: 0.44, y: hipY + kneeOffset + 0.20, visibility: 0.9 };
-  lms[28] = { x: 0.56, y: hipY + kneeOffset + 0.20, visibility: 0.9 };
+  // Modela perna como dois segmentos coxa (hip→knee) e canela (knee→ankle),
+  // com o joelho deslocado horizontalmente conforme o ângulo (menor ângulo => mais flexão).
+  // Ângulo em graus entre coxa e canela.
+  const seg = 0.18;
+  const half = ((180 - kneeAngle) / 2) * (Math.PI / 180);
+  const kneeDx = seg * Math.sin(half);
+  const kneeDy = seg * Math.cos(half);
+  lms[25] = { x: 0.44 - kneeDx, y: hipY + kneeDy, visibility: 0.9 };
+  lms[26] = { x: 0.56 + kneeDx, y: hipY + kneeDy, visibility: 0.9 };
+  lms[27] = { x: 0.44, y: hipY + 2 * kneeDy, visibility: 0.9 };
+  lms[28] = { x: 0.56, y: hipY + 2 * kneeDy, visibility: 0.9 };
   return lms;
 }
 
-function seriesForReps(reps: number, framesPerRep = 20, baseY = 0.45, depth = 0.10): FrameSample[] {
+function seriesForReps(reps: number, framesPerRep = 20, baseY = 0.42, depth = 0.10): FrameSample[] {
   const out: FrameSample[] = [];
   const total = reps > 0 ? reps * framesPerRep : framesPerRep;
   for (let i = 0; i < total; i++) {
     const phase = reps > 0 ? (i % framesPerRep) / framesPerRep : 0;
     // seno positivo (y desce = agachou)
     const y = reps > 0 ? baseY + depth * Math.sin(phase * Math.PI) : baseY;
-    const kneeAngle = 180 - (y - baseY) * 400; // varia com y
+    // Ângulo de joelho de 170° (em pé) até ~90° no fundo do agachamento.
+    const kneeAngle = 170 - ((y - baseY) / depth) * 80;
     const s = sampleFromLandmarks(synthLandmarks(y, kneeAngle), i / 10);
     if (s) out.push(s);
   }

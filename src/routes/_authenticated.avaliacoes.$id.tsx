@@ -210,6 +210,10 @@ function AvaliacaoDetailPage() {
   const showMovement = type === "dynamic" || type === "follow_up";
   const showExercise = type === "pilates_exercise" || type === "follow_up";
 
+  const { consent } = usePatientConsent(assessment.patient_id);
+  const consentImageUse = Boolean(consent?.consent_image_use);
+  const patientHref = `/alunos/${assessment.patient_id}#consentimento`;
+
   const saveHeader = async () => {
     setSaving(true);
     try {
@@ -397,6 +401,8 @@ function AvaliacaoDetailPage() {
                 items={postural}
                 editable={isDraft}
                 onSaved={reload}
+                consentImageUse={consentImageUse}
+                patientHref={patientHref}
               />
             </TabsContent>
           )}
@@ -409,6 +415,8 @@ function AvaliacaoDetailPage() {
                 items={movement}
                 editable={isDraft}
                 onSaved={reload}
+                consentImageUse={consentImageUse}
+                patientHref={patientHref}
               />
             </TabsContent>
           )}
@@ -421,6 +429,8 @@ function AvaliacaoDetailPage() {
                 items={exercise}
                 editable={isDraft}
                 onSaved={reload}
+                consentImageUse={consentImageUse}
+                patientHref={patientHref}
               />
             </TabsContent>
           )}

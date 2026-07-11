@@ -67,6 +67,29 @@ import {
 } from "@/lib/assessmentsStore";
 import { generateReportFromAssessment } from "@/lib/reportsStore";
 
+function GenerateReportButton({ assessmentId }: { assessmentId: string }) {
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  async function go() {
+    setBusy(true);
+    try {
+      const report = await generateReportFromAssessment(assessmentId);
+      toast.success("Relatório gerado. Revise e finalize.");
+      navigate({ to: "/relatorios/$id", params: { id: report.id } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao gerar relatório.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Button variant="hero" size="sm" onClick={go} disabled={busy}>
+      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+      Gerar relatório
+    </Button>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/avaliacoes/$id")({
   component: AvaliacaoDetailPage,
   head: () => ({ meta: [{ title: "Avaliação | PilatesVision" }] }),

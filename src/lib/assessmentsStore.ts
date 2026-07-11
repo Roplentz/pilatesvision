@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type AssessmentRow = Database["public"]["Tables"]["assessments"]["Row"];
 export type AssessmentWithPatient = AssessmentRow & {
-  patients: { name: string } | null;
+  patient: { name: string } | null;
 };
 export type NewAssessmentInput = Omit<
   Database["public"]["Tables"]["assessments"]["Insert"],
@@ -60,7 +60,7 @@ export function useAssessments(clinicId: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, patients:patients(name)")
+      .select("*, patient:patients(name)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
@@ -223,7 +223,7 @@ export function useAssessment(id: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, patients:patients(name)")
+      .select("*, patient:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {

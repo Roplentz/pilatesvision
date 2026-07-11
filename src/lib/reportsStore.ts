@@ -4,7 +4,7 @@ import type { Database, Json } from "@/integrations/supabase/types";
 
 export type ReportRow = Database["public"]["Tables"]["reports"]["Row"];
 export type ReportWithRelations = ReportRow & {
-  patients: { name: string } | null;
+  patient: { name: string } | null;
 };
 
 export type ReportContent = {
@@ -121,7 +121,7 @@ export function useReport(id: string | null | undefined) {
     setError(null);
     supabase
       .from("reports")
-      .select("*, patients:patients(name)")
+      .select("*, patient:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {

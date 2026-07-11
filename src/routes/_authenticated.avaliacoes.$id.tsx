@@ -264,7 +264,7 @@ function AvaliacaoDetailPage() {
       <main className="mx-auto max-w-5xl space-y-8 px-6 py-10">
         <section>
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
-            <User className="h-3.5 w-3.5" /> {assessment.patients?.name ?? "Paciente"}
+            <User className="h-3.5 w-3.5" /> {assessment.patient?.name ?? "Paciente"}
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
             {assessment.title || `Avaliação ${typeLabel[type] ?? ""}`}

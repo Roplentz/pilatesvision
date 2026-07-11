@@ -59,7 +59,7 @@ function AvaliacoesListPage() {
       if (statusFilter !== "all" && a.status !== statusFilter) return false;
       if (!needle) return true;
       const name =
-        a.patients?.name?.toLowerCase() ?? patientMap[a.patient_id]?.name.toLowerCase() ?? "";
+        a.patient?.name?.toLowerCase() ?? patientMap[a.patient_id]?.name.toLowerCase() ?? "";
       return (
         name.includes(needle) ||
         a.main_complaint?.toLowerCase().includes(needle) ||
@@ -146,7 +146,7 @@ function AvaliacoesListPage() {
         ) : (
           <ul className="space-y-3">
             {filtered.map((a, i) => {
-              const patientName = a.patients?.name ?? patientMap[a.patient_id]?.name ?? "Aluno";
+              const patientName = a.patient?.name ?? patientMap[a.patient_id]?.name ?? "Aluno";
               return (
                 <motion.li
                   key={a.id}

@@ -34,6 +34,12 @@ import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
 import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
+import { ExerciseLibraryPicker } from "@/components/ExerciseLibraryPicker";
+import {
+  SUPPORT_LEVEL_OPTIONS,
+  LEVEL_LABEL_LIB,
+  type ExerciseLibraryRow,
+} from "@/lib/exerciseLibraryStore";
 import {
   AlertDialog,
   AlertDialogAction,

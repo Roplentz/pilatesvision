@@ -129,10 +129,9 @@ const severityTone: Record<Severity, string> = {
 
 const FUNCTIONAL_MOVEMENTS = [
   "Agachamento",
+  "Flexão de tronco",
+  "Elevação de MMSS",
   "Ponte",
-  "Lunge",
-  "Apoio unipodal",
-  "Sentar e levantar",
   "Movimento livre",
 ] as const;
 

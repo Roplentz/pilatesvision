@@ -11,7 +11,14 @@ import {
 import { Loader2, Camera, Square, Play, CircleCheck, CircleAlert, Video } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { POSE_CONNECTIONS, LM, type Landmark } from "@/lib/poseMetrics";
+import {
+  POSE_CONNECTIONS,
+  LM,
+  sampleFromLandmarks,
+  summarizeSamples,
+  type Landmark,
+  type AutoMetricsSummary,
+} from "@/lib/poseMetrics";
 
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";

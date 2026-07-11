@@ -1,0 +1,11 @@
+sample_id,video_id,start_s,end_s,category,exercise_ref,ref_reps,frames_total,frames_valid,valid_ratio,mean_confidence,reps_detected,reps_valid,median_knee_range_left,median_knee_range_right,median_trunk_p95,median_bilateral_symmetry,consistency,abs_error,false_positive,false_negative,rejected,rejection_reason
+S01,0006,68,78,regular,squats,,301,301,1,0.99,1,1,23.9,22.5,89.8,0.94,1,,false,false,false,
+S02,0009,65,78,regular,squats,5,391,391,1,0.99,6,6,61.5,73.6,88.8,0.84,0.72,1,false,false,false,
+S03,0010,68,78,regular,squats,,301,301,1,0.99,0,0,0,0,0,0,1,,false,true,true,nenhuma repetição válida detectada
+S04,0011,68,78,regular,squats,,301,301,1,0.99,0,0,0,0,0,0,1,,false,true,true,nenhuma repetição válida detectada
+S05,0039,69,79,variacao,squat jumps,5,300,300,1,0.99,2,2,80.9,76.7,90,0.92,0.86,3,false,false,false,
+S06,0031,90,100,variacao,squat kicks,,301,301,1,0.98,3,3,61.4,42.8,87.9,0.61,0.86,,false,false,false,
+S07,0010,80.5,85.5,qualidade_reduzida,squats,,151,151,1,0.99,0,0,0,0,0,0,1,,false,true,true,nenhuma repetição válida detectada
+S08,0011,82.5,87.5,qualidade_reduzida,squats,,151,151,1,0.95,1,1,5.4,4.8,89,0.9,1,,false,false,false,
+S09,0006,90,100,nao_agachamento,pushups,0,274,274,1,0.76,1,1,63,48.8,89.6,0.78,1,1,true,false,false,
+S10,0006,40,50,nao_agachamento,jumping jacks,0,301,301,1,0.98,0,0,0,0,0,0,1,0,false,false,true,nenhuma repetição válida detectada

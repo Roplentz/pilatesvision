@@ -31,6 +31,7 @@ import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import { usePatientConsent } from "@/lib/patientConsentsStore";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
+import { PoseCapture } from "@/components/PoseCapture";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
 import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
@@ -395,6 +396,7 @@ function AvaliacaoDetailPage() {
             {showPostural && <TabsTrigger value="postural">Postural</TabsTrigger>}
             {showMovement && <TabsTrigger value="movement">Dinâmica</TabsTrigger>}
             {showExercise && <TabsTrigger value="exercise">Exercício</TabsTrigger>}
+            <TabsTrigger value="capture">Captura ao vivo</TabsTrigger>
           </TabsList>
 
           {showPostural && (
@@ -439,6 +441,16 @@ function AvaliacaoDetailPage() {
               />
             </TabsContent>
           )}
+          <TabsContent value="capture" className="mt-4">
+            <PoseCapture
+              assessmentId={assessment.id}
+              clinicId={assessment.clinic_id}
+              patientId={assessment.patient_id}
+              consentImageUse={consentImageUse}
+              editable={isDraft}
+              onSaved={reload}
+            />
+          </TabsContent>
         </Tabs>
 
         {/* Ações */}

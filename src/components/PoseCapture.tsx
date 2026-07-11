@@ -11,7 +11,14 @@ import {
 import { Loader2, Camera, Square, Play, CircleCheck, CircleAlert, Video } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { POSE_CONNECTIONS, LM, type Landmark } from "@/lib/poseMetrics";
+import {
+  POSE_CONNECTIONS,
+  LM,
+  sampleFromLandmarks,
+  summarizeSamples,
+  type Landmark,
+  type AutoMetricsSummary,
+} from "@/lib/poseMetrics";
 
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
@@ -397,6 +404,26 @@ export function PoseCapture({
     setSaving(true);
     try {
       const fps = frames.length / (durationMs / 1000);
+      // Motor biomecânico v1: para agachamento, gera resumo determinístico
+      // além da série bruta de landmarks. Bloqueia se não houver ao menos
+      // 1 repetição válida na estimativa.
+      let biomechanics: AutoMetricsSummary | null = null;
+      if (preset.key === "agachamento") {
+        const samples = frames
+          .map((f) => {
+            const asLm: Landmark[] = f.lm.map((p) => ({ x: p.x, y: p.y, z: p.z, visibility: p.v }));
+            return sampleFromLandmarks(asLm, f.t / 1000);
+          })
+          .filter((s): s is NonNullable<typeof s> => !!s);
+        biomechanics = summarizeSamples(samples, durationMs / 1000, "squat");
+        if (biomechanics.reps_valid < 1) {
+          setRejectReason(
+            `Nenhuma repetição válida detectada (${biomechanics.reps_total} tentativa(s), confiança média ${Math.round(biomechanics.mean_confidence * 100)}%). Refaça a captura executando o agachamento com amplitude e ritmo consistentes.`,
+          );
+          setSaving(false);
+          return;
+        }
+      }
       const insertPayload = {
         assessment_id: assessmentId,
         patient_id: patientId,
@@ -415,6 +442,8 @@ export function PoseCapture({
           mean_visibility: Math.round(meanVis * 100) / 100,
           orientation_required: orientationRef.current,
           visibility_threshold: VISIBILITY_THRESHOLD,
+          biomechanics: biomechanics ?? undefined,
+          analysis_kind: preset.key === "agachamento" ? "biomechanics-mvp-v1" : "basic",
           note: "Estimativa 2D — apoio à decisão, requer confirmação clínica.",
         },
         landmarks: frames,

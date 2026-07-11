@@ -18,8 +18,17 @@ export type ExerciseResultRow = Database["public"]["Tables"]["exercise_results"]
 export type PrescribedExerciseRow = Database["public"]["Tables"]["prescribed_exercises"]["Row"];
 export type ReportRow = Database["public"]["Tables"]["reports"]["Row"];
 
-export type AssessmentType = "postural" | "dynamic" | "exercise" | "complete";
-export type AssessmentStatus = "draft" | "in_review" | "finalized";
+export type AssessmentType =
+  | "postural_static"
+  | "dynamic"
+  | "pilates_exercise"
+  | "follow_up";
+export type AssessmentStatus =
+  | "draft"
+  | "processing"
+  | "review"
+  | "completed"
+  | "archived";
 
 export type PosturalView = "anterior" | "posterior" | "right_lateral" | "left_lateral";
 export type Severity = "leve" | "moderada" | "importante";
@@ -99,12 +108,12 @@ export async function updateAssessment(
   return data as AssessmentRow;
 }
 
-/** Finaliza avaliação: status='finalized' e finalized_at=now(). */
+/** Finaliza avaliação: status='completed' e finalized_at=now(). */
 export async function finalizeAssessment(id: string): Promise<AssessmentRow> {
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("assessments")
-    .update({ status: "finalized", finalized_at: now, updated_at: now })
+    .update({ status: "completed", finalized_at: now, updated_at: now })
     .eq("id", id)
     .select("*")
     .single();

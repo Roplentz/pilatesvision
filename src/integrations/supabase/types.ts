@@ -544,6 +544,7 @@ export type Database = {
           finalized_at: string | null
           id: string
           patient_id: string
+          pdf_storage_path: string | null
           pdf_url: string | null
           plain_text: string | null
           status: string
@@ -561,6 +562,7 @@ export type Database = {
           finalized_at?: string | null
           id?: string
           patient_id: string
+          pdf_storage_path?: string | null
           pdf_url?: string | null
           plain_text?: string | null
           status?: string
@@ -578,6 +580,7 @@ export type Database = {
           finalized_at?: string | null
           id?: string
           patient_id?: string
+          pdf_storage_path?: string | null
           pdf_url?: string | null
           plain_text?: string | null
           status?: string

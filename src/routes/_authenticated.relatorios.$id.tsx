@@ -787,7 +787,7 @@ function DynamicFindingsEditor({
           </div>
           <div className="mt-3">
             <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Indicador de qualidade de movimento — apoio à decisão
+              Indicador de apoio — requer confirmação do profissional
             </div>
             <div className="mt-2 flex items-center gap-3">
               <div className="h-2 flex-1 rounded-full bg-muted">

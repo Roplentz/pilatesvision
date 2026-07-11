@@ -321,24 +321,18 @@ function TimelineChart({ samples, reps }: { samples: FrameSample[]; reps: RepMet
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-40 w-full">
         <rect x={0} y={0} width={W} height={H} fill="transparent" />
-        {reps.map((r) => {
-          const x1 = xOf(samples[r.index - 1] ? tMin : tMin);
-          void x1;
-          // usar tempos reais das reps mapeando pelo intervalo
-          return null;
-        })}
-        {/* faixas das repetições */}
-        {reps.map((r) => {
-          const rep = r;
-          const start = samples[0]?.t ?? 0;
-          void start;
-          return null;
-        })}
         {/* eixos */}
         <line x1={PAD} y1={H - PAD} x2={W - PAD} y2={H - PAD} stroke="currentColor" strokeOpacity={0.2} />
         <line x1={PAD} y1={PAD} x2={PAD} y2={H - PAD} stroke="currentColor" strokeOpacity={0.2} />
         <path d={path(kneeR)} stroke="rgb(56 189 248)" strokeWidth={1.5} fill="none" />
         <path d={path(kneeL)} stroke="rgb(52 211 153)" strokeWidth={1.5} fill="none" />
+        {/* faixas leves indicando repetições detectadas */}
+        {reps.map((r) => {
+          const s = samples[r.index - 1];
+          if (!s) return null;
+          const x = xOf(s.t);
+          return <line key={r.index} x1={x} y1={PAD} x2={x} y2={H - PAD} stroke="currentColor" strokeOpacity={0.15} strokeDasharray="3 3" />;
+        })}
       </svg>
     </div>
   );

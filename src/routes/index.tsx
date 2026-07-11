@@ -523,12 +523,12 @@ function Footer() {
           <span>© {new Date().getFullYear()}</span>
         </div>
         <div className="flex gap-6">
-          <a href="#" className="transition hover:text-foreground">
+          <Link to="/privacidade" className="transition hover:text-foreground">
             Privacidade
-          </a>
-          <a href="#" className="transition hover:text-foreground">
+          </Link>
+          <Link to="/termos" className="transition hover:text-foreground">
             Termos
-          </a>
+          </Link>
           <a href="#" className="transition hover:text-foreground">
             Contato
           </a>

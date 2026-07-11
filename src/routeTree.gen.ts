@@ -19,6 +19,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
+import { Route as AuthenticatedAvaliacaoPosturalRouteImport } from './routes/_authenticated.avaliacao-postural'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -81,6 +82,12 @@ const AuthenticatedConfiguracoesRoute =
   AuthenticatedConfiguracoesRouteImport.update({
     id: '/configuracoes',
     path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAvaliacaoPosturalRoute =
+  AuthenticatedAvaliacaoPosturalRouteImport.update({
+    id: '/avaliacao-postural',
+    path: '/avaliacao-postural',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -160,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
@@ -183,6 +191,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
@@ -208,6 +217,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/avaliacao-postural'
     | '/configuracoes'
     | '/dashboard'
     | '/nova-avaliacao'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/avaliacao-postural'
     | '/configuracoes'
     | '/dashboard'
     | '/nova-avaliacao'
@@ -280,6 +292,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
+    | '/_authenticated/avaliacao-postural'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/nova-avaliacao'
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/configuracoes'
       fullPath: '/configuracoes'
       preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/avaliacao-postural': {
+      id: '/_authenticated/avaliacao-postural'
+      path: '/avaliacao-postural'
+      fullPath: '/avaliacao-postural'
+      preLoaderRoute: typeof AuthenticatedAvaliacaoPosturalRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -483,6 +503,7 @@ const AuthenticatedRelatoriosRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAvaliacaoPosturalRoute: typeof AuthenticatedAvaliacaoPosturalRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
@@ -498,6 +519,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAvaliacaoPosturalRoute: AuthenticatedAvaliacaoPosturalRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,

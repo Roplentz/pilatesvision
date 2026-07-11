@@ -496,6 +496,8 @@ function PosturalSection({
   items: PosturalResultRow[];
   editable: boolean;
   onSaved: () => void;
+  consentImageUse: boolean;
+  patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<PosturalView>("anterior");
@@ -766,6 +768,8 @@ function MovementSection({
   items: MovementResultRow[];
   editable: boolean;
   onSaved: () => void;
+  consentImageUse: boolean;
+  patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [movementPreset, setMovementPreset] = useState<string>(FUNCTIONAL_MOVEMENTS[0]);
@@ -1075,6 +1079,8 @@ function ExerciseSection({
   items: ExerciseResultRow[];
   editable: boolean;
   onSaved: () => void;
+  consentImageUse: boolean;
+  patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [namePreset, setNamePreset] = useState<string>(PILATES_EXERCISES[0]);

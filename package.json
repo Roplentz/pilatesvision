@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint": "prettier --write . && eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "ci": "bun run lint && bun run typecheck && bun run build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "ci": "bun run lint && bun run typecheck && bun run test:run && bun run build",
     "format": "prettier --write ."
   },
   "dependencies": {

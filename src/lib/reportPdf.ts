@@ -361,7 +361,7 @@ export async function exportReportPdf(params: {
 }): Promise<string> {
   const bytes = buildPdf(params.json, params.title);
   const path = `${params.clinicId}/reports/${params.reportId}-v${params.version}.pdf`;
-  const blob = new Blob([bytes], { type: "application/pdf" });
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
   const up = await supabase.storage
     .from("clinical-media")
     .upload(path, blob, { contentType: "application/pdf", upsert: true });

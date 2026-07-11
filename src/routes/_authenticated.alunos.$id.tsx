@@ -35,7 +35,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { archivePatient, updatePatient, usePatient, type PatientStatus } from "@/lib/patientsStore";
-import { usePatientAssessments } from "@/lib/assessmentsStore";
+import {
+  usePatientAssessments,
+  useAssessmentExtras,
+  type AssessmentRow,
+  type MovementResultRow,
+  type PosturalResultRow,
+} from "@/lib/assessmentsStore";
+import { usePatientReports, ASSESSMENT_TYPE_LABEL } from "@/lib/reportsStore";
 import { toast } from "sonner";
 import { ClipboardPlus, FileText, Plus } from "lucide-react";
 

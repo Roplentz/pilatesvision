@@ -37,7 +37,7 @@ import {
   type Severity,
 } from "@/lib/reportsStore";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
-import { exportReportPdf, getReportPdfSignedUrl } from "@/lib/reportPdf";
+import { exportReportPdf, getReportPdfSignedUrl, previewReportPdf } from "@/lib/reportPdf";
 
 export const Route = createFileRoute("/_authenticated/relatorios/$id")({
   head: () => ({ meta: [{ title: "Relatório | PilatesVision" }] }),
@@ -97,6 +97,18 @@ function RelatorioDetailPage() {
       toast.error(e instanceof Error ? e.message : "Falha ao abrir PDF.");
     } finally {
       setOpeningPdf(false);
+    }
+  }
+
+  function handlePreviewPdf() {
+    try {
+      const url = previewReportPdf({ title, json });
+      const w = window.open(url, "_blank", "noopener,noreferrer");
+      if (!w) toast.error("Habilite pop-ups para visualizar a prévia.");
+      // Libera o object URL depois de algum tempo para permitir o carregamento.
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao gerar prévia.");
     }
   }
 

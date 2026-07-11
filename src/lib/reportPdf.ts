@@ -376,6 +376,16 @@ export async function exportReportPdf(params: {
   return path;
 }
 
+/**
+ * Gera o PDF localmente (sem upload) e devolve um object URL para prévia.
+ * Usado para revisão de rascunhos antes da finalização.
+ */
+export function previewReportPdf(params: { title: string; json: ReportJson }): string {
+  const bytes = buildPdf(params.json, params.title);
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
+  return URL.createObjectURL(blob);
+}
+
 /** Cria uma URL assinada de curta duração para download/visualização. */
 export async function getReportPdfSignedUrl(path: string, expiresInSeconds = 300): Promise<string> {
   const { data, error } = await supabase.storage

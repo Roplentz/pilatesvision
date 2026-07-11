@@ -10,11 +10,11 @@ function sb(ctx: ToolContext) {
 }
 
 export default defineTool({
-  name: "create_student",
-  title: "Cadastrar aluno",
-  description: "Cria um novo aluno na clínica do usuário autenticado.",
+  name: "create_patient",
+  title: "Cadastrar paciente",
+  description: "Cria um novo paciente na clínica do usuário autenticado.",
   inputSchema: {
-    full_name: z.string().trim().min(1).describe("Nome completo do aluno."),
+    full_name: z.string().trim().min(1).describe("Nome completo do paciente."),
     email: z.string().email().optional().describe("E-mail de contato."),
     phone: z.string().optional().describe("Telefone de contato."),
     birth_date: z.string().optional().describe("Data de nascimento em formato YYYY-MM-DD."),
@@ -42,7 +42,7 @@ export default defineTool({
       .single();
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return {
-      content: [{ type: "text", text: `Aluno criado: ${data.id}` }],
+      content: [{ type: "text", text: `Paciente criado: ${data.id}` }],
       structuredContent: { patient: data },
     };
   },

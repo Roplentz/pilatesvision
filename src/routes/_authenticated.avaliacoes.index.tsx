@@ -47,7 +47,7 @@ function AvaliacoesListPage() {
   const { assessments, loading: assessmentsLoading } = useAssessments(clinicId);
   const { patients } = usePatients(clinicId);
   const [q, setQ] = useState("");
-  const [patientFilter, setStudentFilter] = useState<string>("all");
+  const [patientFilter, setPatientFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const patientMap = useMemo(() => Object.fromEntries(patients.map((s) => [s.id, s])), [patients]);
@@ -109,7 +109,7 @@ function AvaliacoesListPage() {
               className="pl-9"
             />
           </div>
-          <Select value={patientFilter} onValueChange={setStudentFilter}>
+          <Select value={patientFilter} onValueChange={setPatientFilter}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Aluno" />
             </SelectTrigger>

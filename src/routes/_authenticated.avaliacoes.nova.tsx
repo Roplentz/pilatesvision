@@ -42,7 +42,7 @@ function NovaAvaliacaoPage() {
   const { clinicId, loading: profileLoading } = useProfile();
   const { patients, loading: patientsLoading } = usePatients(clinicId);
 
-  const [patientId, setStudentId] = useState(search.patientId ?? "");
+  const [patientId, setPatientId] = useState(search.patientId ?? "");
   const [type, setType] = useState<AssessmentType>("postural");
   const [title, setTitle] = useState("");
   const [objective, setObjective] = useState("");
@@ -112,7 +112,7 @@ function NovaAvaliacaoPage() {
         >
           <div>
             <Label>Paciente *</Label>
-            <Select value={patientId} onValueChange={setStudentId}>
+            <Select value={patientId} onValueChange={setPatientId}>
               <SelectTrigger className="mt-1.5">
                 <SelectValue
                   placeholder={patientsLoading ? "Carregando…" : "Selecione um paciente"}

@@ -10,9 +10,9 @@ function sb(ctx: ToolContext) {
 }
 
 export default defineTool({
-  name: "list_students",
-  title: "Listar alunos",
-  description: "Lista os alunos cadastrados na clínica do usuário autenticado.",
+  name: "list_patients",
+  title: "Listar pacientes",
+  description: "Lista os pacientes cadastrados na clínica do usuário autenticado.",
   inputSchema: {
     limit: z
       .number()
@@ -20,7 +20,7 @@ export default defineTool({
       .min(1)
       .max(100)
       .optional()
-      .describe("Máximo de alunos a retornar (padrão 25)."),
+      .describe("Máximo de pacientes a retornar (padrão 25)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ limit }, ctx) => {

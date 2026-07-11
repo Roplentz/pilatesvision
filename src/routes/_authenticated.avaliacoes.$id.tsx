@@ -489,6 +489,8 @@ function PosturalSection({
   items,
   editable,
   onSaved,
+  consentImageUse,
+  patientHref,
 }: {
   assessmentId: string;
   clinicId: string;
@@ -736,6 +738,8 @@ function PosturalSection({
             currentPath={imagePath}
             onUploaded={(p) => setImagePath(p)}
             onCleared={() => setImagePath(null)}
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
@@ -761,6 +765,8 @@ function MovementSection({
   items,
   editable,
   onSaved,
+  consentImageUse,
+  patientHref,
 }: {
   assessmentId: string;
   clinicId: string;
@@ -1036,6 +1042,8 @@ function MovementSection({
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
             onCleared={() => setVideoPath(null)}
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <ClinicalMediaUploader
@@ -1047,6 +1055,8 @@ function MovementSection({
             onUploaded={(p) => setImagePath(p)}
             onCleared={() => setImagePath(null)}
             label="Foto de referência (opcional)"
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">
@@ -1072,6 +1082,8 @@ function ExerciseSection({
   items,
   editable,
   onSaved,
+  consentImageUse,
+  patientHref,
 }: {
   assessmentId: string;
   clinicId: string;
@@ -1376,6 +1388,8 @@ function ExerciseSection({
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
             onCleared={() => setVideoPath(null)}
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <ClinicalMediaUploader
@@ -1387,6 +1401,8 @@ function ExerciseSection({
             onUploaded={(p) => setImagePath(p)}
             onCleared={() => setImagePath(null)}
             label="Foto de referência (opcional)"
+            consentImageUse={consentImageUse}
+            patientHref={patientHref}
           />
 
           <div className="flex justify-end gap-2 border-t border-border/40 pt-3">

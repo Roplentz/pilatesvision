@@ -34,6 +34,12 @@ import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
 import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
+import { ExerciseLibraryPicker } from "@/components/ExerciseLibraryPicker";
+import {
+  SUPPORT_LEVEL_OPTIONS,
+  LEVEL_LABEL_LIB,
+  type ExerciseLibraryRow,
+} from "@/lib/exerciseLibraryStore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -1095,11 +1101,12 @@ function ExerciseSection({
   patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [namePreset, setNamePreset] = useState<string>(PILATES_EXERCISES[0]);
+  const [libraryItem, setLibraryItem] = useState<ExerciseLibraryRow | null>(null);
   const [nameCustom, setNameCustom] = useState("");
   const [apparatus, setApparatus] = useState<string>(APPARATUS_OPTIONS[0]);
   const [execution, setExecution] = useState("");
   const [control, setControl] = useState<ControlLevel>("bom");
+  const [supportLevel, setSupportLevel] = useState<0 | 1 | 2 | 3>(1);
   const [recommendation, setRecommendation] = useState("");
   const [comps, setComps] = useState<ExerciseCompensation[]>([]);
   const [comp, setComp] = useState("");
@@ -1116,8 +1123,7 @@ function ExerciseSection({
   };
 
   const save = async () => {
-    const resolvedName =
-      namePreset === "Exercício livre" ? nameCustom.trim() : namePreset.trim();
+    const resolvedName = libraryItem ? libraryItem.name_pt : nameCustom.trim();
     if (!resolvedName) return toast.error("Informe o exercício.");
     setSaving(true);
     try {
@@ -1129,6 +1135,9 @@ function ExerciseSection({
         apparatus: apparatus || null,
         execution_notes: execution.trim() || null,
         control_level: control,
+        support_level: supportLevel,
+        library_exercise_id: libraryItem?.id ?? null,
+        generated_by: "professional",
         recommendation: recommendation.trim() || null,
         compensations: comps as unknown as never,
         video_url: videoPath,
@@ -1136,11 +1145,12 @@ function ExerciseSection({
       });
       toast.success("Registro de exercício salvo.");
       setOpen(false);
-      setNamePreset(PILATES_EXERCISES[0]);
+      setLibraryItem(null);
       setNameCustom("");
       setApparatus(APPARATUS_OPTIONS[0]);
       setExecution("");
       setControl("bom");
+      setSupportLevel(1);
       setRecommendation("");
       setComps([]);
       setVideoPath(null);
@@ -1195,11 +1205,21 @@ function ExerciseSection({
                     <div className="text-xs text-muted-foreground">Aparelho: {r.apparatus}</div>
                   )}
                 </div>
-                {r.control_level && (
-                  <Badge variant="outline" className="text-[11px]">
-                    Controle: {r.control_level}
-                  </Badge>
-                )}
+                <div className="flex flex-wrap gap-1.5">
+                  {r.control_level && (
+                    <Badge variant="outline" className="text-[11px]">
+                      Controle: {r.control_level}
+                    </Badge>
+                  )}
+                  {typeof r.support_level === "number" && (
+                    <Badge
+                      variant="outline"
+                      className={`text-[11px] ${SUPPORT_LEVEL_OPTIONS[r.support_level as 0 | 1 | 2 | 3]?.tone ?? ""}`}
+                    >
+                      Suporte {r.support_level}
+                    </Badge>
+                  )}
+                </div>
               </div>
               {r.execution_notes && (
                 <p className="mt-3 text-sm text-muted-foreground">{r.execution_notes}</p>
@@ -1262,28 +1282,41 @@ function ExerciseSection({
             <div className="md:col-span-2">
               <Label>Exercício *</Label>
               <div className="mt-1.5 rounded-md border border-border/60 bg-background/40 px-3 py-2 text-sm">
-                Selecionado: <span className="font-medium">{namePreset}</span>
+                Selecionado:{" "}
+                <span className="font-medium">
+                  {libraryItem ? libraryItem.name_pt : nameCustom || "—"}
+                </span>
                 {apparatus && (
                   <span className="ml-2 text-xs text-muted-foreground">
                     · {apparatus}
                   </span>
                 )}
+                {libraryItem?.primary_goal && (
+                  <div className="mt-1 text-[11px] text-muted-foreground">
+                    Objetivo: {libraryItem.primary_goal}
+                  </div>
+                )}
+                {libraryItem?.red_flags && (
+                  <div className="mt-1 text-[11px] text-amber-300">
+                    Atenção clínica (red flags): {libraryItem.red_flags}
+                  </div>
+                )}
               </div>
-              {namePreset === "Exercício livre" && (
+              {!libraryItem && (
                 <Input
                   value={nameCustom}
                   onChange={(e) => setNameCustom(e.target.value)}
-                  placeholder="Nome do exercício"
+                  placeholder="Nome do exercício livre (fora do catálogo)"
                   className="mt-2"
                 />
               )}
               <div className="mt-2">
-                <ExerciseCatalogPicker
-                  allowedCategories={["mat", "reformer", "cadillac", "chair", "barrel"]}
-                  selectedName={namePreset}
-                  onPick={(it: ExerciseCatalogItem) => {
-                    setNamePreset(it.name);
-                    if (it.apparatus !== "—") setApparatus(it.apparatus);
+                <ExerciseLibraryPicker
+                  selectedId={libraryItem?.id ?? null}
+                  onPick={(it: ExerciseLibraryRow) => {
+                    setLibraryItem(it);
+                    setNameCustom("");
+                    if (it.equipment) setApparatus(it.equipment);
                   }}
                 />
               </div>
@@ -1329,14 +1362,36 @@ function ExerciseSection({
               </Select>
             </div>
             <div>
-              <Label>Recomendação</Label>
+              <Label>Nível de suporte (apoio à decisão)</Label>
+              <Select
+                value={String(supportLevel)}
+                onValueChange={(v) => setSupportLevel(Number(v) as 0 | 1 | 2 | 3)}
+              >
+                <SelectTrigger className="mt-1.5">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SUPPORT_LEVEL_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={String(opt.value)}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {SUPPORT_LEVEL_OPTIONS[supportLevel].hint}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <Label>Recomendação</Label>
               <Input
                 value={recommendation}
                 onChange={(e) => setRecommendation(e.target.value)}
                 placeholder="Sugestão de progressão/regressão"
                 className="mt-1.5"
               />
-            </div>
           </div>
 
           <div className="rounded-lg border border-border/50 bg-background/40 p-4">

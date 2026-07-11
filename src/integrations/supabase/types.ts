@@ -131,6 +131,78 @@ export type Database = {
         }
         Relationships: []
       }
+      exercise_library: {
+        Row: {
+          clinical_focus: string | null
+          common_compensations: string | null
+          created_at: string
+          equipment: string
+          execution: string | null
+          id: string
+          image_ref: string | null
+          is_active: boolean
+          key_cues: string | null
+          level: string
+          method_family: string | null
+          name_en: string | null
+          name_pt: string
+          position: string | null
+          primary_goal: string | null
+          progression: string | null
+          red_flags: string | null
+          regression: string | null
+          setup: string | null
+          updated_at: string
+          vision_metrics: string | null
+        }
+        Insert: {
+          clinical_focus?: string | null
+          common_compensations?: string | null
+          created_at?: string
+          equipment: string
+          execution?: string | null
+          id: string
+          image_ref?: string | null
+          is_active?: boolean
+          key_cues?: string | null
+          level: string
+          method_family?: string | null
+          name_en?: string | null
+          name_pt: string
+          position?: string | null
+          primary_goal?: string | null
+          progression?: string | null
+          red_flags?: string | null
+          regression?: string | null
+          setup?: string | null
+          updated_at?: string
+          vision_metrics?: string | null
+        }
+        Update: {
+          clinical_focus?: string | null
+          common_compensations?: string | null
+          created_at?: string
+          equipment?: string
+          execution?: string | null
+          id?: string
+          image_ref?: string | null
+          is_active?: boolean
+          key_cues?: string | null
+          level?: string
+          method_family?: string | null
+          name_en?: string | null
+          name_pt?: string
+          position?: string | null
+          primary_goal?: string | null
+          progression?: string | null
+          red_flags?: string | null
+          regression?: string | null
+          setup?: string | null
+          updated_at?: string
+          vision_metrics?: string | null
+        }
+        Relationships: []
+      }
       exercise_results: {
         Row: {
           analysis_status: string | null
@@ -142,11 +214,14 @@ export type Database = {
           created_at: string
           execution_notes: string | null
           exercise_name: string
+          generated_by: string
           id: string
           image_url: string | null
+          library_exercise_id: string | null
           metrics: Json
           patient_id: string
           recommendation: string | null
+          support_level: number | null
           updated_at: string
           video_url: string | null
         }
@@ -160,11 +235,14 @@ export type Database = {
           created_at?: string
           execution_notes?: string | null
           exercise_name: string
+          generated_by?: string
           id?: string
           image_url?: string | null
+          library_exercise_id?: string | null
           metrics?: Json
           patient_id: string
           recommendation?: string | null
+          support_level?: number | null
           updated_at?: string
           video_url?: string | null
         }
@@ -178,11 +256,14 @@ export type Database = {
           created_at?: string
           execution_notes?: string | null
           exercise_name?: string
+          generated_by?: string
           id?: string
           image_url?: string | null
+          library_exercise_id?: string | null
           metrics?: Json
           patient_id?: string
           recommendation?: string | null
+          support_level?: number | null
           updated_at?: string
           video_url?: string | null
         }
@@ -199,6 +280,13 @@ export type Database = {
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exercise_results_library_exercise_id_fkey"
+            columns: ["library_exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercise_library"
             referencedColumns: ["id"]
           },
           {

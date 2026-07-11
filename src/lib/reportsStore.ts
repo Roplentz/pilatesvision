@@ -438,9 +438,15 @@ export async function generateReportFromAssessment(assessmentId: string): Promis
       row.execution_notes ?? "",
       ...comps.map((c) => c.compensation ?? "").filter(Boolean),
     ].filter((s) => s.trim().length > 0);
+    const sl =
+      typeof row.support_level === "number" &&
+      row.support_level >= 0 &&
+      row.support_level <= 3
+        ? (row.support_level as 0 | 1 | 2 | 3)
+        : controlToSupportLevel(row.control_level);
     return {
       exercise: [row.exercise_name, row.apparatus].filter(Boolean).join(" · "),
-      support_level: controlToSupportLevel(row.control_level),
+      support_level: sl,
       observations: obs,
       suggested_cues: row.recommendation ? [row.recommendation] : [],
     };

@@ -60,15 +60,16 @@ export function VideoPoseAnalyzer({
     setRunning(true);
     setProgress(0);
 
-    let landmarker: { detectForVideo: (v: HTMLVideoElement, t: number) => { landmarks?: Landmark[][] }; close: () => void } | null = null;
+    type Lmr = { detectForVideo: (v: HTMLVideoElement, t: number) => { landmarks?: Landmark[][] }; close: () => void };
+    let landmarker: Lmr | null = null;
     try {
       const { FilesetResolver, PoseLandmarker } = await import("@mediapipe/tasks-vision");
       const fileset = await FilesetResolver.forVisionTasks(WASM_URL);
-      landmarker = await PoseLandmarker.createFromOptions(fileset, {
+      landmarker = (await PoseLandmarker.createFromOptions(fileset, {
         baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
         runningMode: "VIDEO",
         numPoses: 1,
-      }) as unknown as typeof landmarker;
+      })) as unknown as Lmr;
 
       if (video.readyState < 1) {
         await new Promise<void>((resolve, reject) => {

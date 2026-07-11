@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const searchSchema = z.object({
-  mode: z.enum(["signin", "signup"]).optional(),
+  mode: z.enum(["signin", "signup", "forgot"]).optional(),
   redirect: z.string().optional(),
 });
 
@@ -36,8 +36,10 @@ function AuthPage() {
   const navigate = useNavigate();
   const mode = search.mode ?? "signin";
   const isSignup = mode === "signup";
+  const isForgot = mode === "forgot";
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const destination =
     search.redirect && search.redirect.startsWith("/") ? search.redirect : "/dashboard";
@@ -45,6 +47,14 @@ function AuthPage() {
   // Se já está logado, redireciona. Também escuta mudanças de auth.
   useEffect(() => {
     let mounted = true;
+    // No fluxo "esqueci minha senha" não redirecionamos automaticamente,
+    // porque o usuário pode estar autenticado por token de recuperação.
+    if (isForgot) {
+      setCheckingSession(false);
+      return () => {
+        mounted = false;
+      };
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
       if (data.session) {
@@ -62,10 +72,35 @@ function AuthPage() {
       mounted = false;
       sub.subscription.unsubscribe();
     };
-  }, [navigate, destination]);
+  }, [navigate, destination, isForgot]);
 
-  const switchMode = (next: "signin" | "signup") => {
+  const switchMode = (next: "signin" | "signup" | "forgot") => {
     navigate({ to: "/auth", search: { mode: next } });
+  };
+
+  const onForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = String(formData.get("email") ?? "").trim();
+    if (!email) {
+      toast.error("Informe seu e-mail.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset`,
+      });
+      // Mensagem neutra — não confirmamos existência do e-mail.
+      setForgotSent(true);
+      toast.success("Se o e-mail existir, enviaremos as instruções.");
+    } catch {
+      // Mesma mensagem neutra em caso de erro do provedor.
+      setForgotSent(true);
+      toast.success("Se o e-mail existir, enviaremos as instruções.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -149,12 +184,18 @@ function AuthPage() {
             <Activity className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight">
-            {isSignup ? "Crie seu estúdio" : "Bem-vindo de volta"}
+            {isForgot
+              ? "Recuperar senha"
+              : isSignup
+                ? "Crie seu estúdio"
+                : "Bem-vindo de volta"}
           </h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            {isSignup
-              ? "14 dias grátis. Sem cartão. Cancele quando quiser."
-              : "Entre com seu e-mail e senha."}
+            {isForgot
+              ? "Enviaremos um link seguro para redefinir sua senha."
+              : isSignup
+                ? "14 dias grátis. Sem cartão. Cancele quando quiser."
+                : "Entre com seu e-mail e senha."}
           </p>
         </motion.div>
 
@@ -164,6 +205,7 @@ function AuthPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mt-10 rounded-2xl border border-border/60 bg-surface/80 p-6 shadow-elevated backdrop-blur"
         >
+          {!isForgot && (
           <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-background/60 p-1 text-sm">
             <button
               type="button"
@@ -188,7 +230,59 @@ function AuthPage() {
               Criar conta
             </button>
           </div>
+          )}
 
+          {isForgot ? (
+            forgotSent ? (
+              <div className="space-y-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Se o e-mail informado existir em nossa base, enviaremos um link
+                  para redefinir a senha. Verifique também a caixa de spam.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => switchMode("signin")}
+                >
+                  Voltar para o login
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={onForgotSubmit} className="space-y-4">
+                <p className="text-xs text-muted-foreground">
+                  Informe o e-mail cadastrado e enviaremos um link seguro para
+                  redefinir sua senha.
+                </p>
+                <Field id="email" label="E-mail" icon={Mail}>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="voce@estudio.com"
+                    required
+                    autoComplete="email"
+                  />
+                </Field>
+                <Button
+                  type="submit"
+                  variant="hero"
+                  size="lg"
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enviar link"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => switchMode("signin")}
+                  className="w-full text-center text-xs text-muted-foreground transition hover:text-foreground"
+                >
+                  Voltar para o login
+                </button>
+              </form>
+            )
+          ) : (
           <form onSubmit={onSubmit} className="space-y-4">
             {isSignup && (
               <Field id="name" label="Nome do estúdio" icon={User}>
@@ -219,12 +313,13 @@ function AuthPage() {
 
             {!isSignup && (
               <div className="flex justify-end">
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={() => switchMode("forgot")}
                   className="text-xs text-muted-foreground transition hover:text-foreground"
                 >
                   Esqueci minha senha
-                </a>
+                </button>
               </div>
             )}
 
@@ -238,6 +333,7 @@ function AuthPage() {
               )}
             </Button>
           </form>
+          )}
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Ao continuar você concorda com nossos{" "}

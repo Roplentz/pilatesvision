@@ -184,6 +184,8 @@ function AvaliacaoDetailPage() {
     });
   }, [assessment]);
 
+  const { consent } = usePatientConsent(assessment?.patient_id ?? null);
+
   if (loading || extrasLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -216,7 +218,6 @@ function AvaliacaoDetailPage() {
   const showMovement = type === "dynamic" || type === "follow_up";
   const showExercise = type === "pilates_exercise" || type === "follow_up";
 
-  const { consent } = usePatientConsent(assessment.patient_id);
   const consentImageUse = Boolean(consent?.consent_image_use);
   const patientHref = `/alunos/${assessment.patient_id}#consentimento`;
 

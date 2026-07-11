@@ -300,7 +300,7 @@ function buildPdf(json: ReportJson, title: string): Uint8Array {
         `${f.movement} — qualidade ${f.quality_score}/100${comps}${f.notes ? ` — ${f.notes}` : ""}.`,
       );
     }
-    footnote(ctx, "Análise dependente de confirmação profissional.");
+    footnote(ctx, "Indicador de apoio — requer confirmação do profissional.");
   }
 
   // 08 · Exercícios avaliados

@@ -14,7 +14,6 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiAnalyzeImageRouteImport } from './routes/api/analyze-image'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
@@ -58,11 +57,6 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAnalyzeImageRoute = ApiAnalyzeImageRouteImport.update({
-  id: '/api/analyze-image',
-  path: '/api/analyze-image',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
@@ -194,7 +188,6 @@ export interface FileRoutesByFullPath {
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
-  '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
@@ -221,7 +214,6 @@ export interface FileRoutesByTo {
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
-  '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/alunos/$id': typeof AuthenticatedAlunosIdRoute
@@ -250,7 +242,6 @@ export interface FileRoutesById {
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
-  '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/alunos/$id': typeof AuthenticatedAlunosIdRoute
@@ -279,7 +270,6 @@ export interface FileRouteTypes {
     | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
-    | '/api/analyze-image'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/alunos/$id'
@@ -306,7 +296,6 @@ export interface FileRouteTypes {
     | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
-    | '/api/analyze-image'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/alunos/$id'
@@ -334,7 +323,6 @@ export interface FileRouteTypes {
     | '/_authenticated/nova-avaliacao'
     | '/_authenticated/onboarding'
     | '/_authenticated/relatorios'
-    | '/api/analyze-image'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/alunos/$id'
@@ -354,7 +342,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  ApiAnalyzeImageRoute: typeof ApiAnalyzeImageRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -394,13 +381,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/analyze-image': {
-      id: '/api/analyze-image'
-      path: '/api/analyze-image'
-      fullPath: '/api/analyze-image'
-      preLoaderRoute: typeof ApiAnalyzeImageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/relatorios': {
@@ -609,7 +589,6 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
-  ApiAnalyzeImageRoute: ApiAnalyzeImageRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }

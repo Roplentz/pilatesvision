@@ -17,9 +17,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
 import { Route as AuthenticatedNovaAvaliacaoRouteImport } from './routes/_authenticated.nova-avaliacao'
+import { Route as AuthenticatedExerciciosRouteImport } from './routes/_authenticated.exercicios'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedAvaliacaoPosturalRouteImport } from './routes/_authenticated.avaliacao-postural'
+import { Route as AuthenticatedAvaliacaoDinamicaRouteImport } from './routes/_authenticated.avaliacao-dinamica'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -73,6 +75,11 @@ const AuthenticatedNovaAvaliacaoRoute =
     path: '/nova-avaliacao',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedExerciciosRoute = AuthenticatedExerciciosRouteImport.update({
+  id: '/exercicios',
+  path: '/exercicios',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -88,6 +95,12 @@ const AuthenticatedAvaliacaoPosturalRoute =
   AuthenticatedAvaliacaoPosturalRouteImport.update({
     id: '/avaliacao-postural',
     path: '/avaliacao-postural',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAvaliacaoDinamicaRoute =
+  AuthenticatedAvaliacaoDinamicaRouteImport.update({
+    id: '/avaliacao-dinamica',
+    path: '/avaliacao-dinamica',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -167,9 +180,11 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
@@ -191,9 +206,11 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
@@ -217,9 +234,11 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/avaliacao-dinamica': typeof AuthenticatedAvaliacaoDinamicaRoute
   '/_authenticated/avaliacao-postural': typeof AuthenticatedAvaliacaoPosturalRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
@@ -243,9 +262,11 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/avaliacao-dinamica'
     | '/avaliacao-postural'
     | '/configuracoes'
     | '/dashboard'
+    | '/exercicios'
     | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
@@ -267,9 +288,11 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/avaliacao-dinamica'
     | '/avaliacao-postural'
     | '/configuracoes'
     | '/dashboard'
+    | '/exercicios'
     | '/nova-avaliacao'
     | '/onboarding'
     | '/relatorios'
@@ -292,9 +315,11 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
+    | '/_authenticated/avaliacao-dinamica'
     | '/_authenticated/avaliacao-postural'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
+    | '/_authenticated/exercicios'
     | '/_authenticated/nova-avaliacao'
     | '/_authenticated/onboarding'
     | '/_authenticated/relatorios'
@@ -379,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNovaAvaliacaoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/exercicios': {
+      id: '/_authenticated/exercicios'
+      path: '/exercicios'
+      fullPath: '/exercicios'
+      preLoaderRoute: typeof AuthenticatedExerciciosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -398,6 +430,13 @@ declare module '@tanstack/react-router' {
       path: '/avaliacao-postural'
       fullPath: '/avaliacao-postural'
       preLoaderRoute: typeof AuthenticatedAvaliacaoPosturalRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/avaliacao-dinamica': {
+      id: '/_authenticated/avaliacao-dinamica'
+      path: '/avaliacao-dinamica'
+      fullPath: '/avaliacao-dinamica'
+      preLoaderRoute: typeof AuthenticatedAvaliacaoDinamicaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -503,9 +542,11 @@ const AuthenticatedRelatoriosRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAvaliacaoDinamicaRoute: typeof AuthenticatedAvaliacaoDinamicaRoute
   AuthenticatedAvaliacaoPosturalRoute: typeof AuthenticatedAvaliacaoPosturalRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRouteWithChildren
@@ -519,9 +560,11 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAvaliacaoDinamicaRoute: AuthenticatedAvaliacaoDinamicaRoute,
   AuthenticatedAvaliacaoPosturalRoute: AuthenticatedAvaliacaoPosturalRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRouteWithChildren,

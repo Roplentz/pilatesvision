@@ -65,6 +65,7 @@ import {
   type PosturalView,
   type Severity,
 } from "@/lib/assessmentsStore";
+import { generateReportFromAssessment } from "@/lib/reportsStore";
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/$id")({
   component: AvaliacaoDetailPage,
@@ -410,11 +411,7 @@ function AvaliacaoDetailPage() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {status === "completed" && (
-              <Link to="/relatorios">
-                <Button variant="ghost" size="sm">
-                  <FileText className="h-4 w-4" /> Gerar relatório
-                </Button>
-              </Link>
+              <GenerateReportButton assessmentId={assessment.id} />
             )}
             {canFinalize && (
               <AlertDialog>

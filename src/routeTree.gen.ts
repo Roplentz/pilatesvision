@@ -28,7 +28,6 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedAvaliacoesIndexRouteImport } from './routes/_authenticated.avaliacoes.index'
 import { Route as AuthenticatedAlunosIndexRouteImport } from './routes/_authenticated.alunos.index'
-import { Route as AuthenticatedRelatoriosIdRouteImport } from './routes/_authenticated.relatorios.$id'
 import { Route as AuthenticatedAvaliacoesNovaRouteImport } from './routes/_authenticated.avaliacoes.nova'
 import { Route as AuthenticatedAvaliacoesIdRouteImport } from './routes/_authenticated.avaliacoes.$id'
 import { Route as AuthenticatedAlunosNovoRouteImport } from './routes/_authenticated.alunos.novo'
@@ -138,12 +137,6 @@ const AuthenticatedAlunosIndexRoute =
     path: '/alunos/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedRelatoriosIdRoute =
-  AuthenticatedRelatoriosIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedRelatoriosRoute,
-  } as any)
 const AuthenticatedAvaliacoesNovaRoute =
   AuthenticatedAvaliacoesNovaRouteImport.update({
     id: '/avaliacoes/nova',
@@ -193,7 +186,7 @@ export interface FileRoutesByFullPath {
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -201,7 +194,6 @@ export interface FileRoutesByFullPath {
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
   '/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
-  '/relatorios/$id': typeof AuthenticatedRelatoriosIdRoute
   '/alunos/': typeof AuthenticatedAlunosIndexRoute
   '/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
 }
@@ -220,7 +212,7 @@ export interface FileRoutesByTo {
   '/exercicios': typeof AuthenticatedExerciciosRoute
   '/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
+  '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -228,7 +220,6 @@ export interface FileRoutesByTo {
   '/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
   '/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
-  '/relatorios/$id': typeof AuthenticatedRelatoriosIdRoute
   '/alunos': typeof AuthenticatedAlunosIndexRoute
   '/avaliacoes': typeof AuthenticatedAvaliacoesIndexRoute
 }
@@ -249,7 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/exercicios': typeof AuthenticatedExerciciosRoute
   '/_authenticated/nova-avaliacao': typeof AuthenticatedNovaAvaliacaoRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRouteWithChildren
+  '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/api/analyze-image': typeof ApiAnalyzeImageRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -257,7 +248,6 @@ export interface FileRoutesById {
   '/_authenticated/alunos/novo': typeof AuthenticatedAlunosNovoRoute
   '/_authenticated/avaliacoes/$id': typeof AuthenticatedAvaliacoesIdRoute
   '/_authenticated/avaliacoes/nova': typeof AuthenticatedAvaliacoesNovaRoute
-  '/_authenticated/relatorios/$id': typeof AuthenticatedRelatoriosIdRoute
   '/_authenticated/alunos/': typeof AuthenticatedAlunosIndexRoute
   '/_authenticated/avaliacoes/': typeof AuthenticatedAvaliacoesIndexRoute
 }
@@ -286,7 +276,6 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
-    | '/relatorios/$id'
     | '/alunos/'
     | '/avaliacoes/'
   fileRoutesByTo: FileRoutesByTo
@@ -313,7 +302,6 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
-    | '/relatorios/$id'
     | '/alunos'
     | '/avaliacoes'
   id:
@@ -341,7 +329,6 @@ export interface FileRouteTypes {
     | '/_authenticated/alunos/novo'
     | '/_authenticated/avaliacoes/$id'
     | '/_authenticated/avaliacoes/nova'
-    | '/_authenticated/relatorios/$id'
     | '/_authenticated/alunos/'
     | '/_authenticated/avaliacoes/'
   fileRoutesById: FileRoutesById
@@ -494,13 +481,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlunosIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/relatorios/$id': {
-      id: '/_authenticated/relatorios/$id'
-      path: '/$id'
-      fullPath: '/relatorios/$id'
-      preLoaderRoute: typeof AuthenticatedRelatoriosIdRouteImport
-      parentRoute: typeof AuthenticatedRelatoriosRoute
-    }
     '/_authenticated/avaliacoes/nova': {
       id: '/_authenticated/avaliacoes/nova'
       path: '/avaliacoes/nova'
@@ -546,20 +526,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedRelatoriosRouteChildren {
-  AuthenticatedRelatoriosIdRoute: typeof AuthenticatedRelatoriosIdRoute
-}
-
-const AuthenticatedRelatoriosRouteChildren: AuthenticatedRelatoriosRouteChildren =
-  {
-    AuthenticatedRelatoriosIdRoute: AuthenticatedRelatoriosIdRoute,
-  }
-
-const AuthenticatedRelatoriosRouteWithChildren =
-  AuthenticatedRelatoriosRoute._addFileChildren(
-    AuthenticatedRelatoriosRouteChildren,
-  )
-
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAvaliacaoDinamicaRoute: typeof AuthenticatedAvaliacaoDinamicaRoute
@@ -569,7 +535,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedExerciciosRoute: typeof AuthenticatedExerciciosRoute
   AuthenticatedNovaAvaliacaoRoute: typeof AuthenticatedNovaAvaliacaoRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRouteWithChildren
+  AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedAlunosIdRoute: typeof AuthenticatedAlunosIdRoute
   AuthenticatedAlunosNovoRoute: typeof AuthenticatedAlunosNovoRoute
   AuthenticatedAvaliacoesIdRoute: typeof AuthenticatedAvaliacoesIdRoute
@@ -587,7 +553,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedExerciciosRoute: AuthenticatedExerciciosRoute,
   AuthenticatedNovaAvaliacaoRoute: AuthenticatedNovaAvaliacaoRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRouteWithChildren,
+  AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedAlunosIdRoute: AuthenticatedAlunosIdRoute,
   AuthenticatedAlunosNovoRoute: AuthenticatedAlunosNovoRoute,
   AuthenticatedAvaliacoesIdRoute: AuthenticatedAvaliacoesIdRoute,

@@ -264,7 +264,6 @@ function RelatorioDetailPage() {
         <header className="flex flex-col gap-6 border-b border-border/70 pb-8 md:flex-row md:items-end md:justify-between">
           <div className="flex items-center gap-4">
             {json.clinic.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={json.clinic.logo_url}
                 alt={clinicName}

@@ -184,12 +184,18 @@ function AuthPage() {
             <Activity className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight">
-            {isSignup ? "Crie seu estúdio" : "Bem-vindo de volta"}
+            {isForgot
+              ? "Recuperar senha"
+              : isSignup
+                ? "Crie seu estúdio"
+                : "Bem-vindo de volta"}
           </h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            {isSignup
-              ? "14 dias grátis. Sem cartão. Cancele quando quiser."
-              : "Entre com seu e-mail e senha."}
+            {isForgot
+              ? "Enviaremos um link seguro para redefinir sua senha."
+              : isSignup
+                ? "14 dias grátis. Sem cartão. Cancele quando quiser."
+                : "Entre com seu e-mail e senha."}
           </p>
         </motion.div>
 

@@ -29,6 +29,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClinicalMediaUploader } from "@/components/ClinicalMediaUploader";
 import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
+import { usePatientConsent } from "@/lib/patientConsentsStore";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";

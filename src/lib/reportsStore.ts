@@ -177,6 +177,37 @@ export function useReport(id: string | null | undefined) {
   return { report, loading, error, reload: () => setReloadKey((k) => k + 1) };
 }
 
+/** Lista todos os relatórios (draft + finalizados) de um paciente. */
+export function usePatientReports(patientId: string | null | undefined) {
+  const [reports, setReports] = useState<ReportRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(Boolean(patientId));
+
+  useEffect(() => {
+    if (!patientId) {
+      setReports([]);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    supabase
+      .from("reports")
+      .select("*")
+      .eq("patient_id", patientId)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (cancelled) return;
+        setReports((data ?? []) as ReportRow[]);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [patientId]);
+
+  return { reports, loading };
+}
+
 /* =========================================================================
  *  Mutations
  * =======================================================================*/

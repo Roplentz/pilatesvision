@@ -1101,11 +1101,12 @@ function ExerciseSection({
   patientHref: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [namePreset, setNamePreset] = useState<string>(PILATES_EXERCISES[0]);
+  const [libraryItem, setLibraryItem] = useState<ExerciseLibraryRow | null>(null);
   const [nameCustom, setNameCustom] = useState("");
   const [apparatus, setApparatus] = useState<string>(APPARATUS_OPTIONS[0]);
   const [execution, setExecution] = useState("");
   const [control, setControl] = useState<ControlLevel>("bom");
+  const [supportLevel, setSupportLevel] = useState<0 | 1 | 2 | 3>(1);
   const [recommendation, setRecommendation] = useState("");
   const [comps, setComps] = useState<ExerciseCompensation[]>([]);
   const [comp, setComp] = useState("");
@@ -1122,8 +1123,7 @@ function ExerciseSection({
   };
 
   const save = async () => {
-    const resolvedName =
-      namePreset === "Exercício livre" ? nameCustom.trim() : namePreset.trim();
+    const resolvedName = libraryItem ? libraryItem.name_pt : nameCustom.trim();
     if (!resolvedName) return toast.error("Informe o exercício.");
     setSaving(true);
     try {
@@ -1135,6 +1135,9 @@ function ExerciseSection({
         apparatus: apparatus || null,
         execution_notes: execution.trim() || null,
         control_level: control,
+        support_level: supportLevel,
+        library_exercise_id: libraryItem?.id ?? null,
+        generated_by: "professional",
         recommendation: recommendation.trim() || null,
         compensations: comps as unknown as never,
         video_url: videoPath,
@@ -1142,11 +1145,12 @@ function ExerciseSection({
       });
       toast.success("Registro de exercício salvo.");
       setOpen(false);
-      setNamePreset(PILATES_EXERCISES[0]);
+      setLibraryItem(null);
       setNameCustom("");
       setApparatus(APPARATUS_OPTIONS[0]);
       setExecution("");
       setControl("bom");
+      setSupportLevel(1);
       setRecommendation("");
       setComps([]);
       setVideoPath(null);

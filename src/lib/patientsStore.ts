@@ -2,21 +2,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-export type StudentRow = Database["public"]["Tables"]["patients"]["Row"];
-export type NewStudentInput = Omit<
+export type PatientRow = Database["public"]["Tables"]["patients"]["Row"];
+export type NewPatientInput = Omit<
   Database["public"]["Tables"]["patients"]["Insert"],
   "id" | "created_at"
 >;
-export type UpdateStudentInput = Database["public"]["Tables"]["patients"]["Update"];
+export type UpdatePatientInput = Database["public"]["Tables"]["patients"]["Update"];
 
-export type StudentStatus = "active" | "inactive" | "archived";
+export type PatientStatus = "active" | "inactive" | "archived";
 
-/** Lista alunos de uma clínica com filtro opcional de status. */
-export function useStudents(
+/** Lista pacientes de uma clínica com filtro opcional de status. */
+export function usePatients(
   clinicId: string | null | undefined,
-  options?: { status?: StudentStatus | "all" },
+  options?: { status?: PatientStatus | "all" },
 ) {
-  const [students, setStudents] = useState<StudentRow[]>([]);
+  const [patients, setPatients] = useState<PatientRow[]>([]);
   const [loading, setLoading] = useState<boolean>(Boolean(clinicId));
   const [error, setError] = useState<Error | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -24,7 +24,7 @@ export function useStudents(
 
   useEffect(() => {
     if (!clinicId) {
-      setStudents([]);
+      setPatients([]);
       setLoading(false);
       return;
     }
@@ -42,7 +42,7 @@ export function useStudents(
     query.then(({ data, error }) => {
       if (cancelled) return;
       if (error) setError(new Error(error.message));
-      else setStudents((data ?? []) as StudentRow[]);
+      else setPatients((data ?? []) as PatientRow[]);
       setLoading(false);
     });
     return () => {
@@ -50,18 +50,18 @@ export function useStudents(
     };
   }, [clinicId, statusFilter, reloadKey]);
 
-  return { students, loading, error, reload: () => setReloadKey((k) => k + 1) };
+  return { patients, loading, error, reload: () => setReloadKey((k) => k + 1) };
 }
 
-/** Busca um único aluno pelo id. */
-export function useStudent(id: string | null | undefined) {
-  const [student, setStudent] = useState<StudentRow | null>(null);
+/** Busca um único paciente pelo id. */
+export function usePatient(id: string | null | undefined) {
+  const [patient, setPatient] = useState<PatientRow | null>(null);
   const [loading, setLoading] = useState<boolean>(Boolean(id));
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!id) {
-      setStudent(null);
+      setPatient(null);
       setLoading(false);
       return;
     }
@@ -76,7 +76,7 @@ export function useStudent(id: string | null | undefined) {
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) setError(new Error(error.message));
-        else setStudent((data as StudentRow | null) ?? null);
+        else setPatient((data as PatientRow | null) ?? null);
         setLoading(false);
       });
     return () => {
@@ -84,19 +84,19 @@ export function useStudent(id: string | null | undefined) {
     };
   }, [id]);
 
-  return { student, loading, error };
+  return { patient, loading, error };
 }
 
-/** Insere um novo aluno. clinic_id deve vir do perfil do usuário logado. */
-export async function createStudent(input: NewStudentInput): Promise<StudentRow> {
+/** Insere um novo paciente. clinic_id deve vir do perfil do usuário logado. */
+export async function createPatient(input: NewPatientInput): Promise<PatientRow> {
   const { data, error } = await supabase.from("patients").insert(input).select("*").single();
   if (error) throw new Error(error.message);
-  return data as StudentRow;
+  return data as PatientRow;
 }
 
-/** Atualiza dados básicos de um aluno. clinic_id nunca é alterado. */
-export async function updateStudent(id: string, patch: UpdateStudentInput): Promise<StudentRow> {
-  const safe: UpdateStudentInput = { ...patch };
+/** Atualiza dados básicos de um paciente. clinic_id nunca é alterado. */
+export async function updatePatient(id: string, patch: UpdatePatientInput): Promise<PatientRow> {
+  const safe: UpdatePatientInput = { ...patch };
   delete (safe as { clinic_id?: string }).clinic_id;
   const { data, error } = await supabase
     .from("patients")
@@ -105,17 +105,17 @@ export async function updateStudent(id: string, patch: UpdateStudentInput): Prom
     .select("*")
     .single();
   if (error) throw new Error(error.message);
-  return data as StudentRow;
+  return data as PatientRow;
 }
 
-/** Arquiva o aluno (soft delete). */
-export async function archiveStudent(id: string): Promise<void> {
+/** Arquiva o paciente (soft delete). */
+export async function archivePatient(id: string): Promise<void> {
   const { error } = await supabase.from("patients").update({ status: "archived" }).eq("id", id);
   if (error) throw new Error(error.message);
 }
 
-/** Contagens de alunos por status (ativos, arquivados, inativos). */
-export function useStudentCounts(clinicId: string | null | undefined) {
+/** Contagens de pacientes por status (ativos, arquivados, inativos). */
+export function usePatientCounts(clinicId: string | null | undefined) {
   const [counts, setCounts] = useState({ active: 0, inactive: 0, archived: 0 });
   const [loading, setLoading] = useState<boolean>(Boolean(clinicId));
 

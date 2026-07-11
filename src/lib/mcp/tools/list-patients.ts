@@ -35,7 +35,7 @@ export default defineTool({
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return {
       content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
-      structuredContent: { students: data },
+      structuredContent: { patients: data },
     };
   },
 });

@@ -264,7 +264,7 @@ function AvaliacaoDetailPage() {
       <main className="mx-auto max-w-5xl space-y-8 px-6 py-10">
         <section>
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-xs text-muted-foreground">
-            <User className="h-3.5 w-3.5" /> {assessment.students?.name ?? "Paciente"}
+            <User className="h-3.5 w-3.5" /> {assessment.patients?.name ?? "Paciente"}
           </div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
             {assessment.title || `Avaliação ${typeLabel[type] ?? ""}`}
@@ -366,7 +366,7 @@ function AvaliacaoDetailPage() {
               <PosturalSection
                 assessmentId={assessment.id}
                 clinicId={assessment.clinic_id}
-                studentId={assessment.patient_id}
+                patientId={assessment.patient_id}
                 items={postural}
                 editable={isDraft}
                 onSaved={reload}
@@ -378,7 +378,7 @@ function AvaliacaoDetailPage() {
               <MovementSection
                 assessmentId={assessment.id}
                 clinicId={assessment.clinic_id}
-                studentId={assessment.patient_id}
+                patientId={assessment.patient_id}
                 items={movement}
                 editable={isDraft}
                 onSaved={reload}
@@ -390,7 +390,7 @@ function AvaliacaoDetailPage() {
               <ExerciseSection
                 assessmentId={assessment.id}
                 clinicId={assessment.clinic_id}
-                studentId={assessment.patient_id}
+                patientId={assessment.patient_id}
                 items={exercise}
                 editable={isDraft}
                 onSaved={reload}
@@ -452,14 +452,14 @@ function AvaliacaoDetailPage() {
 function PosturalSection({
   assessmentId,
   clinicId,
-  studentId,
+  patientId,
   items,
   editable,
   onSaved,
 }: {
   assessmentId: string;
   clinicId: string;
-  studentId: string;
+  patientId: string;
   items: PosturalResultRow[];
   editable: boolean;
   onSaved: () => void;
@@ -506,7 +506,7 @@ function PosturalSection({
       await insertPosturalResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
-        patient_id: studentId,
+        patient_id: patientId,
         view,
         findings: findings as unknown as never,
         score: score ? Number(score) : null,
@@ -696,7 +696,7 @@ function PosturalSection({
           <ClinicalMediaUploader
             kind="image"
             clinicId={clinicId}
-            studentId={studentId}
+            patientId={patientId}
             assessmentId={assessmentId}
             currentPath={imagePath}
             onUploaded={(p) => setImagePath(p)}
@@ -722,14 +722,14 @@ function PosturalSection({
 function MovementSection({
   assessmentId,
   clinicId,
-  studentId,
+  patientId,
   items,
   editable,
   onSaved,
 }: {
   assessmentId: string;
   clinicId: string;
-  studentId: string;
+  patientId: string;
   items: MovementResultRow[];
   editable: boolean;
   onSaved: () => void;
@@ -769,7 +769,7 @@ function MovementSection({
       await insertMovementResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
-        patient_id: studentId,
+        patient_id: patientId,
         movement_name: resolvedName,
         compensations: compensations as unknown as never,
         controle: score ? Number(score) : null,
@@ -994,7 +994,7 @@ function MovementSection({
           <ClinicalMediaUploader
             kind="video"
             clinicId={clinicId}
-            studentId={studentId}
+            patientId={patientId}
             assessmentId={assessmentId}
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
@@ -1004,7 +1004,7 @@ function MovementSection({
           <ClinicalMediaUploader
             kind="image"
             clinicId={clinicId}
-            studentId={studentId}
+            patientId={patientId}
             assessmentId={assessmentId}
             currentPath={imagePath}
             onUploaded={(p) => setImagePath(p)}
@@ -1031,14 +1031,14 @@ function MovementSection({
 function ExerciseSection({
   assessmentId,
   clinicId,
-  studentId,
+  patientId,
   items,
   editable,
   onSaved,
 }: {
   assessmentId: string;
   clinicId: string;
-  studentId: string;
+  patientId: string;
   items: ExerciseResultRow[];
   editable: boolean;
   onSaved: () => void;
@@ -1073,7 +1073,7 @@ function ExerciseSection({
       await insertExerciseResult({
         assessment_id: assessmentId,
         clinic_id: clinicId,
-        patient_id: studentId,
+        patient_id: patientId,
         exercise_name: resolvedName,
         apparatus: apparatus || null,
         execution_notes: execution.trim() || null,
@@ -1332,7 +1332,7 @@ function ExerciseSection({
           <ClinicalMediaUploader
             kind="video"
             clinicId={clinicId}
-            studentId={studentId}
+            patientId={patientId}
             assessmentId={assessmentId}
             currentPath={videoPath}
             onUploaded={(p) => setVideoPath(p)}
@@ -1342,7 +1342,7 @@ function ExerciseSection({
           <ClinicalMediaUploader
             kind="image"
             clinicId={clinicId}
-            studentId={studentId}
+            patientId={patientId}
             assessmentId={assessmentId}
             currentPath={imagePath}
             onUploaded={(p) => setImagePath(p)}

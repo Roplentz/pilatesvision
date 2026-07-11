@@ -144,7 +144,7 @@ function RelatorioDetailPage() {
           </Link>
           <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight">Relatório clínico</h1>
           <p className="text-sm text-muted-foreground">
-            Paciente: {report.students?.name ?? "—"} · Versão {report.version}
+            Paciente: {report.patients?.name ?? "—"} · Versão {report.version}
           </p>
         </div>
         <div className="flex items-center gap-2">

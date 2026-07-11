@@ -171,14 +171,14 @@ export function useClinicById(id: string | null | undefined) {
 }
 
 export interface ClinicCounts {
-  students: number;
+  patients: number;
   assessments: number;
   reports: number;
 }
 
 export function useClinicCounts(clinicId: string | null | undefined) {
   const [counts, setCounts] = useState<ClinicCounts>({
-    students: 0,
+    patients: 0,
     assessments: 0,
     reports: 0,
   });
@@ -186,7 +186,7 @@ export function useClinicCounts(clinicId: string | null | undefined) {
 
   useEffect(() => {
     if (!clinicId) {
-      setCounts({ students: 0, assessments: 0, reports: 0 });
+      setCounts({ patients: 0, assessments: 0, reports: 0 });
       setLoading(false);
       return;
     }
@@ -195,7 +195,7 @@ export function useClinicCounts(clinicId: string | null | undefined) {
     setLoading(true);
 
     const loadCounts = async () => {
-      const [studentsResult, assessmentsResult, reportsResult] = await Promise.all([
+      const [patientsResult, assessmentsResult, reportsResult] = await Promise.all([
         supabase
           .from("patients")
           .select("id", { count: "exact", head: true })
@@ -213,7 +213,7 @@ export function useClinicCounts(clinicId: string | null | undefined) {
       if (cancelled) return;
 
       setCounts({
-        students: studentsResult.count ?? 0,
+        patients: patientsResult.count ?? 0,
         assessments: assessmentsResult.count ?? 0,
         reports: reportsResult.count ?? 0,
       });

@@ -43,7 +43,7 @@ export default defineTool({
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     return {
       content: [{ type: "text", text: `Aluno criado: ${data.id}` }],
-      structuredContent: { student: data },
+      structuredContent: { patient: data },
     };
   },
 });

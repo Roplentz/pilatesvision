@@ -114,7 +114,7 @@ export interface Student {
 export interface Assessment {
   id: string;
   clinicId: string;
-  studentId: string;
+  patientId: string;
   professionalId: string;
   status: AssessmentStatus;
   currentStage: AssessmentStage;

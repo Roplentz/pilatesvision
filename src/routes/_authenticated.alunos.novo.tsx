@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createStudent } from "@/lib/studentsStore";
+import { createPatient } from "@/lib/patientsStore";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -57,7 +57,7 @@ function NovoAlunoPage() {
     }
     setSubmitting(true);
     try {
-      const created = await createStudent({
+      const created = await createPatient({
         clinic_id: clinicId,
         name: name.trim(),
         email: email.trim() || null,

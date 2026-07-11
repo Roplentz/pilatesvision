@@ -14,13 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStudents } from "@/lib/studentsStore";
+import { usePatients } from "@/lib/patientsStore";
 import { createAssessment, type AssessmentType } from "@/lib/assessmentsStore";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-const searchSchema = z.object({ studentId: z.string().optional() });
+const searchSchema = z.object({ patientId: z.string().optional() });
 
 export const Route = createFileRoute("/_authenticated/avaliacoes/nova")({
   component: NovaAvaliacaoPage,
@@ -40,9 +40,9 @@ function NovaAvaliacaoPage() {
   const search = Route.useSearch();
   const { user } = useAuth();
   const { clinicId, loading: profileLoading } = useProfile();
-  const { students, loading: studentsLoading } = useStudents(clinicId);
+  const { patients, loading: patientsLoading } = usePatients(clinicId);
 
-  const [studentId, setStudentId] = useState(search.studentId ?? "");
+  const [patientId, setStudentId] = useState(search.patientId ?? "");
   const [type, setType] = useState<AssessmentType>("postural");
   const [title, setTitle] = useState("");
   const [objective, setObjective] = useState("");
@@ -54,12 +54,12 @@ function NovaAvaliacaoPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clinicId) return toast.error("Perfil sem clínica vinculada.");
-    if (!studentId) return toast.error("Selecione um paciente.");
+    if (!patientId) return toast.error("Selecione um paciente.");
     setSubmitting(true);
     try {
       const created = await createAssessment({
         clinic_id: clinicId,
-        patient_id: studentId,
+        patient_id: patientId,
         professional_id: user?.id ?? null,
         type,
         title: title.trim() || null,
@@ -112,14 +112,14 @@ function NovaAvaliacaoPage() {
         >
           <div>
             <Label>Paciente *</Label>
-            <Select value={studentId} onValueChange={setStudentId}>
+            <Select value={patientId} onValueChange={setStudentId}>
               <SelectTrigger className="mt-1.5">
                 <SelectValue
-                  placeholder={studentsLoading ? "Carregando…" : "Selecione um paciente"}
+                  placeholder={patientsLoading ? "Carregando…" : "Selecione um paciente"}
                 />
               </SelectTrigger>
               <SelectContent>
-                {students.map((s) => (
+                {patients.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.name}
                   </SelectItem>

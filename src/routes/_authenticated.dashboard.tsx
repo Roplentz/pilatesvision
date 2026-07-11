@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, Archive, ClipboardCheck, Plus, ArrowRight } from "lucide-react";
-import { useStudents, useStudentCounts } from "@/lib/studentsStore";
+import { usePatients, usePatientCounts } from "@/lib/patientsStore";
 import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -14,10 +14,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function DashboardPage() {
   const { clinicId, loading: profileLoading } = useProfile();
-  const { students, loading: studentsLoading } = useStudents(clinicId, { status: "active" });
-  const { counts, loading: countsLoading } = useStudentCounts(clinicId);
+  const { patients, loading: patientsLoading } = usePatients(clinicId, { status: "active" });
+  const { counts, loading: countsLoading } = usePatientCounts(clinicId);
 
-  const loading = profileLoading || studentsLoading || countsLoading;
+  const loading = profileLoading || patientsLoading || countsLoading;
 
   const stats = [
     { label: "Pacientes ativos", value: counts.active, icon: Users },
@@ -25,7 +25,7 @@ function DashboardPage() {
     { label: "Avaliações (em breve)", value: 0, icon: ClipboardCheck },
   ];
 
-  const recent = students.slice(0, 5);
+  const recent = patients.slice(0, 5);
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-6 py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">

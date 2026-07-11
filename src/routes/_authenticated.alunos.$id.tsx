@@ -34,8 +34,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { archiveStudent, updateStudent, useStudent, type StudentStatus } from "@/lib/studentsStore";
-import { useStudentAssessments } from "@/lib/assessmentsStore";
+import { archivePatient, updatePatient, usePatient, type PatientStatus } from "@/lib/patientsStore";
+import { usePatientAssessments } from "@/lib/assessmentsStore";
 import { toast } from "sonner";
 import { ClipboardPlus, FileText, Plus } from "lucide-react";
 
@@ -53,7 +53,7 @@ function ageFrom(iso: string | null, fallback: number | null): number | null {
   return Math.floor((Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000));
 }
 
-const statusLabel: Record<StudentStatus, string> = {
+const statusLabel: Record<PatientStatus, string> = {
   active: "Ativo",
   inactive: "Inativo",
   archived: "Arquivado",
@@ -62,7 +62,7 @@ const statusLabel: Record<StudentStatus, string> = {
 function AlunoDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const { student, loading } = useStudent(id);
+  const { patient, loading } = usePatient(id);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -75,24 +75,24 @@ function AlunoDetailPage() {
     main_goal: "",
     main_complaint: "",
     clinical_notes: "",
-    status: "active" as StudentStatus,
+    status: "active" as PatientStatus,
   });
 
   useEffect(() => {
-    if (!student) return;
+    if (!patient) return;
     setForm({
-      name: student.name,
-      email: student.email ?? "",
-      phone: student.phone ?? "",
-      birth_date: student.birth_date ?? "",
-      age: student.age != null ? String(student.age) : "",
-      gender: (student.gender as "F" | "M" | "outro") ?? "F",
-      main_goal: student.goals?.[0] ?? "",
-      main_complaint: student.main_complaint ?? "",
-      clinical_notes: student.clinical_notes ?? "",
-      status: (student.status as StudentStatus) ?? "active",
+      name: patient.name,
+      email: patient.email ?? "",
+      phone: patient.phone ?? "",
+      birth_date: patient.birth_date ?? "",
+      age: patient.age != null ? String(patient.age) : "",
+      gender: (patient.gender as "F" | "M" | "outro") ?? "F",
+      main_goal: patient.goals?.[0] ?? "",
+      main_complaint: patient.main_complaint ?? "",
+      clinical_notes: patient.clinical_notes ?? "",
+      status: (patient.status as PatientStatus) ?? "active",
     });
-  }, [student]);
+  }, [patient]);
 
   if (loading) {
     return (
@@ -102,7 +102,7 @@ function AlunoDetailPage() {
     );
   }
 
-  if (!student) {
+  if (!patient) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
@@ -117,8 +117,8 @@ function AlunoDetailPage() {
     );
   }
 
-  const age = ageFrom(student.birth_date, student.age);
-  const st = (student.status as StudentStatus) ?? "active";
+  const age = ageFrom(patient.birth_date, patient.age);
+  const st = (patient.status as PatientStatus) ?? "active";
 
   const save = async () => {
     if (!form.name.trim()) {
@@ -131,7 +131,7 @@ function AlunoDetailPage() {
     }
     setSaving(true);
     try {
-      await updateStudent(student.id, {
+      await updatePatient(patient.id, {
         name: form.name.trim(),
         email: form.email.trim() || null,
         phone: form.phone.trim() || null,
@@ -147,7 +147,7 @@ function AlunoDetailPage() {
       toast.success("Paciente atualizado.");
       setEditing(false);
       // trigger reload via navigate to same route
-      navigate({ to: "/alunos/$id", params: { id: student.id }, replace: true });
+      navigate({ to: "/alunos/$id", params: { id: patient.id }, replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Falha ao salvar.");
     } finally {
@@ -157,7 +157,7 @@ function AlunoDetailPage() {
 
   const archive = async () => {
     try {
-      await archiveStudent(student.id);
+      await archivePatient(patient.id);
       toast.success("Paciente arquivado.");
       navigate({ to: "/alunos" });
     } catch (err) {
@@ -219,18 +219,18 @@ function AlunoDetailPage() {
       <main className="mx-auto max-w-5xl px-6 py-10">
         <div className="flex items-center gap-5">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-lg font-semibold text-primary">
-            {student.name
+            {patient.name
               .split(" ")
               .slice(0, 2)
               .map((p) => p[0])
               .join("")}
           </div>
           <div className="flex-1">
-            <h1 className="font-display text-3xl font-semibold tracking-tight">{student.name}</h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">{patient.name}</h1>
             <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               {age != null ? `${age} anos · ` : ""}
-              {student.gender ?? "—"} · cadastrado em{" "}
-              {new Date(student.created_at).toLocaleDateString("pt-BR")}
+              {patient.gender ?? "—"} · cadastrado em{" "}
+              {new Date(patient.created_at).toLocaleDateString("pt-BR")}
               <Badge
                 variant={st === "active" ? "default" : st === "archived" ? "outline" : "secondary"}
                 className="text-[10px]"
@@ -312,7 +312,7 @@ function AlunoDetailPage() {
                 <Label>Status</Label>
                 <Select
                   value={form.status}
-                  onValueChange={(v) => setForm({ ...form, status: v as StudentStatus })}
+                  onValueChange={(v) => setForm({ ...form, status: v as PatientStatus })}
                 >
                   <SelectTrigger className="mt-1.5">
                     <SelectValue />
@@ -362,16 +362,16 @@ function AlunoDetailPage() {
                 <ul className="mt-3 space-y-2 text-sm">
                   <li className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    {student.email ?? "—"}
+                    {patient.email ?? "—"}
                   </li>
                   <li className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    {student.phone ?? "—"}
+                    {patient.phone ?? "—"}
                   </li>
                   <li className="flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                    {student.birth_date
-                      ? new Date(student.birth_date).toLocaleDateString("pt-BR")
+                    {patient.birth_date
+                      ? new Date(patient.birth_date).toLocaleDateString("pt-BR")
                       : "—"}
                   </li>
                 </ul>
@@ -381,30 +381,30 @@ function AlunoDetailPage() {
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">
                   Objetivo principal
                 </div>
-                <p className="mt-3 text-sm">{student.goals?.[0] ?? "—"}</p>
+                <p className="mt-3 text-sm">{patient.goals?.[0] ?? "—"}</p>
               </div>
 
               <div className="rounded-xl border border-border/60 bg-card/40 p-5">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">
                   Queixa principal
                 </div>
-                <p className="mt-3 text-sm">{student.main_complaint ?? "—"}</p>
+                <p className="mt-3 text-sm">{patient.main_complaint ?? "—"}</p>
               </div>
             </div>
 
-            {student.clinical_notes && (
+            {patient.clinical_notes && (
               <div className="mt-6 rounded-xl border border-border/60 bg-card/40 p-5">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">
                   Observações clínicas
                 </div>
                 <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">
-                  {student.clinical_notes}
+                  {patient.clinical_notes}
                 </p>
               </div>
             )}
 
             <div className="mt-10">
-              <AssessmentsHistory studentId={student.id} />
+              <AssessmentsHistory patientId={patient.id} />
             </div>
           </>
         )}
@@ -425,13 +425,13 @@ const asmtTypeLabel: Record<string, string> = {
   complete: "Completa",
 };
 
-function AssessmentsHistory({ studentId }: { studentId: string }) {
-  const { assessments, loading } = useStudentAssessments(studentId);
+function AssessmentsHistory({ patientId }: { patientId: string }) {
+  const { assessments, loading } = usePatientAssessments(patientId);
   return (
     <>
       <div className="flex items-center justify-between">
         <h2 className="font-display text-xl font-semibold">Avaliações</h2>
-        <Link to="/avaliacoes/nova" search={{ studentId }}>
+        <Link to="/avaliacoes/nova" search={{ patientId }}>
           <Button variant="hero" size="sm">
             <ClipboardPlus className="h-4 w-4" /> Nova avaliação
           </Button>

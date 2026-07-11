@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 export type AssessmentRow = Database["public"]["Tables"]["assessments"]["Row"];
-export type AssessmentWithStudent = AssessmentRow & {
-  students: { name: string } | null;
+export type AssessmentWithPatient = AssessmentRow & {
+  patients: { name: string } | null;
 };
 export type NewAssessmentInput = Omit<
   Database["public"]["Tables"]["assessments"]["Insert"],
@@ -45,7 +45,7 @@ export type ExerciseCompensation = {
 
 /** Lista avaliações de uma clínica, incluindo o nome do aluno relacionado. */
 export function useAssessments(clinicId: string | null | undefined) {
-  const [assessments, setAssessments] = useState<AssessmentWithStudent[]>([]);
+  const [assessments, setAssessments] = useState<AssessmentWithPatient[]>([]);
   const [loading, setLoading] = useState<boolean>(Boolean(clinicId));
   const [error, setError] = useState<Error | null>(null);
 
@@ -60,13 +60,13 @@ export function useAssessments(clinicId: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, students:patients(name)")
+      .select("*, patients:patients(name)")
       .eq("clinic_id", clinicId)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) setError(new Error(error.message));
-        else setAssessments((data ?? []) as unknown as AssessmentWithStudent[]);
+        else setAssessments((data ?? []) as unknown as AssessmentWithPatient[]);
         setLoading(false);
       });
     return () => {
@@ -208,7 +208,7 @@ export function useAssessmentResults(assessmentId: string | null | undefined) {
 
 /** Busca uma avaliação pelo id, com o nome do aluno. */
 export function useAssessment(id: string | null | undefined) {
-  const [assessment, setAssessment] = useState<AssessmentWithStudent | null>(null);
+  const [assessment, setAssessment] = useState<AssessmentWithPatient | null>(null);
   const [loading, setLoading] = useState<boolean>(Boolean(id));
   const [error, setError] = useState<Error | null>(null);
 
@@ -223,13 +223,13 @@ export function useAssessment(id: string | null | undefined) {
     setError(null);
     supabase
       .from("assessments")
-      .select("*, students:patients(name)")
+      .select("*, patients:patients(name)")
       .eq("id", id)
       .maybeSingle()
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) setError(new Error(error.message));
-        else setAssessment((data as unknown as AssessmentWithStudent | null) ?? null);
+        else setAssessment((data as unknown as AssessmentWithPatient | null) ?? null);
         setLoading(false);
       });
     return () => {
@@ -285,12 +285,12 @@ export function useAssessmentExtras(assessmentId: string | null | undefined) {
 }
 
 /** Lista avaliações de um aluno específico. */
-export function useStudentAssessments(studentId: string | null | undefined) {
+export function usePatientAssessments(patientId: string | null | undefined) {
   const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(Boolean(studentId));
+  const [loading, setLoading] = useState<boolean>(Boolean(patientId));
 
   useEffect(() => {
-    if (!studentId) {
+    if (!patientId) {
       setAssessments([]);
       setLoading(false);
       return;
@@ -300,7 +300,7 @@ export function useStudentAssessments(studentId: string | null | undefined) {
     supabase
       .from("assessments")
       .select("*")
-      .eq("patient_id", studentId)
+      .eq("patient_id", patientId)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
         if (cancelled) return;
@@ -310,7 +310,7 @@ export function useStudentAssessments(studentId: string | null | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [studentId]);
+  }, [patientId]);
 
   return { assessments, loading };
 }

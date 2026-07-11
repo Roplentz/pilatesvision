@@ -529,7 +529,7 @@ function Footer() {
           <Link to="/termos" className="transition hover:text-foreground">
             Termos
           </Link>
-          <a href="#" className="transition hover:text-foreground">
+          <a href="mailto:contato@pilatesvision.com.br" className="transition hover:text-foreground">
             Contato
           </a>
         </div>

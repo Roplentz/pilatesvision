@@ -63,9 +63,34 @@ bun run build
 bun run ci
 ```
 
+## Bootstrap do banco a partir do zero
+
+Fonte única de verdade: `supabase/migrations/*.sql` em ordem cronológica.
+`database/schema.sql` é apenas histórico e **não deve** ser executado.
+
+```bash
+# Exemplo com Supabase local
+supabase start
+supabase db reset            # aplica todas as migrations, em ordem
+```
+
+A sequência produz o schema canônico usado pelo frontend: `clinics`, `profiles`,
+`user_roles`, `patients`, `patient_consents`, `assessments`, `postural_results`,
+`movement_results`, `exercise_results`, `prescribed_exercises`, `reports`,
+`exercise_library`, `pose_captures`, `platform_admins`, com RLS habilitada,
+funções (`handle_new_user`, `has_role`, `current_clinic_id`, `is_platform_admin`,
+`platform_overview`, `tg_set_updated_at`), triggers `updated_at`, índices e o
+bucket privado `clinical-media` com policies escopadas por `clinic_id`.
+
+Auditoria detalhada: `docs/db/SCHEMA_AUDIT.md`.
+Matriz do Sprint Zero: `docs/SPRINT_ZERO_STABILIZATION.md`.
+
 ## Banco de dados esperado
 
-A tipagem atual contempla clinics, profiles, students, assessments, postural_results, movement_results, prescribed_exercises, reports e user_roles.
+A tipagem atual contempla `clinics`, `profiles`, `patients` (nome canônico —
+"aluno" só aparece na UI), `patient_consents`, `assessments`, `postural_results`,
+`movement_results`, `exercise_results`, `prescribed_exercises`, `reports`,
+`exercise_library`, `pose_captures`, `platform_admins` e `user_roles`.
 
 Regra essencial: toda informação clínica deve pertencer a uma clínica, com RLS impedindo acesso cruzado entre clínicas.
 

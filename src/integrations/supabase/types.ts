@@ -78,7 +78,7 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "assessments_student_id_fkey";
+            foreignKeyName: "assessments_patient_id_fkey";
             columns: ["patient_id"];
             isOneToOne: false;
             referencedRelation: "patients";
@@ -284,7 +284,7 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "exercise_results_student_id_fkey";
+            foreignKeyName: "exercise_results_patient_id_fkey";
             columns: ["patient_id"];
             isOneToOne: false;
             referencedRelation: "patients";
@@ -369,7 +369,7 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "movement_results_student_id_fkey";
+            foreignKeyName: "movement_results_patient_id_fkey";
             columns: ["patient_id"];
             isOneToOne: false;
             referencedRelation: "patients";
@@ -516,7 +516,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "students_clinic_id_fkey";
+            foreignKeyName: "patients_clinic_id_fkey";
             columns: ["clinic_id"];
             isOneToOne: false;
             referencedRelation: "clinics";
@@ -680,7 +680,7 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "postural_results_student_id_fkey";
+            foreignKeyName: "postural_results_patient_id_fkey";
             columns: ["patient_id"];
             isOneToOne: false;
             referencedRelation: "patients";

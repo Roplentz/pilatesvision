@@ -28,6 +28,24 @@ Todas com RLS habilitada após esta migration.
 - Não cria bucket `clinical-media` (bloqueio da plataforma para SQL de bucket) — bucket já existe e é privado (confirmado no contexto).
 - Não altera `handle_new_user()`, `has_role()`, `current_clinic_id()`, `is_platform_admin()`, `platform_overview()`, `tg_set_updated_at()` — estão corretos.
 
+## Complemento aplicado (segunda migration)
+
+- **Storage `clinical-media`**: policies `clinical_media_sel/ins/upd` recriadas
+  como `TO authenticated` (antes `TO public`, embora o predicado já exigisse
+  usuário autenticado via `current_user_clinic_id()`) e nova policy
+  `clinical_media_del`. Todas mantêm o escopo `(storage.foldername(name))[1] = clinic_id`.
+- **Constraints legadas**: renomeadas `students_*` → `patients_*` e
+  `*_student_id_fkey` → `*_patient_id_fkey` para alinhar nomes de constraints
+  ao modelo canônico (`patients`). Puramente cosmético — nomes de constraint
+  não afetam dados, aplicação ou tipos.
+
+## Reproduzir do zero
+
+`supabase db reset` (em Supabase local) aplica toda a sequência em
+`supabase/migrations/` e produz o schema equivalente ao remoto atual.
+`database/schema.sql` **não é fonte da verdade** e não deve ser executado
+durante o bootstrap.
+
 ## Warnings do linter Supabase pós-migration
 
 9 warnings tipo `0028/0029 SECURITY DEFINER function executable`. Todos são **falsos positivos aceitáveis no MVP**:

@@ -11,6 +11,38 @@ Matriz de entregas, comandos, evidências, limitações e critérios de aceite.
 | C   | CI verde                                   | `.github/workflows/ci.yml` (Bun fixado, format:check, lint:check, typecheck, test:run, build)                               | ✅ pipeline determinística                                        |
 | D   | Jornada com dois usuários / dois pacientes | `src/__tests__/journey-isolation.test.ts` (mock in-memory, roda no CI) + `e2e/journey.e2e.ts` (Playwright, skip por padrão) | ⚠ Playwright autenticado só roda localmente contra Supabase local |
 
+## Entrega 1 — evidências
+
+Duas migrations canônicas aditivas foram aplicadas em produção (2026-07-12):
+
+1. **Baseline funcional**: RLS habilitada em 14 tabelas, trigger
+   `on_auth_user_created` em `auth.users`, `set_updated_at` em 10 tabelas,
+   policy `platform_admins_select_self`, GRANTs defensivos, índices em
+   `clinic_id`/`patient_id`/`assessment_id`.
+2. **Storage e cosmético**: policies do bucket `clinical-media` recriadas como
+   `TO authenticated` com escopo por
+   `(storage.foldername(name))[1] = current_user_clinic_id()` e nova policy
+   DELETE. Constraints legadas `students_*` renomeadas para `patients_*` sem
+   alterar dados nem estrutura.
+
+Fonte única de verdade para reproduzir do zero: `supabase/migrations/*.sql`
+em ordem cronológica. `database/schema.sql` é apenas histórico. Ver
+`README.md` § "Bootstrap do banco a partir do zero".
+
+### Comandos de validação executados
+
+```bash
+bun run test:run       # 38/38 ✅  (rls-static: 20, journey-isolation: 7, poseMetrics: 11)
+bun run typecheck      # ✅
+bun run format:check   # ✅
+bun run lint:check     # 0 erros (6 warnings pré-existentes react-refresh)
+```
+
+Linter Supabase pós-migration: apenas warnings pré-existentes de
+`SECURITY DEFINER` (falsos positivos aceitáveis — funções `has_role` /
+`current_clinic_id` / `is_platform_admin` precisam ser executáveis por
+usuários autenticados dentro de expressões de policy).
+
 ## Comandos
 
 ```bash

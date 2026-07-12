@@ -74,6 +74,14 @@ supabase start
 supabase db reset            # aplica todas as migrations, em ordem
 ```
 
+Validação completa automatizada (requer Docker, Supabase CLI e psql):
+
+```bash
+bash scripts/setup-supabase-local.sh
+```
+
+O mesmo processo roda no job `Supabase clean bootstrap and RLS` do GitHub Actions. Ele sobe serviços locais em Docker, recria um banco vazio e executa o teste de isolamento multi-clínica.
+
 A sequência produz o schema canônico usado pelo frontend: `clinics`, `profiles`,
 `user_roles`, `patients`, `patient_consents`, `assessments`, `postural_results`,
 `movement_results`, `exercise_results`, `prescribed_exercises`, `reports`,

@@ -9,7 +9,7 @@ Matriz de entregas, comandos, evidências, limitações e critérios de aceite.
 | A | Banco oficial reproduzível | `supabase/migrations/*_canonical_baseline` (última migration) + `docs/db/SCHEMA_AUDIT.md` | ✅ aditiva/idempotente, aplicada em produção |
 | B | Segurança multi-clínica validada | `src/__tests__/rls-static.test.ts`, `supabase/tests/rls_isolation.sql`, rotas legadas removidas | ✅ estática no CI; SQL manual em Supabase local |
 | C | CI verde | `.github/workflows/ci.yml` (Bun fixado, format:check, lint:check, typecheck, test:run, build) | ✅ pipeline determinística |
-| D | Jornada com dois usuários / dois pacientes | `src/__tests__/journey-isolation.test.ts` (mock in-memory, roda no CI) + `e2e/journey.spec.ts` (Playwright, skip por padrão) | ⚠ Playwright autenticado só roda localmente contra Supabase local |
+| D | Jornada com dois usuários / dois pacientes | `src/__tests__/journey-isolation.test.ts` (mock in-memory, roda no CI) + `e2e/journey.e2e.ts` (Playwright, skip por padrão) | ⚠ Playwright autenticado só roda localmente contra Supabase local |
 
 ## Comandos
 
@@ -41,7 +41,7 @@ export E2E_USER_A_EMAIL=... E2E_USER_A_PASSWORD=...
 export E2E_USER_B_EMAIL=... E2E_USER_B_PASSWORD=...
 bun add -d @playwright/test && bunx playwright install chromium
 bun run dev &
-bunx playwright test e2e/journey.spec.ts
+bunx playwright test e2e/journey.e2e.ts
 ```
 
 ## Rotas legadas removidas

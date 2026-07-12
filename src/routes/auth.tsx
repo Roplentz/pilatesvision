@@ -342,7 +342,6 @@ function AuthPage() {
                   Li e aceito a{" "}
                   <Link
                     to="/privacidade"
-                    target="_blank"
                     className="underline underline-offset-2 hover:text-foreground"
                   >
                     Política de Privacidade
@@ -350,7 +349,6 @@ function AuthPage() {
                   e os{" "}
                   <Link
                     to="/termos"
-                    target="_blank"
                     className="underline underline-offset-2 hover:text-foreground"
                   >
                     Termos de Uso

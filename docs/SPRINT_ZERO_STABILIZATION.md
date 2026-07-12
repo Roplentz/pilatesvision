@@ -4,101 +4,59 @@ Matriz de entregas, comandos, evidências, limitações e critérios de aceite.
 
 ## Entregas
 
-| #   | Entrega                                    | Artefato                                                                                                                    | Status                                                            |
-| --- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| A   | Banco oficial reproduzível                 | `supabase/migrations/*_canonical_baseline` (última migration) + `docs/db/SCHEMA_AUDIT.md`                                   | ✅ aditiva/idempotente, aplicada em produção                      |
-| B   | Segurança multi-clínica validada           | `src/__tests__/rls-static.test.ts`, `supabase/tests/rls_isolation.sql`, rotas legadas removidas                             | ✅ estática no CI; SQL manual em Supabase local                   |
-| C   | CI verde                                   | `.github/workflows/ci.yml` (Bun fixado, format:check, lint:check, typecheck, test:run, build)                               | ✅ pipeline determinística                                        |
-| D   | Jornada com dois usuários / dois pacientes | `src/__tests__/journey-isolation.test.ts` (mock in-memory, roda no CI) + `e2e/journey.e2e.ts` (Playwright, skip por padrão) | ⚠ Playwright autenticado só roda localmente contra Supabase local |
+| # | Entrega | Evidência atual | Status |
+| --- | --- | --- | --- |
+| A | Banco oficial | Migrations aditivas aplicadas no banco atual; bootstrap documentado | ⚠️ produção estabilizada; reconstrução limpa ainda não executada |
+| B | Segurança multi-clínica | Testes estáticos no CI; SQL com SELECT/UPDATE/DELETE cruzados pronto para Supabase local | ⚠️ teste SQL real ainda não executado |
+| C | CI | Bun fixado, format:check, lint:check, typecheck, test:run e build | ✅ local; GitHub Actions deve ser confirmado no commit |
+| D | Jornada com dois usuários/pacientes | Vitest em memória e spec Playwright opt-in | ⚠️ simulada; Playwright autenticado ainda não executado |
 
 ## Entrega 1 — evidências
 
-Duas migrations canônicas aditivas foram aplicadas em produção (2026-07-12):
+Duas migrations aditivas foram aplicadas em produção em 2026-07-12:
 
-1. **Baseline funcional**: RLS habilitada em 14 tabelas, trigger
-   `on_auth_user_created` em `auth.users`, `set_updated_at` em 10 tabelas,
-   policy `platform_admins_select_self`, GRANTs defensivos, índices em
-   `clinic_id`/`patient_id`/`assessment_id`.
-2. **Storage e cosmético**: policies do bucket `clinical-media` recriadas como
-   `TO authenticated` com escopo por
-   `(storage.foldername(name))[1] = current_user_clinic_id()` e nova policy
-   DELETE. Constraints legadas `students_*` renomeadas para `patients_*` sem
-   alterar dados nem estrutura.
+1. RLS habilitada nas tabelas canônicas, trigger de novo usuário, triggers updated_at, grants e índices.
+2. Policies do bucket clinical-media recriadas para authenticated, incluindo DELETE, com escopo pelo primeiro segmento do caminho igual ao clinic_id. Constraints legadas foram renomeadas para patients sem alterar dados.
 
-Fonte única de verdade para reproduzir do zero: `supabase/migrations/*.sql`
-em ordem cronológica. `database/schema.sql` é apenas histórico. Ver
-`README.md` § "Bootstrap do banco a partir do zero".
+Essas execuções comprovam compatibilidade com o banco atual. A reprodução completa em banco vazio só será considerada comprovada após `supabase db reset` em ambiente local descartável.
 
-### Comandos de validação executados
+## Validações executadas
 
 ```bash
-bun run test:run       # 38/38 ✅  (rls-static: 20, journey-isolation: 7, poseMetrics: 11)
-bun run typecheck      # ✅
-bun run format:check   # ✅
-bun run lint:check     # 0 erros (6 warnings pré-existentes react-refresh)
+bun run test:run       # 38/38
+bun run typecheck
+bun run format:check
+bun run lint:check
 ```
 
-Linter Supabase pós-migration: apenas warnings pré-existentes de
-`SECURITY DEFINER` (falsos positivos aceitáveis — funções `has_role` /
-`current_clinic_id` / `is_platform_admin` precisam ser executáveis por
-usuários autenticados dentro de expressões de policy).
-
-## Comandos
-
-```bash
-bun install --frozen-lockfile
-bun run format:check      # prettier em modo verificação
-bun run lint:check        # eslint sem --fix
-bun run typecheck         # tsc --noEmit
-bun run test:run          # vitest run (inclui rls-static + journey-isolation)
-bun run build             # build de produção
-bun run ci                # roda tudo em sequência
-```
-
-### Rodando o teste SQL de RLS (opcional, exige Supabase local)
+## Validações locais ainda necessárias
 
 ```bash
 supabase start
+supabase db reset
 psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rls_isolation.sql
-# Sucesso silencioso; qualquer violação de isolamento aborta a transação.
-```
 
-### Rodando E2E Playwright localmente
-
-```bash
-supabase start
-# Semeie dois usuários fictícios + duas clínicas (ex.: via supabase/tests/seed.sql).
 export RUN_E2E=1
-export E2E_USER_A_EMAIL=... E2E_USER_A_PASSWORD=...
-export E2E_USER_B_EMAIL=... E2E_USER_B_PASSWORD=...
-bun add -d @playwright/test && bunx playwright install chromium
-bun run dev &
+export E2E_USER_A_EMAIL=...
+export E2E_USER_A_PASSWORD=...
+export E2E_USER_B_EMAIL=...
+export E2E_USER_B_PASSWORD=...
 bunx playwright test e2e/journey.e2e.ts
 ```
 
-## Rotas legadas removidas
+O teste SQL utiliza somente UUIDs hexadecimais válidos, valida leitura e bloqueio de alteração/exclusão entre clínicas e executa dentro de transação revertida.
 
-- `_authenticated.avaliacao-postural.tsx` — redirecionava para `/avaliacoes/nova`.
-- `_authenticated.avaliacao-dinamica.tsx` — idem.
-- `_authenticated.exercicios.tsx` — idem.
+## Fluxo canônico
 
-Fluxo canônico único: `/alunos → /alunos/$id → /avaliacoes/nova → /avaliacoes/$id → /relatorios/$id`, sempre vinculado a paciente + consentimento.
+`/alunos → /alunos/$id → /avaliacoes/nova → /avaliacoes/$id → /relatorios/$id`
 
-## Endpoint público `/api/analyze-image`
+As rotas legadas de avaliação foram removidas. O endpoint público legado `/api/analyze-image` não existe e sua reintrodução é bloqueada pelo teste estático.
 
-**Auditado — inexistente.** `rg -n "analyze-image" src/` retorna zero. Não há caminho legado de IA generativa clínica exposto publicamente no MVP. Teste `rls-static.test.ts` garante que qualquer reintrodução falhe o CI.
+## Critérios de encerramento
 
-## Limitações declaradas
-
-1. **Playwright autenticado real** requer Supabase local + usuários semeados. Não roda no sandbox Lovable nem no CI padrão (segredos ausentes).
-2. **Teste RLS real** roda em Postgres local; o CI usa apenas o teste estático de parsing das migrations.
-3. **`bun install`** no CI executa scripts arbitrários (rebuild de nativos). Segredos de forks não estão expostos.
-4. **Migration canônica é aditiva.** Divergências antigas (ex.: policy `Clinics: own clinic` como `TO public`) permanecem por segurança — corrigir exigiria DROP POLICY explícito, avaliar em sprint futuro.
-5. **Motor biomecânico**: este sprint é apenas de estabilização; não faz validação clínica.
-
-## Critérios de aceite
-
-- `bun run ci` sai com código 0 no sandbox Lovable e no GitHub Actions.
-- `supabase--linter` sem warnings novos introduzidos por esta migration (warnings pré-existentes de `SECURITY DEFINER` são intencionais — funções `has_role`, `current_clinic_id`, `is_platform_admin` precisam ser chamáveis por usuários autenticados dentro de policies).
-- Nenhum dado de produção alterado, nenhum DROP destrutivo executado.
-- Nenhuma rota legada permanece no repositório.
+- Todos os comandos de CI retornam código zero.
+- GitHub Actions verde no commit final.
+- `supabase db reset` conclui em banco local vazio.
+- `rls_isolation.sql` conclui sem exceção.
+- Playwright autenticado completa a jornada A/B.
+- Nenhum dado fictício é inserido na produção.

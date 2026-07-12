@@ -1,12 +1,102 @@
 [
-  {"sample_id":"S01","video":"0006","exercise":"squats","category":"regular","start":68.0,"end":78.0,"ref_reps":null,"ref_note":"sem contagem no dataset; janela 10 s no meio da série"},
-  {"sample_id":"S02","video":"0009","exercise":"squats","category":"regular","start":65.0,"end":78.0,"ref_reps":5,"ref_note":"contagem '5' em 67.07 s e '10' em 77.37 s → 5 reps entre marcos"},
-  {"sample_id":"S03","video":"0010","exercise":"squats","category":"regular","start":68.0,"end":78.0,"ref_reps":null,"ref_note":"sem contagem no dataset"},
-  {"sample_id":"S04","video":"0011","exercise":"squats","category":"regular","start":68.0,"end":78.0,"ref_reps":null,"ref_note":"sem contagem no dataset"},
-  {"sample_id":"S05","video":"0039","exercise":"squat jumps","category":"variacao","start":69.0,"end":79.0,"ref_reps":5,"ref_note":"contagem '5' em 69.3 s e '10' em 73.87 s (variação)"},
-  {"sample_id":"S06","video":"0031","exercise":"squat kicks","category":"variacao","start":90.0,"end":100.0,"ref_reps":null,"ref_note":"variação sem contagem no dataset"},
-  {"sample_id":"S07","video":"0010","exercise":"squats","category":"qualidade_reduzida","start":80.5,"end":85.5,"ref_reps":null,"ref_note":"janela curta 5 s próxima ao fim da série — menor amostragem"},
-  {"sample_id":"S08","video":"0011","exercise":"squats","category":"qualidade_reduzida","start":82.5,"end":87.5,"ref_reps":null,"ref_note":"janela curta 5 s no fim da série — menor amostragem"},
-  {"sample_id":"S09","video":"0006","exercise":"pushups","category":"nao_agachamento","start":90.0,"end":100.0,"ref_reps":0,"ref_note":"pushups — não é agachamento (teste de falso positivo)"},
-  {"sample_id":"S10","video":"0006","exercise":"jumping jacks","category":"nao_agachamento","start":40.0,"end":50.0,"ref_reps":0,"ref_note":"jumping jacks — não é agachamento (teste de falso positivo)"}
+  {
+    "sample_id": "S01",
+    "video": "0006",
+    "exercise": "squats",
+    "category": "regular",
+    "start": 68.0,
+    "end": 78.0,
+    "ref_reps": null,
+    "ref_note": "sem contagem no dataset; janela 10 s no meio da série"
+  },
+  {
+    "sample_id": "S02",
+    "video": "0009",
+    "exercise": "squats",
+    "category": "regular",
+    "start": 65.0,
+    "end": 78.0,
+    "ref_reps": 5,
+    "ref_note": "contagem '5' em 67.07 s e '10' em 77.37 s → 5 reps entre marcos"
+  },
+  {
+    "sample_id": "S03",
+    "video": "0010",
+    "exercise": "squats",
+    "category": "regular",
+    "start": 68.0,
+    "end": 78.0,
+    "ref_reps": null,
+    "ref_note": "sem contagem no dataset"
+  },
+  {
+    "sample_id": "S04",
+    "video": "0011",
+    "exercise": "squats",
+    "category": "regular",
+    "start": 68.0,
+    "end": 78.0,
+    "ref_reps": null,
+    "ref_note": "sem contagem no dataset"
+  },
+  {
+    "sample_id": "S05",
+    "video": "0039",
+    "exercise": "squat jumps",
+    "category": "variacao",
+    "start": 69.0,
+    "end": 79.0,
+    "ref_reps": 5,
+    "ref_note": "contagem '5' em 69.3 s e '10' em 73.87 s (variação)"
+  },
+  {
+    "sample_id": "S06",
+    "video": "0031",
+    "exercise": "squat kicks",
+    "category": "variacao",
+    "start": 90.0,
+    "end": 100.0,
+    "ref_reps": null,
+    "ref_note": "variação sem contagem no dataset"
+  },
+  {
+    "sample_id": "S07",
+    "video": "0010",
+    "exercise": "squats",
+    "category": "qualidade_reduzida",
+    "start": 80.5,
+    "end": 85.5,
+    "ref_reps": null,
+    "ref_note": "janela curta 5 s próxima ao fim da série — menor amostragem"
+  },
+  {
+    "sample_id": "S08",
+    "video": "0011",
+    "exercise": "squats",
+    "category": "qualidade_reduzida",
+    "start": 82.5,
+    "end": 87.5,
+    "ref_reps": null,
+    "ref_note": "janela curta 5 s no fim da série — menor amostragem"
+  },
+  {
+    "sample_id": "S09",
+    "video": "0006",
+    "exercise": "pushups",
+    "category": "nao_agachamento",
+    "start": 90.0,
+    "end": 100.0,
+    "ref_reps": 0,
+    "ref_note": "pushups — não é agachamento (teste de falso positivo)"
+  },
+  {
+    "sample_id": "S10",
+    "video": "0006",
+    "exercise": "jumping jacks",
+    "category": "nao_agachamento",
+    "start": 40.0,
+    "end": 50.0,
+    "ref_reps": 0,
+    "ref_note": "jumping jacks — não é agachamento (teste de falso positivo)"
+  }
 ]

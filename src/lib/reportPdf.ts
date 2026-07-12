@@ -43,17 +43,10 @@ function addFooter(ctx: Ctx) {
   doc.setFontSize(8);
   doc.setTextColor(120);
   const footerY = PAGE_H - MARGIN + 16;
-  doc.text(
-    `${ctx.clinicName} · Relatório de apoio à decisão profissional`,
-    MARGIN,
-    footerY,
-  );
-  doc.text(
-    `${ctx.generatedAt} · pág. ${page}/${total}`,
-    PAGE_W - MARGIN,
-    footerY,
-    { align: "right" },
-  );
+  doc.text(`${ctx.clinicName} · Relatório de apoio à decisão profissional`, MARGIN, footerY);
+  doc.text(`${ctx.generatedAt} · pág. ${page}/${total}`, PAGE_W - MARGIN, footerY, {
+    align: "right",
+  });
   doc.setTextColor(0);
 }
 
@@ -66,17 +59,10 @@ function stampAllFooters(ctx: Ctx) {
     doc.setFontSize(8);
     doc.setTextColor(120);
     const footerY = PAGE_H - MARGIN + 16;
-    doc.text(
-      `${ctx.clinicName} · Relatório de apoio à decisão profissional`,
-      MARGIN,
-      footerY,
-    );
-    doc.text(
-      `${ctx.generatedAt} · pág. ${i}/${total}`,
-      PAGE_W - MARGIN,
-      footerY,
-      { align: "right" },
-    );
+    doc.text(`${ctx.clinicName} · Relatório de apoio à decisão profissional`, MARGIN, footerY);
+    doc.text(`${ctx.generatedAt} · pág. ${i}/${total}`, PAGE_W - MARGIN, footerY, {
+      align: "right",
+    });
     doc.setTextColor(0);
   }
 }
@@ -97,7 +83,11 @@ function heading(ctx: Ctx, number: string, title: string) {
   ctx.y += 14;
 }
 
-function paragraph(ctx: Ctx, text: string, opts: { size?: number; muted?: boolean; italic?: boolean } = {}) {
+function paragraph(
+  ctx: Ctx,
+  text: string,
+  opts: { size?: number; muted?: boolean; italic?: boolean } = {},
+) {
   if (!text) return;
   const { doc } = ctx;
   const size = opts.size ?? 10.5;
@@ -181,12 +171,9 @@ function drawHeader(ctx: Ctx, json: ReportJson, title: string) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(110);
-  const typeLabel = ASSESSMENT_TYPE_LABEL[json.assessment.type] ?? json.assessment.type ?? "Avaliação";
-  doc.text(
-    `${typeLabel} · ${formatDate(json.assessment.date)}`,
-    MARGIN,
-    88,
-  );
+  const typeLabel =
+    ASSESSMENT_TYPE_LABEL[json.assessment.type] ?? json.assessment.type ?? "Avaliação";
+  doc.text(`${typeLabel} · ${formatDate(json.assessment.date)}`, MARGIN, 88);
   if (json.clinic.professional) {
     const line = [json.clinic.professional, json.clinic.professional_license]
       .filter(Boolean)
@@ -287,7 +274,10 @@ function buildPdf(json: ReportJson, title: string): Uint8Array {
         `${f.body_region || "Região"} — ${f.description || "sem descrição"} (${SEVERITY_LABEL[f.severity] ?? f.severity}).`,
       );
     }
-    footnote(ctx, "Achados observados em imagem estática; sujeitos a confirmação clínica presencial.");
+    footnote(
+      ctx,
+      "Achados observados em imagem estática; sujeitos a confirmação clínica presencial.",
+    );
   }
 
   // 07 · Achados dinâmicos
@@ -307,10 +297,7 @@ function buildPdf(json: ReportJson, title: string): Uint8Array {
   if (json.exercise_findings.length > 0) {
     heading(ctx, "08", "Exercícios avaliados");
     for (const e of json.exercise_findings) {
-      bullet(
-        ctx,
-        `${e.exercise} — ${SUPPORT_LEVEL_LABEL[e.support_level]}.`,
-      );
+      bullet(ctx, `${e.exercise} — ${SUPPORT_LEVEL_LABEL[e.support_level]}.`);
       for (const o of e.observations) bullet(ctx, `   ${o}`);
       for (const c of e.suggested_cues ?? []) bullet(ctx, `   Cue: ${c}`);
     }

@@ -116,9 +116,7 @@ export function ExerciseLibraryPicker({ selectedId, onPick }: Props) {
                     <span className="flex flex-col items-start gap-0.5">
                       <span className="text-sm">{it.name_pt}</span>
                       {it.primary_goal && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {it.primary_goal}
-                        </span>
+                        <span className="text-[10px] text-muted-foreground">{it.primary_goal}</span>
                       )}
                     </span>
                     <span className="flex shrink-0 flex-wrap items-center justify-end gap-1">

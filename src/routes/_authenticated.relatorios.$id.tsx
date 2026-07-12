@@ -65,7 +65,7 @@ function RelatorioDetailPage() {
   const isFinalized = report?.status === "finalized";
   const editable = !isFinalized;
   const pdfStoragePath =
-    ((report as unknown as { pdf_storage_path?: string | null } | null)?.pdf_storage_path) ?? null;
+    (report as unknown as { pdf_storage_path?: string | null } | null)?.pdf_storage_path ?? null;
 
   async function handleExportPdf() {
     if (!report) return;
@@ -210,12 +210,7 @@ function RelatorioDetailPage() {
                   {pdfStoragePath ? "Regerar PDF" : "Exportar PDF"}
                 </Button>
                 {pdfStoragePath && (
-                  <Button
-                    variant="hero"
-                    size="sm"
-                    onClick={handleOpenPdf}
-                    disabled={openingPdf}
-                  >
+                  <Button variant="hero" size="sm" onClick={handleOpenPdf} disabled={openingPdf}>
                     {openingPdf ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
@@ -271,9 +266,7 @@ function RelatorioDetailPage() {
               />
             ) : (
               <div className="grid h-14 w-14 place-items-center rounded-lg bg-primary/10 text-primary">
-                <span className="font-display text-xl font-semibold">
-                  {clinicName.slice(0, 1)}
-                </span>
+                <span className="font-display text-xl font-semibold">{clinicName.slice(0, 1)}</span>
               </div>
             )}
             <div>
@@ -293,9 +286,7 @@ function RelatorioDetailPage() {
               label="Profissional"
               value={json.clinic.professional}
               editable={editable}
-              onChange={(v) =>
-                patch((j) => ({ ...j, clinic: { ...j.clinic, professional: v } }))
-              }
+              onChange={(v) => patch((j) => ({ ...j, clinic: { ...j.clinic, professional: v } }))}
             />
             <ClinicHeaderField
               label="Registro (CREFITO/CREF)"
@@ -320,7 +311,10 @@ function RelatorioDetailPage() {
         )}
         {editable && (
           <div className="mt-8">
-            <Label htmlFor="report-title" className="text-xs uppercase tracking-wider text-muted-foreground">
+            <Label
+              htmlFor="report-title"
+              className="text-xs uppercase tracking-wider text-muted-foreground"
+            >
               Título do relatório
             </Label>
             <Input
@@ -367,9 +361,7 @@ function RelatorioDetailPage() {
                 label="Objetivo principal do paciente"
                 value={json.patient.main_goal}
                 editable={editable}
-                onChange={(v) =>
-                  patch((j) => ({ ...j, patient: { ...j.patient, main_goal: v } }))
-                }
+                onChange={(v) => patch((j) => ({ ...j, patient: { ...j.patient, main_goal: v } }))}
               />
             </div>
           </div>
@@ -412,9 +404,7 @@ function RelatorioDetailPage() {
             <PosturalFindingsEditor
               items={json.postural_findings}
               editable={editable}
-              onChange={(items) =>
-                patch((j) => ({ ...j, postural_findings: items }))
-              }
+              onChange={(items) => patch((j) => ({ ...j, postural_findings: items }))}
             />
             <SectionFootnote>
               Achados observados em imagem estática; sujeitos a confirmação clínica presencial.
@@ -492,9 +482,7 @@ function RelatorioDetailPage() {
               12 · Disclaimer clínico
             </span>
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            {REPORT_DISCLAIMER}
-          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{REPORT_DISCLAIMER}</p>
         </section>
 
         {/* Rodapé de página */}
@@ -533,9 +521,7 @@ function Section({
 }
 
 function SectionFootnote({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mt-3 text-xs italic text-muted-foreground">{children}</p>
-  );
+  return <p className="mt-3 text-xs italic text-muted-foreground">{children}</p>;
 }
 
 function DefItem({ term, desc }: { term: string; desc: string }) {
@@ -564,11 +550,7 @@ function FieldInline({
     <div>
       <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
       {editable ? (
-        <Input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="mt-1"
-        />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} className="mt-1" />
       ) : (
         <div className="mt-1 text-sm">
           {value || "—"}
@@ -657,19 +639,13 @@ function PosturalFindingsEditor({
     onChange(items.filter((_, i) => i !== idx));
   }
   function add() {
-    onChange([
-      ...items,
-      { body_region: "", description: "", severity: "moderate" as Severity },
-    ]);
+    onChange([...items, { body_region: "", description: "", severity: "moderate" as Severity }]);
   }
   if (items.length === 0 && !editable) return <EmptyLine />;
   return (
     <div className="space-y-3">
       {items.map((item, idx) => (
-        <div
-          key={idx}
-          className="rounded-lg border border-border/60 bg-card/30 p-4"
-        >
+        <div key={idx} className="rounded-lg border border-border/60 bg-card/30 p-4">
           <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
             <FieldInline
               label="Região corporal"
@@ -684,9 +660,7 @@ function PosturalFindingsEditor({
               {editable ? (
                 <select
                   value={item.severity}
-                  onChange={(e) =>
-                    update(idx, { severity: e.target.value as Severity })
-                  }
+                  onChange={(e) => update(idx, { severity: e.target.value as Severity })}
                   className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <option value="low">Leve</option>
@@ -816,15 +790,11 @@ function DynamicFindingsEditor({
                   min={0}
                   max={100}
                   value={item.quality_score}
-                  onChange={(e) =>
-                    update(idx, { quality_score: Number(e.target.value) || 0 })
-                  }
+                  onChange={(e) => update(idx, { quality_score: Number(e.target.value) || 0 })}
                   className="w-20"
                 />
               ) : (
-                <span className="w-12 text-right text-sm tabular-nums">
-                  {item.quality_score}
-                </span>
+                <span className="w-12 text-right text-sm tabular-nums">{item.quality_score}</span>
               )}
             </div>
           </div>
@@ -838,9 +808,7 @@ function DynamicFindingsEditor({
             />
           </div>
           <div className="mt-3">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">
-              Notas
-            </div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Notas</div>
             {editable ? (
               <Textarea
                 value={item.notes ?? ""}
@@ -884,10 +852,7 @@ function ExerciseFindingsEditor({
     onChange(items.filter((_, i) => i !== idx));
   }
   function add() {
-    onChange([
-      ...items,
-      { exercise: "", support_level: 1, observations: [], suggested_cues: [] },
-    ]);
+    onChange([...items, { exercise: "", support_level: 1, observations: [], suggested_cues: [] }]);
   }
   if (items.length === 0 && !editable) return <EmptyLine />;
   return (
@@ -1090,9 +1055,7 @@ function StringListEditor({
     return (
       <div>
         {label && (
-          <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-            {label}
-          </div>
+          <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
         )}
         <ul className="list-disc space-y-1 pl-5 text-sm text-foreground/90">
           {clean.map((c, i) => (
@@ -1105,9 +1068,7 @@ function StringListEditor({
   return (
     <div>
       {label && (
-        <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
-          {label}
-        </div>
+        <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
       )}
       <div className="space-y-2">
         {items.map((it, idx) => (

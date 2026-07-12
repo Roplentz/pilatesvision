@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-export type PatientConsentRow =
-  Database["public"]["Tables"]["patient_consents"]["Row"];
+export type PatientConsentRow = Database["public"]["Tables"]["patient_consents"]["Row"];
 
 export const CONSENT_TEXT_V1 =
   "Autorizo a coleta e o uso de imagens e vídeos meus (dados biométricos sensíveis) exclusivamente para fins de avaliação, acompanhamento clínico e apoio à decisão pelo profissional responsável, nos termos da LGPD. Este consentimento pode ser revogado a qualquer momento.";

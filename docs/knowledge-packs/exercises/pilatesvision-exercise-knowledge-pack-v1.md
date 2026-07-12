@@ -25,18 +25,18 @@ A camada frontend (`src/lib/exerciseCatalog.ts`) reflete o CSV.
 
 Cada exercício é descrito pelos seguintes eixos:
 
-| Campo | Descrição |
-|---|---|
-| `equipment` / `apparatus` | Equipamento físico usado (Mat, Reformer, Cadillac, Wunda/Stability Chair, Ladder Barrel, Magic Circle, Foam roller, Parede, etc.). |
-| `level` | Nível de execução: básico, intermediário, avançado. |
-| `methodFamily` | Família/método de origem (Mat clássico, Mat contemporâneo/clínico, Reformer, Cadillac, Chair, Barrel, Acessórios, Clínico funcional). |
-| `primaryGoal` | Objetivo clínico principal (ex.: ativação de centro, mobilidade segmentar, estabilidade lombo-pélvica, controle unilateral). |
-| `clinicalFocus` | Foco clínico complementar (estruturas, populações, condições de referência). |
-| `visionMetrics` | Métricas observáveis via visão computacional/análise de imagem (ângulos, simetria, trajetórias, estabilidade). |
-| `commonCompensations` | Compensações comuns esperadas durante a execução — servem como **alertas**, nunca como diagnóstico. |
-| `redFlags` | Condições clínicas em que o exercício não deve ser executado sem adaptação profissional. |
-| `regression` | Variação mais simples/segura para reduzir demanda. |
-| `progression` | Variação mais avançada para aumentar demanda. |
+| Campo                     | Descrição                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `equipment` / `apparatus` | Equipamento físico usado (Mat, Reformer, Cadillac, Wunda/Stability Chair, Ladder Barrel, Magic Circle, Foam roller, Parede, etc.).    |
+| `level`                   | Nível de execução: básico, intermediário, avançado.                                                                                   |
+| `methodFamily`            | Família/método de origem (Mat clássico, Mat contemporâneo/clínico, Reformer, Cadillac, Chair, Barrel, Acessórios, Clínico funcional). |
+| `primaryGoal`             | Objetivo clínico principal (ex.: ativação de centro, mobilidade segmentar, estabilidade lombo-pélvica, controle unilateral).          |
+| `clinicalFocus`           | Foco clínico complementar (estruturas, populações, condições de referência).                                                          |
+| `visionMetrics`           | Métricas observáveis via visão computacional/análise de imagem (ângulos, simetria, trajetórias, estabilidade).                        |
+| `commonCompensations`     | Compensações comuns esperadas durante a execução — servem como **alertas**, nunca como diagnóstico.                                   |
+| `redFlags`                | Condições clínicas em que o exercício não deve ser executado sem adaptação profissional.                                              |
+| `regression`              | Variação mais simples/segura para reduzir demanda.                                                                                    |
+| `progression`             | Variação mais avançada para aumentar demanda.                                                                                         |
 
 ## 4. Domínios de score padrão
 
@@ -44,14 +44,14 @@ O produto avalia execução em seis domínios ponderados. Estes pesos são o
 padrão do pacote e podem ser sobrescritos por exercício quando houver
 justificativa clínica.
 
-| Domínio | Peso |
-|---|---|
-| Alinhamento | 30% |
-| Amplitude segura | 20% |
-| Controle / fluidez | 20% |
-| Simetria | 15% |
-| Tempo / cadência | 10% |
-| Tolerância clínica | 5% |
+| Domínio            | Peso |
+| ------------------ | ---- |
+| Alinhamento        | 30%  |
+| Amplitude segura   | 20%  |
+| Controle / fluidez | 20%  |
+| Simetria           | 15%  |
+| Tempo / cadência   | 10%  |
+| Tolerância clínica | 5%   |
 
 O score final é sempre apresentado como **indicador de apoio à decisão**,
 nunca como nota clínica definitiva.

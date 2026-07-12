@@ -9,10 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth/reset")({
   head: () => ({
-    meta: [
-      { title: "Redefinir senha — PilatesVision" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Redefinir senha — PilatesVision" }, { name: "robots", content: "noindex" }],
   }),
   component: ResetPasswordPage,
 });
@@ -116,15 +113,10 @@ function ResetPasswordPage() {
           ) : !canReset ? (
             <div className="space-y-4 text-center">
               <p className="text-sm text-muted-foreground">
-                Este link de redefinição é inválido ou expirou. Solicite um
-                novo link para continuar.
+                Este link de redefinição é inválido ou expirou. Solicite um novo link para
+                continuar.
               </p>
-              <Button
-                asChild
-                variant="hero"
-                size="lg"
-                className="w-full"
-              >
+              <Button asChild variant="hero" size="lg" className="w-full">
                 <Link to="/auth" search={{ mode: "forgot" }}>
                   Solicitar novo link
                 </Link>
@@ -132,8 +124,18 @@ function ResetPasswordPage() {
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
-              <PasswordField id="password" name="password" label="Nova senha" autoComplete="new-password" />
-              <PasswordField id="confirm" name="confirm" label="Confirmar nova senha" autoComplete="new-password" />
+              <PasswordField
+                id="password"
+                name="password"
+                label="Nova senha"
+                autoComplete="new-password"
+              />
+              <PasswordField
+                id="confirm"
+                name="confirm"
+                label="Confirmar nova senha"
+                autoComplete="new-password"
+              />
               <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Redefinir senha"}
               </Button>

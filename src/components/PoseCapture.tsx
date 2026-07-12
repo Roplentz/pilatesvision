@@ -34,9 +34,24 @@ interface MovementPreset {
 }
 
 const PRESETS: MovementPreset[] = [
-  { key: "agachamento", label: "Agachamento", idealView: "frontal", hint: "Pés na largura do quadril" },
-  { key: "flexao_tronco", label: "Flexão de tronco", idealView: "lateral", hint: "Perfil para a câmera" },
-  { key: "elevacao_mmss", label: "Elevação de MMSS", idealView: "frontal", hint: "Braços visíveis" },
+  {
+    key: "agachamento",
+    label: "Agachamento",
+    idealView: "frontal",
+    hint: "Pés na largura do quadril",
+  },
+  {
+    key: "flexao_tronco",
+    label: "Flexão de tronco",
+    idealView: "lateral",
+    hint: "Perfil para a câmera",
+  },
+  {
+    key: "elevacao_mmss",
+    label: "Elevação de MMSS",
+    idealView: "frontal",
+    hint: "Braços visíveis",
+  },
   { key: "ponte", label: "Ponte", idealView: "lateral", hint: "Deitado, perfil para a câmera" },
   { key: "livre", label: "Movimento livre", idealView: "frontal", hint: "Corpo inteiro no quadro" },
 ];
@@ -95,16 +110,14 @@ function evaluateQuality(lms: Landmark[] | null, orientation: Orientation): Qual
     };
   }
   const key = KEY_LM.map((i) => lms[i]).filter(Boolean) as Landmark[];
-  const meanVis =
-    key.reduce((acc, p) => acc + (p.visibility ?? 0), 0) / Math.max(1, key.length);
+  const meanVis = key.reduce((acc, p) => acc + (p.visibility ?? 0), 0) / Math.max(1, key.length);
   const visibilityOk = meanVis >= VISIBILITY_THRESHOLD;
 
   // Full body: nose + ankles visíveis dentro do frame (0..1)
   const nose = lms[LM.NOSE];
   const la = lms[LM.LEFT_ANKLE];
   const ra = lms[LM.RIGHT_ANKLE];
-  const inFrame = (p?: Landmark) =>
-    !!p && p.x >= 0.02 && p.x <= 0.98 && p.y >= 0.02 && p.y <= 0.98;
+  const inFrame = (p?: Landmark) => !!p && p.x >= 0.02 && p.x <= 0.98 && p.y >= 0.02 && p.y <= 0.98;
   const fullBody =
     inFrame(nose) &&
     inFrame(la) &&
@@ -153,7 +166,7 @@ function evaluateQuality(lms: Landmark[] | null, orientation: Orientation): Qual
     );
 
   const ok = fullBody && visibilityOk && orientationOk && cameraLevelOk && distanceOk;
-  const message = ok ? "Enquadramento adequado" : reasons[0] ?? "Ajuste o enquadramento";
+  const message = ok ? "Enquadramento adequado" : (reasons[0] ?? "Ajuste o enquadramento");
 
   return {
     ok,
@@ -565,10 +578,7 @@ export function PoseCapture({
             playsInline
             muted
           />
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 h-full w-full"
-          />
+          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
           {!cameraOn && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">

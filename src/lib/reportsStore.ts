@@ -439,9 +439,7 @@ export async function generateReportFromAssessment(assessmentId: string): Promis
       ...comps.map((c) => c.compensation ?? "").filter(Boolean),
     ].filter((s) => s.trim().length > 0);
     const sl =
-      typeof row.support_level === "number" &&
-      row.support_level >= 0 &&
-      row.support_level <= 3
+      typeof row.support_level === "number" && row.support_level >= 0 && row.support_level <= 3
         ? (row.support_level as 0 | 1 | 2 | 3)
         : controlToSupportLevel(row.control_level);
     return {
@@ -471,10 +469,8 @@ export async function generateReportFromAssessment(assessmentId: string): Promis
     ),
   );
 
-  const mainGoal =
-    (Array.isArray(assessment.patient.goals) && assessment.patient.goals[0]) || "";
-  const complaint =
-    assessment.main_complaint || assessment.patient.main_complaint || "";
+  const mainGoal = (Array.isArray(assessment.patient.goals) && assessment.patient.goals[0]) || "";
+  const complaint = assessment.main_complaint || assessment.patient.main_complaint || "";
 
   const clinicalSummaryBase = [
     mainGoal ? `Paciente com objetivo de ${mainGoal}.` : "",
@@ -515,8 +511,7 @@ export async function generateReportFromAssessment(assessmentId: string): Promis
     disclaimer: REPORT_DISCLAIMER,
   };
 
-  const title =
-    `${ASSESSMENT_TYPE_LABEL[assessment.type] ?? "Relatório clínico"} — ${assessment.patient.name}`;
+  const title = `${ASSESSMENT_TYPE_LABEL[assessment.type] ?? "Relatório clínico"} — ${assessment.patient.name}`;
 
   const { data, error } = await supabase
     .from("reports")

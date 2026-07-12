@@ -18,17 +18,8 @@ export type ExerciseResultRow = Database["public"]["Tables"]["exercise_results"]
 export type PrescribedExerciseRow = Database["public"]["Tables"]["prescribed_exercises"]["Row"];
 export type ReportRow = Database["public"]["Tables"]["reports"]["Row"];
 
-export type AssessmentType =
-  | "postural_static"
-  | "dynamic"
-  | "pilates_exercise"
-  | "follow_up";
-export type AssessmentStatus =
-  | "draft"
-  | "processing"
-  | "review"
-  | "completed"
-  | "archived";
+export type AssessmentType = "postural_static" | "dynamic" | "pilates_exercise" | "follow_up";
+export type AssessmentStatus = "draft" | "processing" | "review" | "completed" | "archived";
 
 export type PosturalView = "anterior" | "posterior" | "right_lateral" | "left_lateral";
 export type Severity = "leve" | "moderada" | "importante";

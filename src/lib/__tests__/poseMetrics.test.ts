@@ -20,8 +20,8 @@ function synthLandmarks(hipY: number, kneeAngle: number): Landmark[] {
   // 33 pontos, mas apenas os que importam recebem coordenadas coerentes.
   const lms: Landmark[] = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, visibility: 0.9 }));
   lms[0] = { x: 0.5, y: 0.15, visibility: 0.95 }; // nariz
-  lms[11] = { x: 0.42, y: 0.30, visibility: 0.9 };
-  lms[12] = { x: 0.58, y: 0.30, visibility: 0.9 };
+  lms[11] = { x: 0.42, y: 0.3, visibility: 0.9 };
+  lms[12] = { x: 0.58, y: 0.3, visibility: 0.9 };
   lms[23] = { x: 0.44, y: hipY, visibility: 0.9 };
   lms[24] = { x: 0.56, y: hipY, visibility: 0.9 };
   // Modela perna como dois segmentos coxa (hip→knee) e canela (knee→ankle),
@@ -38,7 +38,7 @@ function synthLandmarks(hipY: number, kneeAngle: number): Landmark[] {
   return lms;
 }
 
-function seriesForReps(reps: number, framesPerRep = 20, baseY = 0.42, depth = 0.10): FrameSample[] {
+function seriesForReps(reps: number, framesPerRep = 20, baseY = 0.42, depth = 0.1): FrameSample[] {
   const out: FrameSample[] = [];
   const total = reps > 0 ? reps * framesPerRep : framesPerRep;
   for (let i = 0; i < total; i++) {
@@ -151,6 +151,10 @@ describe("summarizeSamples", () => {
   it("com baixa visibilidade global, gera sugestão de recaptura ao invés de sugestões clínicas", () => {
     const samples = seriesForReps(2, 24).map((s) => ({ ...s, meanVisibility: 0.1, valid: false }));
     const summary = summarizeSamples(samples, samples[samples.length - 1].t, "squat");
-    expect(summary.suggestions.some((s) => s.toLowerCase().includes("recaptura") || s.toLowerCase().includes("qualidade"))).toBe(true);
+    expect(
+      summary.suggestions.some(
+        (s) => s.toLowerCase().includes("recaptura") || s.toLowerCase().includes("qualidade"),
+      ),
+    ).toBe(true);
   });
 });

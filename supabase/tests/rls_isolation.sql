@@ -1,14 +1,12 @@
 -- Sprint Zero — teste SQL de isolamento multi-clínica.
--- Executar contra Supabase local (`supabase start`) — NÃO roda no CI padrão.
+-- Executar SOMENTE contra Supabase local descartável.
 -- Uso: psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rls_isolation.sql
 --
--- Estratégia: cria duas clínicas + dois usuários (auth.users) + dois pacientes.
--- Alterna `request.jwt.claims` via SET LOCAL para simular sessões distintas
--- e assegura, com asserts, que cada usuário só enxerga a própria clínica.
+-- Cria duas clínicas, dois usuários e dois pacientes fictícios dentro de uma
+-- transação revertida ao final. Valida SELECT, UPDATE e DELETE cruzados.
 
 BEGIN;
 
--- Fixtures.
 INSERT INTO auth.users (id, email, encrypted_password, aud, role, instance_id)
 VALUES
   ('00000000-0000-0000-0000-0000000000a1', 'a@test.local', 'x', 'authenticated', 'authenticated', '00000000-0000-0000-0000-000000000000'),
@@ -29,11 +27,10 @@ ON CONFLICT (id) DO UPDATE SET clinic_id = EXCLUDED.clinic_id;
 
 INSERT INTO public.patients (id, clinic_id, full_name)
 VALUES
-  ('00000000-0000-0000-0000-00000000pa01', '00000000-0000-0000-0000-00000000ca01', 'Paciente A'),
-  ('00000000-0000-0000-0000-00000000pb01', '00000000-0000-0000-0000-00000000cb01', 'Paciente B')
+  ('00000000-0000-0000-0000-00000000aa01', '00000000-0000-0000-0000-00000000ca01', 'Paciente A'),
+  ('00000000-0000-0000-0000-00000000bb01', '00000000-0000-0000-0000-00000000cb01', 'Paciente B')
 ON CONFLICT (id) DO NOTHING;
 
--- Sessão como usuário A.
 SET LOCAL role authenticated;
 SET LOCAL request.jwt.claims TO '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}';
 
@@ -43,11 +40,18 @@ BEGIN
   SELECT count(*) INTO n FROM public.patients;
   IF n <> 1 THEN RAISE EXCEPTION 'RLS FAIL: user A sees % patient rows (expected 1)', n; END IF;
 
-  SELECT count(*) INTO n FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000pb01';
+  SELECT count(*) INTO n FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000bb01';
   IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user A leaked patient B'; END IF;
+
+  UPDATE public.patients SET full_name = 'INTRUSAO A' WHERE id = '00000000-0000-0000-0000-00000000bb01';
+  GET DIAGNOSTICS n = ROW_COUNT;
+  IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user A updated patient B'; END IF;
+
+  DELETE FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000bb01';
+  GET DIAGNOSTICS n = ROW_COUNT;
+  IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user A deleted patient B'; END IF;
 END $$;
 
--- Sessão como usuário B.
 SET LOCAL request.jwt.claims TO '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}';
 
 DO $$
@@ -56,8 +60,16 @@ BEGIN
   SELECT count(*) INTO n FROM public.patients;
   IF n <> 1 THEN RAISE EXCEPTION 'RLS FAIL: user B sees % patient rows (expected 1)', n; END IF;
 
-  SELECT count(*) INTO n FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000pa01';
+  SELECT count(*) INTO n FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000aa01';
   IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user B leaked patient A'; END IF;
+
+  UPDATE public.patients SET full_name = 'INTRUSAO B' WHERE id = '00000000-0000-0000-0000-00000000aa01';
+  GET DIAGNOSTICS n = ROW_COUNT;
+  IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user B updated patient A'; END IF;
+
+  DELETE FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000aa01';
+  GET DIAGNOSTICS n = ROW_COUNT;
+  IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user B deleted patient A'; END IF;
 END $$;
 
 RESET role;

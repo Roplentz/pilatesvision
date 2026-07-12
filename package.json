@@ -9,11 +9,13 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "prettier --write . && eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "ci": "bun run lint && bun run typecheck && bun run test:run && bun run build",
-    "format": "prettier --write ."
+    "ci": "bun run format:check && bun run lint:check && bun run typecheck && bun run test:run && bun run build"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

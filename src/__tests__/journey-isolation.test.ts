@@ -130,9 +130,9 @@ describe("Jornada canônica com isolamento multi-clínica (mock in-memory)", () 
 
   it("A não consegue inserir registros para clínica B", () => {
     currentClinic = "clinic-A";
-    expect(() =>
-      patients.insert({ id: "hack", clinic_id: "clinic-B", full_name: "hack" }),
-    ).toThrow(/RLS violation/);
+    expect(() => patients.insert({ id: "hack", clinic_id: "clinic-B", full_name: "hack" })).toThrow(
+      /RLS violation/,
+    );
   });
 
   it("A não consegue atualizar registros de B", () => {

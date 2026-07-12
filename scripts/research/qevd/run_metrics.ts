@@ -86,9 +86,7 @@ const files = readdirSync(LANDMARK_DIR)
   .sort();
 
 for (const file of files) {
-  const data: LandmarkFile = JSON.parse(
-    readFileSync(join(LANDMARK_DIR, file), "utf8"),
-  );
+  const data: LandmarkFile = JSON.parse(readFileSync(join(LANDMARK_DIR, file), "utf8"));
   const plan = planById.get(data.sample_id);
   if (!plan) continue;
 
@@ -109,8 +107,7 @@ for (const file of files) {
         : "nenhuma repetição válida detectada"
     : "";
 
-  const abs_error =
-    plan.ref_reps == null ? null : Math.abs(summary.reps_valid - plan.ref_reps);
+  const abs_error = plan.ref_reps == null ? null : Math.abs(summary.reps_valid - plan.ref_reps);
 
   const false_positive = !isSquatFamily && summary.reps_valid > 0;
   const false_negative = isSquatFamily && summary.reps_valid === 0;
@@ -130,10 +127,8 @@ for (const file of files) {
     mean_confidence: summary.mean_confidence,
     reps_detected: summary.reps_total,
     reps_valid: summary.reps_valid,
-    median_knee_range_left:
-      summary.summary_stats.knee_flexion_range_left_deg.median,
-    median_knee_range_right:
-      summary.summary_stats.knee_flexion_range_right_deg.median,
+    median_knee_range_left: summary.summary_stats.knee_flexion_range_left_deg.median,
+    median_knee_range_right: summary.summary_stats.knee_flexion_range_right_deg.median,
     median_trunk_p95: summary.summary_stats.trunk_inclination_p95_deg.median,
     median_bilateral_symmetry: summary.summary_stats.bilateral_symmetry.median,
     consistency: summary.summary_stats.consistency,
@@ -147,24 +142,50 @@ for (const file of files) {
 
 writeFileSync(
   join(OUT_DIR, "results.json"),
-  JSON.stringify({ engine_version: ENGINE_VERSION, schema: SCHEMA_VERSION, rows: results, raw }, null, 2),
+  JSON.stringify(
+    { engine_version: ENGINE_VERSION, schema: SCHEMA_VERSION, rows: results, raw },
+    null,
+    2,
+  ),
 );
 
 const header = [
-  "sample_id","video_id","start_s","end_s","category","exercise_ref",
-  "ref_reps","frames_total","frames_valid","valid_ratio","mean_confidence",
-  "reps_detected","reps_valid","median_knee_range_left","median_knee_range_right",
-  "median_trunk_p95","median_bilateral_symmetry","consistency","abs_error",
-  "false_positive","false_negative","rejected","rejection_reason",
+  "sample_id",
+  "video_id",
+  "start_s",
+  "end_s",
+  "category",
+  "exercise_ref",
+  "ref_reps",
+  "frames_total",
+  "frames_valid",
+  "valid_ratio",
+  "mean_confidence",
+  "reps_detected",
+  "reps_valid",
+  "median_knee_range_left",
+  "median_knee_range_right",
+  "median_trunk_p95",
+  "median_bilateral_symmetry",
+  "consistency",
+  "abs_error",
+  "false_positive",
+  "false_negative",
+  "rejected",
+  "rejection_reason",
 ];
 const csv = [header.join(",")];
 for (const r of results) {
-  csv.push(header.map((h) => {
-    const v = (r as Record<string, unknown>)[h];
-    if (v == null) return "";
-    if (typeof v === "string") return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-    return String(v);
-  }).join(","));
+  csv.push(
+    header
+      .map((h) => {
+        const v = (r as Record<string, unknown>)[h];
+        if (v == null) return "";
+        if (typeof v === "string") return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+        return String(v);
+      })
+      .join(","),
+  );
 }
 writeFileSync(join(OUT_DIR, "results.csv"), csv.join("\n") + "\n");
 

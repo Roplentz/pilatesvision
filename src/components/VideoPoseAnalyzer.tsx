@@ -60,7 +60,10 @@ export function VideoPoseAnalyzer({
     setRunning(true);
     setProgress(0);
 
-    type Lmr = { detectForVideo: (v: HTMLVideoElement, t: number) => { landmarks?: Landmark[][] }; close: () => void };
+    type Lmr = {
+      detectForVideo: (v: HTMLVideoElement, t: number) => { landmarks?: Landmark[][] };
+      close: () => void;
+    };
     let landmarker: Lmr | null = null;
     try {
       const { FilesetResolver, PoseLandmarker } = await import("@mediapipe/tasks-vision");
@@ -73,7 +76,10 @@ export function VideoPoseAnalyzer({
 
       if (video.readyState < 1) {
         await new Promise<void>((resolve, reject) => {
-          const onLoaded = () => { video.removeEventListener("loadedmetadata", onLoaded); resolve(); };
+          const onLoaded = () => {
+            video.removeEventListener("loadedmetadata", onLoaded);
+            resolve();
+          };
           const onErr = () => reject(new Error("Falha ao carregar vídeo."));
           video.addEventListener("loadedmetadata", onLoaded, { once: true });
           video.addEventListener("error", onErr, { once: true });
@@ -111,7 +117,9 @@ export function VideoPoseAnalyzer({
 
       if (collected.length === 0) {
         await supabase.from(table).update({ analysis_status: "error" }).eq("id", resultId);
-        setEngineError("Nenhum marcador foi detectado no vídeo. Refaça a captura com melhor iluminação e enquadramento de corpo inteiro.");
+        setEngineError(
+          "Nenhum marcador foi detectado no vídeo. Refaça a captura com melhor iluminação e enquadramento de corpo inteiro.",
+        );
         toast.error("Análise não detectou marcadores.");
         return;
       }
@@ -130,10 +138,18 @@ export function VideoPoseAnalyzer({
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setEngineError(msg);
-      await supabase.from(table).update({ analysis_status: "error" }).eq("id", resultId).then(() => undefined);
+      await supabase
+        .from(table)
+        .update({ analysis_status: "error" })
+        .eq("id", resultId)
+        .then(() => undefined);
       toast.error("Falha ao analisar vídeo.");
     } finally {
-      try { landmarker?.close(); } catch { /* ignore */ }
+      try {
+        landmarker?.close();
+      } catch {
+        /* ignore */
+      }
       setRunning(false);
     }
   }
@@ -144,10 +160,25 @@ export function VideoPoseAnalyzer({
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium">Análise biomecânica automática</span>
-          <Badge variant="outline" className="text-[10px]">estimativa 2D — apoio à decisão</Badge>
+          <Badge variant="outline" className="text-[10px]">
+            estimativa 2D — apoio à decisão
+          </Badge>
         </div>
-        <Button size="sm" onClick={runAnalysis} disabled={running || urlLoading || !url} variant="hero">
-          {running ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analisando… {progress}%</>) : summary ? "Reanalisar vídeo" : "Analisar vídeo"}
+        <Button
+          size="sm"
+          onClick={runAnalysis}
+          disabled={running || urlLoading || !url}
+          variant="hero"
+        >
+          {running ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analisando… {progress}%
+            </>
+          ) : summary ? (
+            "Reanalisar vídeo"
+          ) : (
+            "Analisar vídeo"
+          )}
         </Button>
       </div>
 
@@ -165,9 +196,16 @@ export function VideoPoseAnalyzer({
 
       <div className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-black">
         {url && (
-          <video ref={videoRef} src={url} crossOrigin="anonymous" playsInline muted preload="auto"
+          <video
+            ref={videoRef}
+            src={url}
+            crossOrigin="anonymous"
+            playsInline
+            muted
+            preload="auto"
             className="block max-h-[420px] w-full opacity-0"
-            style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
+            style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+          />
         )}
         <canvas ref={canvasRef} className="block h-auto w-full" />
         {!summary && !running && (
@@ -180,7 +218,8 @@ export function VideoPoseAnalyzer({
       {summary && <SummaryPanel summary={summary} samples={samples} />}
 
       <p className="text-[11px] text-muted-foreground">
-        Estimativa automática 2D — apoio à decisão. Requer confirmação profissional. Não é diagnóstico.
+        Estimativa automática 2D — apoio à decisão. Requer confirmação profissional. Não é
+        diagnóstico.
       </p>
     </div>
   );
@@ -188,9 +227,16 @@ export function VideoPoseAnalyzer({
 
 function seekTo(video: HTMLVideoElement, t: number): Promise<void> {
   return new Promise((resolve) => {
-    const onSeeked = () => { video.removeEventListener("seeked", onSeeked); resolve(); };
+    const onSeeked = () => {
+      video.removeEventListener("seeked", onSeeked);
+      resolve();
+    };
     video.addEventListener("seeked", onSeeked, { once: true });
-    try { video.currentTime = Math.min(t, video.duration || t); } catch { resolve(); }
+    try {
+      video.currentTime = Math.min(t, video.duration || t);
+    } catch {
+      resolve();
+    }
   });
 }
 
@@ -199,31 +245,68 @@ function drawSkeleton(ctx: CanvasRenderingContext2D, lms: Landmark[], w: number,
   ctx.strokeStyle = "rgba(56, 189, 248, 0.9)";
   ctx.fillStyle = "rgba(250, 204, 21, 0.95)";
   for (const [a, b] of POSE_CONNECTIONS) {
-    const pa = lms[a]; const pb = lms[b];
+    const pa = lms[a];
+    const pb = lms[b];
     if (!pa || !pb) continue;
-    ctx.beginPath(); ctx.moveTo(pa.x * w, pa.y * h); ctx.lineTo(pb.x * w, pb.y * h); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pa.x * w, pa.y * h);
+    ctx.lineTo(pb.x * w, pb.y * h);
+    ctx.stroke();
   }
   for (const p of lms) {
     if (!p) continue;
-    ctx.beginPath(); ctx.arc(p.x * w, p.y * h, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x * w, p.y * h, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
-function SummaryPanel({ summary, samples }: { summary: AutoMetricsSummary; samples: FrameSample[] }) {
+function SummaryPanel({
+  summary,
+  samples,
+}: {
+  summary: AutoMetricsSummary;
+  samples: FrameSample[];
+}) {
   const [expanded, setExpanded] = useState<number | null>(null);
   const s = summary.summary_stats;
   const cards: Array<{ label: string; value: string; sub?: string }> = [
     { label: "Repetições válidas", value: `${summary.reps_valid}/${summary.reps_total}` },
-    { label: "Amplitude mediana D", value: `${fmtDeg(s.knee_flexion_range_right_deg.median)}`, sub: `P5–P95: ${fmtDeg(s.knee_flexion_range_right_deg.p5)} – ${fmtDeg(s.knee_flexion_range_right_deg.p95)}` },
-    { label: "Amplitude mediana E", value: `${fmtDeg(s.knee_flexion_range_left_deg.median)}`, sub: `P5–P95: ${fmtDeg(s.knee_flexion_range_left_deg.p5)} – ${fmtDeg(s.knee_flexion_range_left_deg.p95)}` },
+    {
+      label: "Amplitude mediana D",
+      value: `${fmtDeg(s.knee_flexion_range_right_deg.median)}`,
+      sub: `P5–P95: ${fmtDeg(s.knee_flexion_range_right_deg.p5)} – ${fmtDeg(s.knee_flexion_range_right_deg.p95)}`,
+    },
+    {
+      label: "Amplitude mediana E",
+      value: `${fmtDeg(s.knee_flexion_range_left_deg.median)}`,
+      sub: `P5–P95: ${fmtDeg(s.knee_flexion_range_left_deg.p5)} – ${fmtDeg(s.knee_flexion_range_left_deg.p95)}`,
+    },
     { label: "Tempo mediano/rep", value: `${s.rep_duration_s.median.toFixed(2)}s` },
-    { label: "Simetria bilateral mediana", value: `${Math.round(s.bilateral_symmetry.median * 100)}%` },
+    {
+      label: "Simetria bilateral mediana",
+      value: `${Math.round(s.bilateral_symmetry.median * 100)}%`,
+    },
     { label: "Inclinação de tronco P95", value: `${fmtDeg(s.trunk_inclination_p95_deg.median)}` },
-    { label: "Deslocamento frontal D P95", value: `${s.knee_frontal_deviation_right_p95.median.toFixed(3)}`, sub: "estimativa 2D — não é diagnóstico de valgo" },
-    { label: "Deslocamento frontal E P95", value: `${s.knee_frontal_deviation_left_p95.median.toFixed(3)}`, sub: "estimativa 2D — não é diagnóstico de valgo" },
-    { label: "Confiança (melhor / pior)", value: `${Math.round(s.confidence.best * 100)}% / ${Math.round(s.confidence.worst * 100)}%` },
+    {
+      label: "Deslocamento frontal D P95",
+      value: `${s.knee_frontal_deviation_right_p95.median.toFixed(3)}`,
+      sub: "estimativa 2D — não é diagnóstico de valgo",
+    },
+    {
+      label: "Deslocamento frontal E P95",
+      value: `${s.knee_frontal_deviation_left_p95.median.toFixed(3)}`,
+      sub: "estimativa 2D — não é diagnóstico de valgo",
+    },
+    {
+      label: "Confiança (melhor / pior)",
+      value: `${Math.round(s.confidence.best * 100)}% / ${Math.round(s.confidence.worst * 100)}%`,
+    },
     { label: "Consistência entre repetições", value: `${Math.round(s.consistency * 100)}%` },
-    { label: "Frames válidos", value: `${summary.frames_valid}/${summary.frames_analyzed} (${Math.round(summary.valid_frame_ratio * 100)}%)` },
+    {
+      label: "Frames válidos",
+      value: `${summary.frames_valid}/${summary.frames_analyzed} (${Math.round(summary.valid_frame_ratio * 100)}%)`,
+    },
     { label: "Duração analisada", value: `${summary.duration_seconds.toFixed(1)}s` },
   ];
 
@@ -232,7 +315,9 @@ function SummaryPanel({ summary, samples }: { summary: AutoMetricsSummary; sampl
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((c) => (
           <div key={c.label} className="rounded-md border border-border/40 bg-card/40 px-3 py-2">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{c.label}</div>
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              {c.label}
+            </div>
             <div className="text-sm font-medium">{c.value}</div>
             {c.sub && <div className="text-[10px] text-muted-foreground/80">{c.sub}</div>}
           </div>
@@ -243,7 +328,9 @@ function SummaryPanel({ summary, samples }: { summary: AutoMetricsSummary; sampl
 
       {summary.reps.length > 0 && (
         <div className="space-y-2">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Repetições</div>
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            Repetições
+          </div>
           <ul className="space-y-1">
             {summary.reps.map((r) => (
               <li key={r.index} className="rounded-md border border-border/40 bg-card/40">
@@ -257,16 +344,25 @@ function SummaryPanel({ summary, samples }: { summary: AutoMetricsSummary; sampl
                       #{r.index} {r.valid ? "válida" : "atenção"}
                     </Badge>
                     <span className="text-muted-foreground">
-                      {r.duration_s.toFixed(2)}s · amp D {fmtDeg(r.knee_flexion_range_right_deg)} · amp E {fmtDeg(r.knee_flexion_range_left_deg)}
+                      {r.duration_s.toFixed(2)}s · amp D {fmtDeg(r.knee_flexion_range_right_deg)} ·
+                      amp E {fmtDeg(r.knee_flexion_range_left_deg)}
                     </span>
                   </span>
-                  {expanded === r.index ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  {expanded === r.index ? (
+                    <ChevronUp className="h-3 w-3" />
+                  ) : (
+                    <ChevronDown className="h-3 w-3" />
+                  )}
                 </button>
                 {expanded === r.index && (
                   <div className="grid gap-1 border-t border-border/40 px-3 py-2 text-[11px] text-muted-foreground sm:grid-cols-2">
-                    <div>Descida: {r.descent_s.toFixed(2)}s · Subida: {r.ascent_s.toFixed(2)}s</div>
+                    <div>
+                      Descida: {r.descent_s.toFixed(2)}s · Subida: {r.ascent_s.toFixed(2)}s
+                    </div>
                     <div>Tronco P95: {fmtDeg(r.trunk_inclination_p95_deg)}</div>
-                    <div>Desloc. frontal D P95: {r.knee_frontal_deviation_right_p95.toFixed(3)}</div>
+                    <div>
+                      Desloc. frontal D P95: {r.knee_frontal_deviation_right_p95.toFixed(3)}
+                    </div>
                     <div>Desloc. frontal E P95: {r.knee_frontal_deviation_left_p95.toFixed(3)}</div>
                     <div>Simetria: {Math.round(r.bilateral_symmetry * 100)}%</div>
                     <div>Confiança: {Math.round(r.confidence * 100)}%</div>
@@ -285,7 +381,9 @@ function SummaryPanel({ summary, samples }: { summary: AutoMetricsSummary; sampl
           </div>
           <ul className="space-y-1">
             {summary.suggestions.map((sug, i) => (
-              <li key={i} className="text-xs text-muted-foreground">• {sug}</li>
+              <li key={i} className="text-xs text-muted-foreground">
+                • {sug}
+              </li>
             ))}
           </ul>
         </div>
@@ -295,7 +393,9 @@ function SummaryPanel({ summary, samples }: { summary: AutoMetricsSummary; sampl
 }
 
 function TimelineChart({ samples, reps }: { samples: FrameSample[]; reps: RepMetrics[] }) {
-  const W = 640, H = 160, PAD = 24;
+  const W = 640,
+    H = 160,
+    PAD = 24;
   const times = samples.map((s) => s.t);
   const tMin = times[0] ?? 0;
   const tMax = times[times.length - 1] ?? 1;
@@ -309,21 +409,34 @@ function TimelineChart({ samples, reps }: { samples: FrameSample[]; reps: RepMet
   const xOf = (t: number) => PAD + ((t - tMin) / dt) * (W - 2 * PAD);
   const yOf = (v: number) => H - PAD - ((v - yMin) / dy) * (H - 2 * PAD);
   const path = (arr: number[]) =>
-    arr.map((v, i) => `${i === 0 ? "M" : "L"}${xOf(times[i]).toFixed(1)},${yOf(v).toFixed(1)}`).join(" ");
+    arr
+      .map((v, i) => `${i === 0 ? "M" : "L"}${xOf(times[i]).toFixed(1)},${yOf(v).toFixed(1)}`)
+      .join(" ");
 
   return (
     <div className="overflow-hidden rounded-md border border-border/40 bg-card/30 p-2">
       <div className="mb-1 flex items-center justify-between text-[10px] text-muted-foreground">
         <span>Flexão de joelho ao longo do tempo (graus)</span>
         <span className="flex items-center gap-3">
-          <span className="flex items-center gap-1"><span className="inline-block h-1 w-3 bg-sky-400" /> D</span>
-          <span className="flex items-center gap-1"><span className="inline-block h-1 w-3 bg-emerald-400" /> E</span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-1 w-3 bg-sky-400" /> D
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-1 w-3 bg-emerald-400" /> E
+          </span>
         </span>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-40 w-full">
         <rect x={0} y={0} width={W} height={H} fill="transparent" />
         {/* eixos */}
-        <line x1={PAD} y1={H - PAD} x2={W - PAD} y2={H - PAD} stroke="currentColor" strokeOpacity={0.2} />
+        <line
+          x1={PAD}
+          y1={H - PAD}
+          x2={W - PAD}
+          y2={H - PAD}
+          stroke="currentColor"
+          strokeOpacity={0.2}
+        />
         <line x1={PAD} y1={PAD} x2={PAD} y2={H - PAD} stroke="currentColor" strokeOpacity={0.2} />
         <path d={path(kneeR)} stroke="rgb(56 189 248)" strokeWidth={1.5} fill="none" />
         <path d={path(kneeL)} stroke="rgb(52 211 153)" strokeWidth={1.5} fill="none" />
@@ -332,7 +445,18 @@ function TimelineChart({ samples, reps }: { samples: FrameSample[]; reps: RepMet
           const s = samples[r.index - 1];
           if (!s) return null;
           const x = xOf(s.t);
-          return <line key={r.index} x1={x} y1={PAD} x2={x} y2={H - PAD} stroke="currentColor" strokeOpacity={0.15} strokeDasharray="3 3" />;
+          return (
+            <line
+              key={r.index}
+              x1={x}
+              y1={PAD}
+              x2={x}
+              y2={H - PAD}
+              stroke="currentColor"
+              strokeOpacity={0.15}
+              strokeDasharray="3 3"
+            />
+          );
         })}
       </svg>
     </div>

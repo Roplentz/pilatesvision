@@ -12,12 +12,12 @@ Este documento define como o PilatesVision deve usar o catálogo de exercícios 
 
 ## Classificação de suporte
 
-| Nível | Nome | Conduta sugerida pelo app |
-|---|---|---|
-| 0 | Observação segura | Exercício executado sem alerta relevante. Manter ou progredir conforme objetivo. |
-| 1 | Atenção técnica | Há compensação leve. Sugerir cue, redução de amplitude ou ajuste de posicionamento. |
-| 2 | Regressão recomendada | Compensação moderada, dor leve/moderada ou perda de controle. Sugerir exercício regressivo. |
-| 3 | Interromper e reavaliar | Dor importante, tontura, dispneia, instabilidade, piora neurológica ou risco de queda. |
+| Nível | Nome                    | Conduta sugerida pelo app                                                                   |
+| ----- | ----------------------- | ------------------------------------------------------------------------------------------- |
+| 0     | Observação segura       | Exercício executado sem alerta relevante. Manter ou progredir conforme objetivo.            |
+| 1     | Atenção técnica         | Há compensação leve. Sugerir cue, redução de amplitude ou ajuste de posicionamento.         |
+| 2     | Regressão recomendada   | Compensação moderada, dor leve/moderada ou perda de controle. Sugerir exercício regressivo. |
+| 3     | Interromper e reavaliar | Dor importante, tontura, dispneia, instabilidade, piora neurológica ou risco de queda.      |
 
 ## Variáveis clínicas mínimas antes de recomendar exercício
 
@@ -47,35 +47,35 @@ O app deve exibir alerta de interrupção/reavaliação se houver:
 
 ### Coluna lombar
 
-| Achado visual ou clínico | Ação sugerida |
-|---|---|
-| Hiperlordose com perda de controle em abdominal | Elevar pernas, reduzir alavanca, apoiar cabeça ou regredir para respiração/ponte baixa. |
-| Dor lombar durante extensão | Reduzir amplitude, priorizar extensão torácica, revisar ativação glútea e interromper se dor aumentar. |
-| Assimetria pélvica em ponte | Reduzir altura, alinhar pés, usar feedback visual e considerar ponte bilateral antes de unilateral. |
+| Achado visual ou clínico                        | Ação sugerida                                                                                          |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Hiperlordose com perda de controle em abdominal | Elevar pernas, reduzir alavanca, apoiar cabeça ou regredir para respiração/ponte baixa.                |
+| Dor lombar durante extensão                     | Reduzir amplitude, priorizar extensão torácica, revisar ativação glútea e interromper se dor aumentar. |
+| Assimetria pélvica em ponte                     | Reduzir altura, alinhar pés, usar feedback visual e considerar ponte bilateral antes de unilateral.    |
 
 ### Ombro e cervical
 
-| Achado visual ou clínico | Ação sugerida |
-|---|---|
-| Elevação de ombros em exercício de braços | Reduzir carga/mola, orientar escápulas, diminuir amplitude. |
-| Dor cervical em flexão de tronco | Apoiar cabeça, reduzir repetições ou trocar por exercício com cabeça apoiada. |
-| Escápula alada ou perda de controle em prancha | Regredir para apoio de joelhos, parede ou exercícios escapulares. |
+| Achado visual ou clínico                       | Ação sugerida                                                                 |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| Elevação de ombros em exercício de braços      | Reduzir carga/mola, orientar escápulas, diminuir amplitude.                   |
+| Dor cervical em flexão de tronco               | Apoiar cabeça, reduzir repetições ou trocar por exercício com cabeça apoiada. |
+| Escápula alada ou perda de controle em prancha | Regredir para apoio de joelhos, parede ou exercícios escapulares.             |
 
 ### Quadril, joelho e pé
 
-| Achado visual ou clínico | Ação sugerida |
-|---|---|
+| Achado visual ou clínico                           | Ação sugerida                                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Valgo dinâmico no footwork, chair ou senta-levanta | Reduzir carga/amplitude, cue joelho no segundo dedo, fortalecer controle de quadril. |
-| Assimetria de carga em exercício bilateral | Usar feedback visual, reduzir velocidade, considerar exercício unilateral assistido. |
-| Dor anterior de joelho com cadeia fechada | Reduzir flexão de joelho, ajustar posição dos pés, revisar carga e progressão. |
+| Assimetria de carga em exercício bilateral         | Usar feedback visual, reduzir velocidade, considerar exercício unilateral assistido. |
+| Dor anterior de joelho com cadeia fechada          | Reduzir flexão de joelho, ajustar posição dos pés, revisar carga e progressão.       |
 
 ### Equilíbrio e idosos
 
-| Achado visual ou clínico | Ação sugerida |
-|---|---|
-| Oscilação excessiva em pé | Usar apoio manual, base maior, reduzir amplitude e retirar multitarefa. |
+| Achado visual ou clínico       | Ação sugerida                                                           |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| Oscilação excessiva em pé      | Usar apoio manual, base maior, reduzir amplitude e retirar multitarefa. |
 | Medo/rigidez com instabilidade | Priorizar confiança, transições lentas e exercícios funcionais simples. |
-| Quase queda | Interromper exercício, registrar evento e recomendar reavaliação. |
+| Quase queda                    | Interromper exercício, registrar evento e recomendar reavaliação.       |
 
 ## Lógica de progressão
 

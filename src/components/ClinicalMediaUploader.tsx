@@ -52,9 +52,7 @@ export function ClinicalMediaUploader({
   async function handleFile(file: File) {
     setError(null);
     if (consentBlocked) {
-      setError(
-        "Registre o consentimento de uso de imagem antes de anexar mídia clínica.",
-      );
+      setError("Registre o consentimento de uso de imagem antes de anexar mídia clínica.");
       return;
     }
     const v = validateMediaFile(file, kind);
@@ -90,9 +88,7 @@ export function ClinicalMediaUploader({
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">{label ?? defaultLabel}</div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {kind === "video"
-              ? "MP4, MOV ou WEBM · até 50MB."
-              : "JPG, PNG ou WEBP · até 50MB."}
+            {kind === "video" ? "MP4, MOV ou WEBM · até 50MB." : "JPG, PNG ou WEBP · até 50MB."}
           </p>
 
           {currentPath && !uploading && (
@@ -127,9 +123,7 @@ export function ClinicalMediaUploader({
             >
               <ShieldAlert className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
               <div className="space-y-1">
-                <div>
-                  Registre o consentimento de uso de imagem antes de anexar mídia clínica.
-                </div>
+                <div>Registre o consentimento de uso de imagem antes de anexar mídia clínica.</div>
                 {patientHref && (
                   <a
                     href={patientHref}

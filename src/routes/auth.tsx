@@ -189,11 +189,7 @@ function AuthPage() {
             <Activity className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight">
-            {isForgot
-              ? "Recuperar senha"
-              : isSignup
-                ? "Crie seu estúdio"
-                : "Bem-vindo de volta"}
+            {isForgot ? "Recuperar senha" : isSignup ? "Crie seu estúdio" : "Bem-vindo de volta"}
           </h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">
             {isForgot
@@ -211,38 +207,38 @@ function AuthPage() {
           className="mt-10 rounded-2xl border border-border/60 bg-surface/80 p-6 shadow-elevated backdrop-blur"
         >
           {!isForgot && (
-          <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-background/60 p-1 text-sm">
-            <button
-              type="button"
-              onClick={() => switchMode("signin")}
-              className={`rounded-md px-3 py-2 transition ${
-                !isSignup
-                  ? "bg-surface-elevated text-foreground shadow"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Entrar
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode("signup")}
-              className={`rounded-md px-3 py-2 transition ${
-                isSignup
-                  ? "bg-surface-elevated text-foreground shadow"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Criar conta
-            </button>
-          </div>
+            <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-background/60 p-1 text-sm">
+              <button
+                type="button"
+                onClick={() => switchMode("signin")}
+                className={`rounded-md px-3 py-2 transition ${
+                  !isSignup
+                    ? "bg-surface-elevated text-foreground shadow"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode("signup")}
+                className={`rounded-md px-3 py-2 transition ${
+                  isSignup
+                    ? "bg-surface-elevated text-foreground shadow"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Criar conta
+              </button>
+            </div>
           )}
 
           {isForgot ? (
             forgotSent ? (
               <div className="space-y-4 text-center">
                 <p className="text-sm text-muted-foreground">
-                  Se o e-mail informado existir em nossa base, enviaremos um link
-                  para redefinir a senha. Verifique também a caixa de spam.
+                  Se o e-mail informado existir em nossa base, enviaremos um link para redefinir a
+                  senha. Verifique também a caixa de spam.
                 </p>
                 <Button
                   type="button"
@@ -256,8 +252,7 @@ function AuthPage() {
             ) : (
               <form onSubmit={onForgotSubmit} className="space-y-4">
                 <p className="text-xs text-muted-foreground">
-                  Informe o e-mail cadastrado e enviaremos um link seguro para
-                  redefinir sua senha.
+                  Informe o e-mail cadastrado e enviaremos um link seguro para redefinir sua senha.
                 </p>
                 <Field id="email" label="E-mail" icon={Mail}>
                   <Input
@@ -288,86 +283,86 @@ function AuthPage() {
               </form>
             )
           ) : (
-          <form onSubmit={onSubmit} className="space-y-4">
-            {isSignup && (
-              <Field id="name" label="Nome do estúdio" icon={User}>
-                <Input id="name" name="name" placeholder="Studio Equilibrium" required />
-              </Field>
-            )}
-            <Field id="email" label="E-mail" icon={Mail}>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="voce@estudio.com"
-                required
-                autoComplete="email"
-              />
-            </Field>
-            <Field id="password" label="Senha" icon={Lock}>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-                autoComplete={isSignup ? "new-password" : "current-password"}
-                minLength={6}
-              />
-            </Field>
-
-            {!isSignup && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => switchMode("forgot")}
-                  className="text-xs text-muted-foreground transition hover:text-foreground"
-                >
-                  Esqueci minha senha
-                </button>
-              </div>
-            )}
-
-            {isSignup && (
-              <label className="flex items-start gap-2 text-xs text-muted-foreground">
-                <input
-                  type="checkbox"
-                  checked={acceptTerms}
-                  onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-border/60 bg-background/60 accent-primary"
-                  required
-                  aria-label="Li e aceito a Política de Privacidade e os Termos de Uso"
-                />
-                <span>
-                  Li e aceito a{" "}
-                  <Link
-                    to="/privacidade"
-                    className="underline underline-offset-2 hover:text-foreground"
-                  >
-                    Política de Privacidade
-                  </Link>{" "}
-                  e os{" "}
-                  <Link
-                    to="/termos"
-                    className="underline underline-offset-2 hover:text-foreground"
-                  >
-                    Termos de Uso
-                  </Link>
-                  .
-                </span>
-              </label>
-            )}
-
-            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isSignup ? (
-                "Criar conta"
-              ) : (
-                "Entrar"
+            <form onSubmit={onSubmit} className="space-y-4">
+              {isSignup && (
+                <Field id="name" label="Nome do estúdio" icon={User}>
+                  <Input id="name" name="name" placeholder="Studio Equilibrium" required />
+                </Field>
               )}
-            </Button>
-          </form>
+              <Field id="email" label="E-mail" icon={Mail}>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="voce@estudio.com"
+                  required
+                  autoComplete="email"
+                />
+              </Field>
+              <Field id="password" label="Senha" icon={Lock}>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  autoComplete={isSignup ? "new-password" : "current-password"}
+                  minLength={6}
+                />
+              </Field>
+
+              {!isSignup && (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => switchMode("forgot")}
+                    className="text-xs text-muted-foreground transition hover:text-foreground"
+                  >
+                    Esqueci minha senha
+                  </button>
+                </div>
+              )}
+
+              {isSignup && (
+                <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border/60 bg-background/60 accent-primary"
+                    required
+                    aria-label="Li e aceito a Política de Privacidade e os Termos de Uso"
+                  />
+                  <span>
+                    Li e aceito a{" "}
+                    <Link
+                      to="/privacidade"
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      Política de Privacidade
+                    </Link>{" "}
+                    e os{" "}
+                    <Link
+                      to="/termos"
+                      className="underline underline-offset-2 hover:text-foreground"
+                    >
+                      Termos de Uso
+                    </Link>
+                    .
+                  </span>
+                </label>
+              )}
+
+              <Button type="submit" variant="hero" size="lg" className="w-full" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isSignup ? (
+                  "Criar conta"
+                ) : (
+                  "Entrar"
+                )}
+              </Button>
+            </form>
           )}
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
@@ -376,7 +371,10 @@ function AuthPage() {
               Termos
             </Link>{" "}
             e{" "}
-            <Link to="/privacidade" className="underline-offset-2 hover:text-foreground hover:underline">
+            <Link
+              to="/privacidade"
+              className="underline-offset-2 hover:text-foreground hover:underline"
+            >
               Política de Privacidade
             </Link>
             .

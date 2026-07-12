@@ -216,7 +216,10 @@ function AdminPage() {
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
             {adocao.map((a) => (
-              <div key={a.label} className="flex items-center gap-3 rounded-lg border border-border/60 p-4">
+              <div
+                key={a.label}
+                className="flex items-center gap-3 rounded-lg border border-border/60 p-4"
+              >
                 <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
                   <a.icon className="h-5 w-5" />
                 </div>

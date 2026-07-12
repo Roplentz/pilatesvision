@@ -4,12 +4,12 @@ Matriz de entregas, comandos, evidências, limitações e critérios de aceite.
 
 ## Entregas
 
-| # | Entrega | Artefato | Status |
-|---|---------|----------|--------|
-| A | Banco oficial reproduzível | `supabase/migrations/*_canonical_baseline` (última migration) + `docs/db/SCHEMA_AUDIT.md` | ✅ aditiva/idempotente, aplicada em produção |
-| B | Segurança multi-clínica validada | `src/__tests__/rls-static.test.ts`, `supabase/tests/rls_isolation.sql`, rotas legadas removidas | ✅ estática no CI; SQL manual em Supabase local |
-| C | CI verde | `.github/workflows/ci.yml` (Bun fixado, format:check, lint:check, typecheck, test:run, build) | ✅ pipeline determinística |
-| D | Jornada com dois usuários / dois pacientes | `src/__tests__/journey-isolation.test.ts` (mock in-memory, roda no CI) + `e2e/journey.e2e.ts` (Playwright, skip por padrão) | ⚠ Playwright autenticado só roda localmente contra Supabase local |
+| #   | Entrega                                    | Artefato                                                                                                                    | Status                                                            |
+| --- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| A   | Banco oficial reproduzível                 | `supabase/migrations/*_canonical_baseline` (última migration) + `docs/db/SCHEMA_AUDIT.md`                                   | ✅ aditiva/idempotente, aplicada em produção                      |
+| B   | Segurança multi-clínica validada           | `src/__tests__/rls-static.test.ts`, `supabase/tests/rls_isolation.sql`, rotas legadas removidas                             | ✅ estática no CI; SQL manual em Supabase local                   |
+| C   | CI verde                                   | `.github/workflows/ci.yml` (Bun fixado, format:check, lint:check, typecheck, test:run, build)                               | ✅ pipeline determinística                                        |
+| D   | Jornada com dois usuários / dois pacientes | `src/__tests__/journey-isolation.test.ts` (mock in-memory, roda no CI) + `e2e/journey.e2e.ts` (Playwright, skip por padrão) | ⚠ Playwright autenticado só roda localmente contra Supabase local |
 
 ## Comandos
 

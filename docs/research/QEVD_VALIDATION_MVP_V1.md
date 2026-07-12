@@ -14,7 +14,7 @@
 - **Schema de métricas:** `biomechanics-mvp-v1`
 - **Dataset:** QEVD-FIT-COACH-Benchmark (split de benchmark, 74 vídeos)
   <https://huggingface.co/datasets/Voxel51/qualcomm-exercise-video-dataset-benchmark>
-- **Paper:** Yin et al., *"QEVD: A Fitness Coaching Video Dataset"*, arXiv:2407.08101
+- **Paper:** Yin et al., _"QEVD: A Fitness Coaching Video Dataset"_, arXiv:2407.08101
 - **Licença:** Qualcomm Data Research License (Feb 25, 2025) —
   <https://www.qualcomm.com/content/dam/qcomm-martech/dm-assets/documents/Dataset-Research-License-Feb-25-2025.pdf>
   Uso restrito a pesquisa não comercial. Citação obrigatória: Qualcomm (curator)
@@ -51,18 +51,18 @@ pelo dataset (squat jumps, squat kicks); `qualidade_reduzida` = trechos curtos
 (5 s) próximos ao final da série, com menor amostragem; `nao_agachamento` =
 outros exercícios para teste de falso positivo.
 
-| ID  | Vídeo | Início (s) | Fim (s) | Categoria | Exercício rotulado | Reps de referência | Origem da referência |
-| --- | ----- | ---------- | ------- | --------- | ------------------ | ------------------ | -------------------- |
-| S01 | 0006 | 68.0 | 78.0 | regular | squats | — | dataset não fornece contagem neste trecho |
-| S02 | 0009 | 65.0 | 78.0 | regular | squats | 5 | eventos de contagem "5" (67.07 s) e "10" (77.37 s) |
-| S03 | 0010 | 68.0 | 78.0 | regular | squats | — | dataset não fornece contagem |
-| S04 | 0011 | 68.0 | 78.0 | regular | squats | — | dataset não fornece contagem |
-| S05 | 0039 | 69.0 | 79.0 | variacao | squat jumps | 5 | contagens "5" (69.3 s) e "10" (73.87 s) |
-| S06 | 0031 | 90.0 | 100.0 | variacao | squat kicks | — | dataset não fornece contagem |
-| S07 | 0010 | 80.5 | 85.5 | qualidade_reduzida | squats | — | janela curta 5 s no fim da série |
-| S08 | 0011 | 82.5 | 87.5 | qualidade_reduzida | squats | — | janela curta 5 s no fim da série |
-| S09 | 0006 | 90.0 | 100.0 | nao_agachamento | pushups | 0 | rótulo do dataset — não é agachamento |
-| S10 | 0006 | 40.0 | 50.0 | nao_agachamento | jumping jacks | 0 | rótulo do dataset — não é agachamento |
+| ID  | Vídeo | Início (s) | Fim (s) | Categoria          | Exercício rotulado | Reps de referência | Origem da referência                               |
+| --- | ----- | ---------- | ------- | ------------------ | ------------------ | ------------------ | -------------------------------------------------- |
+| S01 | 0006  | 68.0       | 78.0    | regular            | squats             | —                  | dataset não fornece contagem neste trecho          |
+| S02 | 0009  | 65.0       | 78.0    | regular            | squats             | 5                  | eventos de contagem "5" (67.07 s) e "10" (77.37 s) |
+| S03 | 0010  | 68.0       | 78.0    | regular            | squats             | —                  | dataset não fornece contagem                       |
+| S04 | 0011  | 68.0       | 78.0    | regular            | squats             | —                  | dataset não fornece contagem                       |
+| S05 | 0039  | 69.0       | 79.0    | variacao           | squat jumps        | 5                  | contagens "5" (69.3 s) e "10" (73.87 s)            |
+| S06 | 0031  | 90.0       | 100.0   | variacao           | squat kicks        | —                  | dataset não fornece contagem                       |
+| S07 | 0010  | 80.5       | 85.5    | qualidade_reduzida | squats             | —                  | janela curta 5 s no fim da série                   |
+| S08 | 0011  | 82.5       | 87.5    | qualidade_reduzida | squats             | —                  | janela curta 5 s no fim da série                   |
+| S09 | 0006  | 90.0       | 100.0   | nao_agachamento    | pushups            | 0                  | rótulo do dataset — não é agachamento              |
+| S10 | 0006  | 40.0       | 50.0    | nao_agachamento    | jumping jacks      | 0                  | rótulo do dataset — não é agachamento              |
 
 ## 4. Resultados por trecho
 
@@ -72,18 +72,18 @@ de flexão de joelho (graus) por repetição válida; `TrunkP95` = mediana do P9
 de inclinação de tronco; `Sym` = mediana da simetria bilateral (0–1);
 `Rejeitada` = motor não retornou nenhuma repetição válida.
 
-| ID | Categoria | Frames válidos/total | Conf. média | Reps detectadas | Reps válidas | Ref. | MedRangeL | MedRangeR | TrunkP95 | Sym | Rejeitada | Motivo |
-| -- | --------- | -------------------- | ----------- | --------------- | ------------ | ---- | --------- | --------- | -------- | --- | --------- | ------ |
-| S01 | regular | 301/301 | 0.99 | 1 | 1 | — | 23.9 | 22.5 | 89.8 | 0.94 | não | — |
-| S02 | regular | 391/391 | 0.99 | 6 | 6 | 5 | 61.5 | 73.6 | 88.8 | 0.84 | não | — |
-| S03 | regular | 301/301 | 0.99 | 0 | 0 | — | 0 | 0 | 0 | 0 | **sim** | nenhuma repetição válida |
-| S04 | regular | 301/301 | 0.99 | 0 | 0 | — | 0 | 0 | 0 | 0 | **sim** | nenhuma repetição válida |
-| S05 | variacao (squat jumps) | 301/300 | 0.99 | 2 | 2 | 5 | 42.0 | 44.7 | 61.9 | 0.94 | não | — |
-| S06 | variacao (squat kicks) | 301/301 | 0.98 | 3 | 3 | — | 34.6 | 33.1 | 66.5 | 0.90 | não | — |
-| S07 | qualidade_reduzida | 151/151 | 0.99 | 0 | 0 | — | 0 | 0 | 0 | 0 | **sim** | nenhuma repetição válida |
-| S08 | qualidade_reduzida | 151/151 | 0.95 | 1 | 1 | — | 61.2 | 59.7 | 84.1 | 0.97 | não | — |
-| S09 | nao_agachamento (pushups) | 301/274 | 0.76 | 1 | 1 | 0 | 22.4 | 28.4 | 87.1 | 0.79 | não | **falso positivo** |
-| S10 | nao_agachamento (jumping jacks) | 301/301 | 0.98 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | sim | comportamento esperado |
+| ID  | Categoria                       | Frames válidos/total | Conf. média | Reps detectadas | Reps válidas | Ref. | MedRangeL | MedRangeR | TrunkP95 | Sym  | Rejeitada | Motivo                   |
+| --- | ------------------------------- | -------------------- | ----------- | --------------- | ------------ | ---- | --------- | --------- | -------- | ---- | --------- | ------------------------ |
+| S01 | regular                         | 301/301              | 0.99        | 1               | 1            | —    | 23.9      | 22.5      | 89.8     | 0.94 | não       | —                        |
+| S02 | regular                         | 391/391              | 0.99        | 6               | 6            | 5    | 61.5      | 73.6      | 88.8     | 0.84 | não       | —                        |
+| S03 | regular                         | 301/301              | 0.99        | 0               | 0            | —    | 0         | 0         | 0        | 0    | **sim**   | nenhuma repetição válida |
+| S04 | regular                         | 301/301              | 0.99        | 0               | 0            | —    | 0         | 0         | 0        | 0    | **sim**   | nenhuma repetição válida |
+| S05 | variacao (squat jumps)          | 301/300              | 0.99        | 2               | 2            | 5    | 42.0      | 44.7      | 61.9     | 0.94 | não       | —                        |
+| S06 | variacao (squat kicks)          | 301/301              | 0.98        | 3               | 3            | —    | 34.6      | 33.1      | 66.5     | 0.90 | não       | —                        |
+| S07 | qualidade_reduzida              | 151/151              | 0.99        | 0               | 0            | —    | 0         | 0         | 0        | 0    | **sim**   | nenhuma repetição válida |
+| S08 | qualidade_reduzida              | 151/151              | 0.95        | 1               | 1            | —    | 61.2      | 59.7      | 84.1     | 0.97 | não       | —                        |
+| S09 | nao_agachamento (pushups)       | 301/274              | 0.76        | 1               | 1            | 0    | 22.4      | 28.4      | 87.1     | 0.79 | não       | **falso positivo**       |
+| S10 | nao_agachamento (jumping jacks) | 301/301              | 0.98        | 0               | 0            | 0    | 0         | 0         | 0        | 0    | sim       | comportamento esperado   |
 
 > Valores completos, por-repetição, e o `AutoMetricsSummary` bruto de cada
 > trecho estão em `/tmp/qevd/out/results.json` (não versionado, contém
@@ -182,5 +182,5 @@ opts = mp_vision.PoseLandmarkerOptions(
 
 ---
 
-*Estimativa 2D — apoio à decisão de pesquisa. Não é diagnóstico. Nenhum dado
-de paciente foi utilizado.*
+_Estimativa 2D — apoio à decisão de pesquisa. Não é diagnóstico. Nenhum dado
+de paciente foi utilizado._

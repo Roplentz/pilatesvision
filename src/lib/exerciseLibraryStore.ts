@@ -51,7 +51,13 @@ export function useExerciseLibrary(filters: ExerciseLibraryFilters = {}) {
       )
         return false;
       if (q) {
-        const hay = [r.name_pt, r.name_en ?? "", r.equipment, r.primary_goal ?? "", r.method_family ?? ""]
+        const hay = [
+          r.name_pt,
+          r.name_en ?? "",
+          r.equipment,
+          r.primary_goal ?? "",
+          r.method_family ?? "",
+        ]
           .join(" ")
           .toLowerCase();
         if (!hay.includes(q)) return false;
@@ -63,9 +69,7 @@ export function useExerciseLibrary(filters: ExerciseLibraryFilters = {}) {
   const options = useMemo(() => {
     const equipments = Array.from(new Set(rows.map((r) => r.equipment))).sort();
     const levels = Array.from(new Set(rows.map((r) => r.level))).sort();
-    const goals = Array.from(
-      new Set(rows.map((r) => r.primary_goal ?? "").filter(Boolean)),
-    ).sort();
+    const goals = Array.from(new Set(rows.map((r) => r.primary_goal ?? "").filter(Boolean))).sort();
     return { equipments, levels, goals };
   }, [rows]);
 

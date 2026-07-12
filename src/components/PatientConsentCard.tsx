@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import {
-  usePatientConsent,
-  savePatientConsent,
-  CONSENT_TEXT_V1,
-} from "@/lib/patientConsentsStore";
+import { usePatientConsent, savePatientConsent, CONSENT_TEXT_V1 } from "@/lib/patientConsentsStore";
 import { useProfile } from "@/hooks/useProfile";
 
 interface Props {
@@ -60,10 +56,7 @@ export function PatientConsentCard({ patientId, clinicId }: Props) {
   }
 
   return (
-    <section
-      id="consentimento"
-      className="rounded-xl border border-border/60 bg-card/40 p-5"
-    >
+    <section id="consentimento" className="rounded-xl border border-border/60 bg-card/40 p-5">
       <header className="mb-3 flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           {imageOk ? (
@@ -118,9 +111,7 @@ export function PatientConsentCard({ patientId, clinicId }: Props) {
                 className="mt-0.5"
               />
               <span>
-                <span className="font-medium">
-                  Uso de imagem e vídeo (dados biométricos)
-                </span>
+                <span className="font-medium">Uso de imagem e vídeo (dados biométricos)</span>
                 <span className="block text-xs text-muted-foreground">
                   Necessário para anexar fotos/vídeos em avaliações.
                 </span>
@@ -134,9 +125,7 @@ export function PatientConsentCard({ patientId, clinicId }: Props) {
                 className="mt-0.5"
               />
               <span>
-                <span className="font-medium">
-                  Apoio por análise automática
-                </span>
+                <span className="font-medium">Apoio por análise automática</span>
                 <span className="block text-xs text-muted-foreground">
                   Autoriza uso de ferramentas de apoio à decisão (não substitui o profissional).
                 </span>

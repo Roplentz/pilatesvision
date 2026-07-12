@@ -15,7 +15,6 @@ import {
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-pilates.jpg";
 
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -79,7 +78,6 @@ function Landing() {
     </div>
   );
 }
-
 
 function Nav() {
   return (
@@ -512,7 +510,6 @@ function CTA() {
   );
 }
 
-
 function Footer() {
   return (
     <footer className="border-t border-border/60">
@@ -529,7 +526,10 @@ function Footer() {
           <Link to="/termos" className="transition hover:text-foreground">
             Termos
           </Link>
-          <a href="mailto:contato@pilatesvision.com.br" className="transition hover:text-foreground">
+          <a
+            href="mailto:contato@pilatesvision.com.br"
+            className="transition hover:text-foreground"
+          >
             Contato
           </a>
         </div>

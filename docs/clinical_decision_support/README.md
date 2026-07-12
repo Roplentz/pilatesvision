@@ -6,14 +6,14 @@ O objetivo não é automatizar conduta clínica de forma cega. O objetivo é tra
 
 ## Arquivos
 
-| Arquivo | Função |
-|---|---|
-| `pilates_methods.md` | Taxonomia dos métodos, escolas, abordagens e equipamentos de Pilates. |
-| `exercise_catalog.csv` | Catálogo estruturado de exercícios para uso em produto, banco de dados e motor de análise. |
-| `exercise_image_map.csv` | Mapa entre cada exercício e a referência visual esquemática disponível. |
-| `decision_support_rules.md` | Regras clínicas, alertas, regressões, progressões e limites éticos do suporte à decisão. |
-| `supabase_schema.sql` | Modelo inicial de tabelas para inserir métodos, exercícios, imagens e regras no Supabase. |
-| `image_reference/pilates_exercise_reference_sheet.svg` | Prancha visual esquemática própria, sem cópia de fotos comerciais. |
+| Arquivo                                                | Função                                                                                     |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `pilates_methods.md`                                   | Taxonomia dos métodos, escolas, abordagens e equipamentos de Pilates.                      |
+| `exercise_catalog.csv`                                 | Catálogo estruturado de exercícios para uso em produto, banco de dados e motor de análise. |
+| `exercise_image_map.csv`                               | Mapa entre cada exercício e a referência visual esquemática disponível.                    |
+| `decision_support_rules.md`                            | Regras clínicas, alertas, regressões, progressões e limites éticos do suporte à decisão.   |
+| `supabase_schema.sql`                                  | Modelo inicial de tabelas para inserir métodos, exercícios, imagens e regras no Supabase.  |
+| `image_reference/pilates_exercise_reference_sheet.svg` | Prancha visual esquemática própria, sem cópia de fotos comerciais.                         |
 
 ## Como usar no produto
 

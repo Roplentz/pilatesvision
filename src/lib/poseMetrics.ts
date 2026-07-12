@@ -23,9 +23,18 @@ export const LM = {
 } as const;
 
 export const POSE_CONNECTIONS: Array<[number, number]> = [
-  [11, 12], [11, 23], [12, 24], [23, 24],
-  [23, 25], [25, 27], [24, 26], [26, 28],
-  [11, 13], [13, 15], [12, 14], [14, 16],
+  [11, 12],
+  [11, 23],
+  [12, 24],
+  [23, 24],
+  [23, 25],
+  [25, 27],
+  [24, 26],
+  [26, 28],
+  [11, 13],
+  [13, 15],
+  [12, 14],
+  [14, 16],
 ];
 
 export interface Landmark {
@@ -120,7 +129,11 @@ export function interpolateInvalid(values: number[]): number[] {
   if (n === 0) return out;
   // Extremidade inicial
   let firstValid = -1;
-  for (let i = 0; i < n; i++) if (Number.isFinite(out[i])) { firstValid = i; break; }
+  for (let i = 0; i < n; i++)
+    if (Number.isFinite(out[i])) {
+      firstValid = i;
+      break;
+    }
   if (firstValid === -1) return out.map(() => NaN);
   for (let i = 0; i < firstValid; i++) out[i] = out[firstValid];
   // Interior
@@ -150,8 +163,10 @@ export function interpolateInvalid(values: number[]): number[] {
 // ---------------------------------------------------------------------------
 
 function angleDeg(a: Landmark, b: Landmark, c: Landmark): number {
-  const v1x = a.x - b.x, v1y = a.y - b.y;
-  const v2x = c.x - b.x, v2y = c.y - b.y;
+  const v1x = a.x - b.x,
+    v1y = a.y - b.y;
+  const v2x = c.x - b.x,
+    v2y = c.y - b.y;
   const dot = v1x * v2x + v1y * v2y;
   const m1 = Math.hypot(v1x, v1y);
   const m2 = Math.hypot(v2x, v2y);
@@ -160,7 +175,12 @@ function angleDeg(a: Landmark, b: Landmark, c: Landmark): number {
   return (Math.acos(cos) * 180) / Math.PI;
 }
 
-function frontalDeviation(hip: Landmark, knee: Landmark, ankle: Landmark, hipWidth: number): number {
+function frontalDeviation(
+  hip: Landmark,
+  knee: Landmark,
+  ankle: Landmark,
+  hipWidth: number,
+): number {
   if (hipWidth <= 0) return NaN;
   const dy = ankle.y - hip.y;
   if (Math.abs(dy) < 1e-6) return NaN;
@@ -326,7 +346,9 @@ export function detectReps(
             start: startIdx,
             bottom: bottomIdx,
             end: i,
-            tStart, tBottom, tEnd,
+            tStart,
+            tBottom,
+            tEnd,
           });
         }
         phase = "top";
@@ -349,9 +371,27 @@ function repMetricsFor(rep: RepPhase, samples: FrameSample[], index: number): Re
   const kneeR = slice.map((s) => s.kneeAngleR);
   const rangeL = safeNum(percentile(kneeL, 95) - percentile(kneeL, 5), 0);
   const rangeR = safeNum(percentile(kneeR, 95) - percentile(kneeR, 5), 0);
-  const trunkP95 = safeNum(percentile(slice.map((s) => s.trunkInclination), 95), 0);
-  const devL = safeNum(percentile(slice.map((s) => Math.abs(s.kneeValgusL)), 95), 0);
-  const devR = safeNum(percentile(slice.map((s) => Math.abs(s.kneeValgusR)), 95), 0);
+  const trunkP95 = safeNum(
+    percentile(
+      slice.map((s) => s.trunkInclination),
+      95,
+    ),
+    0,
+  );
+  const devL = safeNum(
+    percentile(
+      slice.map((s) => Math.abs(s.kneeValgusL)),
+      95,
+    ),
+    0,
+  );
+  const devR = safeNum(
+    percentile(
+      slice.map((s) => Math.abs(s.kneeValgusR)),
+      95,
+    ),
+    0,
+  );
   const conf = safeNum(mean(slice.map((s) => s.meanVisibility)), 0);
   const denom = Math.max(rangeL, rangeR, 1e-6);
   const symmetry = safeNum(1 - Math.abs(rangeL - rangeR) / denom, 0);
@@ -460,9 +500,10 @@ export function summarizeSamples(
   const confs = validReps.map((r) => r.confidence);
 
   const consistencyBase = rangeRs.length >= 2 ? rangeRs : rangeLs;
-  const cv = consistencyBase.length >= 2
-    ? stdev(consistencyBase) / Math.max(1e-6, mean(consistencyBase))
-    : 0;
+  const cv =
+    consistencyBase.length >= 2
+      ? stdev(consistencyBase) / Math.max(1e-6, mean(consistencyBase))
+      : 0;
   const consistency = round(Math.max(0, Math.min(1, 1 - cv)), 2);
 
   // Compat legado
@@ -470,8 +511,14 @@ export function summarizeSamples(
   const legacyKneeR = validSamples.map((s) => s.kneeAngleR);
   const legacyTrunk = validSamples.map((s) => s.trunkInclination);
   const legacyHipY = validSamples.map((s) => s.hipMidY);
-  const legacyDevL = Math.max(0, ...validSamples.map((s) => Math.abs(s.kneeValgusL)).filter(Number.isFinite));
-  const legacyDevR = Math.max(0, ...validSamples.map((s) => Math.abs(s.kneeValgusR)).filter(Number.isFinite));
+  const legacyDevL = Math.max(
+    0,
+    ...validSamples.map((s) => Math.abs(s.kneeValgusL)).filter(Number.isFinite),
+  );
+  const legacyDevR = Math.max(
+    0,
+    ...validSamples.map((s) => Math.abs(s.kneeValgusR)).filter(Number.isFinite),
+  );
 
   const kneeLmin = safeNum(percentile(legacyKneeL, 5), 0);
   const kneeLmax = safeNum(percentile(legacyKneeL, 95), 0);
@@ -479,13 +526,8 @@ export function summarizeSamples(
   const kneeRmax = safeNum(percentile(legacyKneeR, 95), 0);
   const trunkMax = safeNum(percentile(legacyTrunk, 95), 0);
   const trunkMean = safeNum(mean(legacyTrunk), 0);
-  const hipAmp = safeNum(
-    (percentile(legacyHipY, 95) || 0) - (percentile(legacyHipY, 5) || 0),
-    0,
-  );
-  const legacySymmetry = Math.round(
-    100 * Math.max(0, Math.min(1, safeNum(mean(syms), 0))),
-  );
+  const hipAmp = safeNum((percentile(legacyHipY, 95) || 0) - (percentile(legacyHipY, 5) || 0), 0);
+  const legacySymmetry = Math.round(100 * Math.max(0, Math.min(1, safeNum(mean(syms), 0))));
 
   const suggestions: string[] = [];
   const canSuggest = framesValid >= 6 && confMean >= 0.4 && validReps.length >= 1;
@@ -497,17 +539,33 @@ export function summarizeSamples(
     const medDevR = median(devRs);
     const medSym = median(syms);
     if (Number.isFinite(medDevR) && medDevR > 0.15)
-      suggestions.push("Deslocamento frontal aparente do joelho direito acima do esperado — sugere-se confirmação clínica presencial.");
+      suggestions.push(
+        "Deslocamento frontal aparente do joelho direito acima do esperado — sugere-se confirmação clínica presencial.",
+      );
     if (Number.isFinite(medDevL) && medDevL > 0.15)
-      suggestions.push("Deslocamento frontal aparente do joelho esquerdo acima do esperado — sugere-se confirmação clínica presencial.");
-    if (Number.isFinite(medRangeL) && Number.isFinite(medRangeR) && Math.abs(medRangeL - medRangeR) > 12)
-      suggestions.push("Possível diferença bilateral na amplitude do joelho — sugere-se avaliação segmentar.");
+      suggestions.push(
+        "Deslocamento frontal aparente do joelho esquerdo acima do esperado — sugere-se confirmação clínica presencial.",
+      );
+    if (
+      Number.isFinite(medRangeL) &&
+      Number.isFinite(medRangeR) &&
+      Math.abs(medRangeL - medRangeR) > 12
+    )
+      suggestions.push(
+        "Possível diferença bilateral na amplitude do joelho — sugere-se avaliação segmentar.",
+      );
     if (Number.isFinite(medTrunk) && medTrunk > 45)
-      suggestions.push("Inclinação de tronco elevada durante o agachamento — sugere-se observar controle de tronco/quadril.");
+      suggestions.push(
+        "Inclinação de tronco elevada durante o agachamento — sugere-se observar controle de tronco/quadril.",
+      );
     if (Number.isFinite(medSym) && medSym < 0.7)
-      suggestions.push("Baixa simetria bilateral média entre repetições — sugere-se observação clínica adicional.");
+      suggestions.push(
+        "Baixa simetria bilateral média entre repetições — sugere-se observação clínica adicional.",
+      );
   } else {
-    suggestions.push("Qualidade insuficiente para gerar sugestões — recomenda-se nova captura com melhor enquadramento e iluminação.");
+    suggestions.push(
+      "Qualidade insuficiente para gerar sugestões — recomenda-se nova captura com melhor enquadramento e iluminação.",
+    );
   }
 
   return {

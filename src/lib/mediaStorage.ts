@@ -4,17 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const CLINICAL_MEDIA_BUCKET = "clinical-media";
 export const MAX_MEDIA_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
-export const ACCEPTED_VIDEO_TYPES = [
-  "video/mp4",
-  "video/quicktime",
-  "video/webm",
-] as const;
+export const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/quicktime", "video/webm"] as const;
 
-export const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-] as const;
+export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
 export type MediaKind = "video" | "image";
 
@@ -26,7 +18,9 @@ export function validateMediaFile(
   file: File,
   kind: MediaKind,
 ): { ok: true } | { ok: false; error: string } {
-  const allowed = (kind === "video" ? ACCEPTED_VIDEO_TYPES : ACCEPTED_IMAGE_TYPES) as readonly string[];
+  const allowed = (
+    kind === "video" ? ACCEPTED_VIDEO_TYPES : ACCEPTED_IMAGE_TYPES
+  ) as readonly string[];
   if (!allowed.includes(file.type)) {
     return {
       ok: false,
@@ -44,12 +38,19 @@ export function validateMediaFile(
 
 function sanitizeFileName(name: string): string {
   const dot = name.lastIndexOf(".");
-  const base = (dot >= 0 ? name.slice(0, dot) : name)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60) || "arquivo";
-  const ext = dot >= 0 ? name.slice(dot + 1).toLowerCase().replace(/[^a-z0-9]+/g, "") : "";
+  const base =
+    (dot >= 0 ? name.slice(0, dot) : name)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "arquivo";
+  const ext =
+    dot >= 0
+      ? name
+          .slice(dot + 1)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "")
+      : "";
   return ext ? `${base}.${ext}` : base;
 }
 
@@ -80,13 +81,11 @@ export async function uploadClinicalMedia(params: {
     assessmentId: params.assessmentId,
     fileName: params.file.name,
   });
-  const { error } = await supabase.storage
-    .from(CLINICAL_MEDIA_BUCKET)
-    .upload(path, params.file, {
-      contentType: params.file.type,
-      upsert: false,
-      cacheControl: "3600",
-    });
+  const { error } = await supabase.storage.from(CLINICAL_MEDIA_BUCKET).upload(path, params.file, {
+    contentType: params.file.type,
+    upsert: false,
+    cacheControl: "3600",
+  });
   if (error) throw new Error(error.message);
   return { path };
 }

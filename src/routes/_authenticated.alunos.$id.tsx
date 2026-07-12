@@ -413,10 +413,7 @@ function AlunoDetailPage() {
 
             {patient.clinic_id && (
               <div className="mt-6">
-                <PatientConsentCard
-                  patientId={patient.id}
-                  clinicId={patient.clinic_id}
-                />
+                <PatientConsentCard patientId={patient.id} clinicId={patient.clinic_id} />
               </div>
             )}
 
@@ -460,9 +457,7 @@ function AssessmentsHistory({ patientId }: { patientId: string }) {
         </Link>
       </div>
 
-      {latestTwo.length >= 2 && (
-        <EvolutionComparison a={latestTwo[0]} b={latestTwo[1]} />
-      )}
+      {latestTwo.length >= 2 && <EvolutionComparison a={latestTwo[0]} b={latestTwo[1]} />}
 
       <h3 className="mt-8 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Avaliações
@@ -588,7 +583,10 @@ function avgQuality(movs: MovementResultRow[]): number | null {
   return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
 }
 
-function topFindings(postural: PosturalResultRow | null, movement: MovementResultRow | null): string[] {
+function topFindings(
+  postural: PosturalResultRow | null,
+  movement: MovementResultRow | null,
+): string[] {
   const out: string[] = [];
   if (postural?.findings && Array.isArray(postural.findings)) {
     for (const f of postural.findings as Array<{ region?: string; finding?: string }>) {
@@ -612,7 +610,9 @@ function EvolutionComparison({ a, b }: { a: AssessmentRow; b: AssessmentRow }) {
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Comparação das duas avaliações mais recentes
         </h3>
-        <span className="text-xs text-muted-foreground">Leitura observacional — sem valor diagnóstico</span>
+        <span className="text-xs text-muted-foreground">
+          Leitura observacional — sem valor diagnóstico
+        </span>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <ComparisonColumn label="Mais recente" assessment={a} />
@@ -627,7 +627,10 @@ function ComparisonColumn({ label, assessment }: { label: string; assessment: As
   const score = avgQuality(movement ? [movement] : []);
   const findings = topFindings(postural, movement);
   const recs = prescribed.length
-    ? prescribed.map((p) => p.name).filter(Boolean).slice(0, 5)
+    ? prescribed
+        .map((p) => p.name)
+        .filter(Boolean)
+        .slice(0, 5)
     : [];
   return (
     <div className="rounded-lg border border-border/50 bg-background/40 p-4">

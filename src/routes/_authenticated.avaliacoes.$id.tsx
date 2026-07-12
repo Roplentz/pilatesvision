@@ -148,14 +148,7 @@ const PILATES_EXERCISES = [
   "Exercício livre",
 ] as const;
 
-const APPARATUS_OPTIONS = [
-  "Solo",
-  "Reformer",
-  "Cadillac",
-  "Chair",
-  "Barrel",
-  "Outro",
-] as const;
+const APPARATUS_OPTIONS = ["Solo", "Reformer", "Cadillac", "Chair", "Barrel", "Outro"] as const;
 
 function AvaliacaoDetailPage() {
   const { id } = Route.useParams();
@@ -462,9 +455,7 @@ function AvaliacaoDetailPage() {
               : "Enquanto rascunho, os campos e achados podem ser editados/adicionados."}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {status === "completed" && (
-              <GenerateReportButton assessmentId={assessment.id} />
-            )}
+            {status === "completed" && <GenerateReportButton assessmentId={assessment.id} />}
             {canFinalize && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -598,8 +589,8 @@ function PosturalSection({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Registro observacional (assimetria, anteriorização, desalinhamento). Ferramenta de
-        apoio à decisão — confirmar clinicamente. Não constitui diagnóstico.
+        Registro observacional (assimetria, anteriorização, desalinhamento). Ferramenta de apoio à
+        decisão — confirmar clinicamente. Não constitui diagnóstico.
       </p>
 
       {items.length === 0 && !open && (
@@ -826,9 +817,7 @@ function MovementSection({
 
   const save = async () => {
     const resolvedName =
-      movementPreset === "Movimento livre"
-        ? movementCustom.trim()
-        : movementPreset.trim();
+      movementPreset === "Movimento livre" ? movementCustom.trim() : movementPreset.trim();
     if (!resolvedName) return toast.error("Informe o movimento avaliado.");
     setSaving(true);
     try {
@@ -1190,8 +1179,8 @@ function ExerciseSection({
               Exercícios Pilates — avaliação da execução dos exercícios do método
             </h3>
             <p className="text-xs text-muted-foreground">
-              Avaliação clínica da execução do repertório Pilates. Estimativa/apoio à
-              decisão — requer confirmação clínica.
+              Avaliação clínica da execução do repertório Pilates. Estimativa/apoio à decisão —
+              requer confirmação clínica.
             </p>
           </div>
         </div>
@@ -1304,9 +1293,7 @@ function ExerciseSection({
                   {libraryItem ? libraryItem.name_pt : nameCustom || "—"}
                 </span>
                 {apparatus && (
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    · {apparatus}
-                  </span>
+                  <span className="ml-2 text-xs text-muted-foreground">· {apparatus}</span>
                 )}
                 {libraryItem?.primary_goal && (
                   <div className="mt-1 text-[11px] text-muted-foreground">
@@ -1403,12 +1390,12 @@ function ExerciseSection({
 
           <div>
             <Label>Recomendação</Label>
-              <Input
-                value={recommendation}
-                onChange={(e) => setRecommendation(e.target.value)}
-                placeholder="Sugestão de progressão/regressão"
-                className="mt-1.5"
-              />
+            <Input
+              value={recommendation}
+              onChange={(e) => setRecommendation(e.target.value)}
+              placeholder="Sugestão de progressão/regressão"
+              className="mt-1.5"
+            />
           </div>
 
           <div className="rounded-lg border border-border/50 bg-background/40 p-4">

@@ -145,8 +145,7 @@ export function ExerciseCatalogPicker({
                 </div>
                 <ul className="space-y-1">
                   {list.map((it) => {
-                    const active =
-                      selectedName && selectedName === it.name;
+                    const active = selectedName && selectedName === it.name;
                     return (
                       <li key={`${it.category}-${it.name}`}>
                         <Button

@@ -15,7 +15,9 @@ export function SignedClinicalMedia({ path, kind, className, alt }: Props) {
 
   if (loading) {
     return (
-      <div className={`flex items-center gap-2 rounded-lg border border-border/60 bg-card/40 p-4 text-xs text-muted-foreground ${className ?? ""}`}>
+      <div
+        className={`flex items-center gap-2 rounded-lg border border-border/60 bg-card/40 p-4 text-xs text-muted-foreground ${className ?? ""}`}
+      >
         <Loader2 className="h-4 w-4 animate-spin" /> Carregando mídia…
       </div>
     );
@@ -23,7 +25,9 @@ export function SignedClinicalMedia({ path, kind, className, alt }: Props) {
 
   if (error || !url) {
     return (
-      <div className={`flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive ${className ?? ""}`}>
+      <div
+        className={`flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive ${className ?? ""}`}
+      >
         <AlertCircle className="h-4 w-4" />
         Não foi possível carregar a mídia.
       </div>

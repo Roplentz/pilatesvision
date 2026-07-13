@@ -41,10 +41,12 @@ CREATE POLICY clinical_media_del ON storage.objects
 
 -- 2. Renomear constraints legadas students_* -> patients_* (cosmético, não destrutivo).
 DO $$
-DECLARE r record;
+DECLARE
+  r record;
+  target_name text;
 BEGIN
   FOR r IN
-    SELECT conname, conrelid::regclass::text AS tbl
+    SELECT conname, conrelid, conrelid::regclass::text AS tbl
     FROM pg_constraint
     WHERE conname LIKE 'students_%'
        OR conname LIKE 'assessments_student_id_%'
@@ -52,10 +54,15 @@ BEGIN
        OR conname LIKE 'movement_results_student_id_%'
        OR conname LIKE 'postural_results_student_id_%'
   LOOP
-    EXECUTE format(
-      'ALTER TABLE %s RENAME CONSTRAINT %I TO %I',
-      r.tbl, r.conname,
-      replace(replace(r.conname, 'students_', 'patients_'), 'student_id', 'patient_id')
-    );
+    target_name := replace(replace(r.conname, 'students_', 'patients_'), 'student_id', 'patient_id');
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_constraint
+      WHERE conrelid = r.conrelid AND conname = target_name
+    ) THEN
+      EXECUTE format(
+        'ALTER TABLE %s RENAME CONSTRAINT %I TO %I',
+        r.tbl, r.conname, target_name
+      );
+    END IF;
   END LOOP;
 END $$;

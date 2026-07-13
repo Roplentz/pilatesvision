@@ -9,13 +9,9 @@ export const FISIOVISION_ALLOWED_EXERCISES = [
   "pilates-teaser",
 ] as const;
 
-export type FisiovisionExerciseId =
-  (typeof FISIOVISION_ALLOWED_EXERCISES)[number];
+export type FisiovisionExerciseId = (typeof FISIOVISION_ALLOWED_EXERCISES)[number];
 
-export const FISIOVISION_EXERCISE_LABELS: Record<
-  FisiovisionExerciseId,
-  string
-> = {
+export const FISIOVISION_EXERCISE_LABELS: Record<FisiovisionExerciseId, string> = {
   "pilates-the-hundred": "The Hundred",
   "pilates-single-leg-stretch": "Single Leg Stretch",
   "pilates-swimming": "Swimming",
@@ -23,11 +19,7 @@ export const FISIOVISION_EXERCISE_LABELS: Record<
   "pilates-teaser": "Teaser",
 };
 
-export type FisiovisionAnalysisStatus =
-  | "queued"
-  | "processing"
-  | "completed"
-  | "failed";
+export type FisiovisionAnalysisStatus = "queued" | "processing" | "completed" | "failed";
 
 export type FisiovisionJson =
   | string
@@ -60,8 +52,7 @@ export const FISIOVISION_ERROR_MESSAGES: Record<string, string> = {
   unauthorized: "Não autenticado para acessar o serviço de análise.",
   forbidden: "Você não tem permissão para acessar este vídeo.",
   not_found: "Análise não encontrada.",
-  rate_limited:
-    "Muitas análises em andamento. Aguarde alguns instantes e tente novamente.",
+  rate_limited: "Muitas análises em andamento. Aguarde alguns instantes e tente novamente.",
   service_unavailable:
     "Serviço de análise temporariamente indisponível. Tente novamente em instantes.",
   config_missing: "Integração de análise não configurada.",
@@ -73,7 +64,5 @@ export const FISIOVISION_ERROR_MESSAGES: Record<string, string> = {
 
 export function translateFisiovisionError(code: string | undefined): string {
   if (!code) return "Falha inesperada ao processar análise.";
-  return (
-    FISIOVISION_ERROR_MESSAGES[code] ?? "Falha inesperada ao processar análise."
-  );
+  return FISIOVISION_ERROR_MESSAGES[code] ?? "Falha inesperada ao processar análise.";
 }

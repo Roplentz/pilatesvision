@@ -32,6 +32,7 @@ import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import { usePatientConsent } from "@/lib/patientConsentsStore";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { PoseCapture } from "@/components/PoseCapture";
+import { FisiovisionAnalyzer } from "@/components/FisiovisionAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
 import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";

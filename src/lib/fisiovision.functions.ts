@@ -205,3 +205,4 @@ function serializeHandled(error: unknown): Error {
   Object.assign(serialized, { code: handled.code, httpStatus: handled.httpStatus });
   return serialized;
 }
+

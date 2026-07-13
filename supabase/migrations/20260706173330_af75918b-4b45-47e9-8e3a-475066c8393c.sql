@@ -86,10 +86,18 @@ ALTER TABLE public.postural_results
   ADD COLUMN IF NOT EXISTS professional_notes text,
   ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
 
-UPDATE public.postural_results pr
-SET clinic_id = a.clinic_id, student_id = a.student_id
-FROM public.assessments a
-WHERE pr.assessment_id = a.id AND (pr.clinic_id IS NULL OR pr.student_id IS NULL);
+DO $
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'assessments' AND column_name = 'student_id'
+  ) THEN
+    EXECUTE 'UPDATE public.postural_results pr
+      SET clinic_id = a.clinic_id, student_id = a.student_id
+      FROM public.assessments a
+      WHERE pr.assessment_id = a.id AND (pr.clinic_id IS NULL OR pr.student_id IS NULL)';
+  END IF;
+END $;
 
 ALTER TABLE public.postural_results ALTER COLUMN clinic_id SET NOT NULL;
 ALTER TABLE public.postural_results ALTER COLUMN findings SET DEFAULT '[]'::jsonb;
@@ -110,10 +118,18 @@ ALTER TABLE public.movement_results
   ADD COLUMN IF NOT EXISTS professional_notes text,
   ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
 
-UPDATE public.movement_results mr
-SET clinic_id = a.clinic_id, student_id = a.student_id
-FROM public.assessments a
-WHERE mr.assessment_id = a.id AND (mr.clinic_id IS NULL OR mr.student_id IS NULL);
+DO $
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'assessments' AND column_name = 'student_id'
+  ) THEN
+    EXECUTE 'UPDATE public.movement_results mr
+      SET clinic_id = a.clinic_id, student_id = a.student_id
+      FROM public.assessments a
+      WHERE mr.assessment_id = a.id AND (mr.clinic_id IS NULL OR mr.student_id IS NULL)';
+  END IF;
+END $;
 
 ALTER TABLE public.movement_results ALTER COLUMN clinic_id SET NOT NULL;
 

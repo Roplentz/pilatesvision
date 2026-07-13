@@ -86,7 +86,7 @@ ALTER TABLE public.postural_results
   ADD COLUMN IF NOT EXISTS professional_notes text,
   ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
 
-DO $
+DO $$
 BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
@@ -97,7 +97,7 @@ BEGIN
       FROM public.assessments a
       WHERE pr.assessment_id = a.id AND (pr.clinic_id IS NULL OR pr.student_id IS NULL)';
   END IF;
-END $;
+END $$;
 
 ALTER TABLE public.postural_results ALTER COLUMN clinic_id SET NOT NULL;
 ALTER TABLE public.postural_results ALTER COLUMN findings SET DEFAULT '[]'::jsonb;
@@ -118,7 +118,7 @@ ALTER TABLE public.movement_results
   ADD COLUMN IF NOT EXISTS professional_notes text,
   ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
 
-DO $
+DO $$
 BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.columns
@@ -129,7 +129,7 @@ BEGIN
       FROM public.assessments a
       WHERE mr.assessment_id = a.id AND (mr.clinic_id IS NULL OR mr.student_id IS NULL)';
   END IF;
-END $;
+END $$;
 
 ALTER TABLE public.movement_results ALTER COLUMN clinic_id SET NOT NULL;
 

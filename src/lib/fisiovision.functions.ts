@@ -318,7 +318,7 @@ function toDTO(row: {
     id: row.id,
     status: normalizeStatus(row.status),
     exerciseId: row.exercise_id,
-    result: row.result ?? null,
+    result: (row.result as FisiovisionJson | null) ?? null,
     error: (row.error as { code?: string; message?: string } | null) ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

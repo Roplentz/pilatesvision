@@ -939,6 +939,16 @@ function MovementSection({
                   />
                 </div>
               )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <FisiovisionAnalyzer
+                    clinicId={assessment.clinic_id}
+                    patientId={assessment.patient_id}
+                    assessmentId={assessment.id}
+                    initialVideoPath={r.video_url}
+                  />
+                </div>
+              )}
               {r.image_url && (
                 <div className="mt-4">
                   <SignedClinicalMedia

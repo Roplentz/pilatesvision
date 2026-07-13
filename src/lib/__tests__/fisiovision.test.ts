@@ -26,21 +26,9 @@ describe("fisiovision integration contract", () => {
 
   it("gera idempotência estável, opaca e dentro do limite da API", async () => {
     const longPath = `clinic/patient/assessment/${"video-com-nome-longo-".repeat(20)}.mp4`;
-    const first = await makeIdempotencyKey(
-      "user-1",
-      longPath,
-      "pilates-teaser",
-    );
-    const repeated = await makeIdempotencyKey(
-      "user-1",
-      longPath,
-      "pilates-teaser",
-    );
-    const otherExercise = await makeIdempotencyKey(
-      "user-1",
-      longPath,
-      "pilates-swan",
-    );
+    const first = await makeIdempotencyKey("user-1", longPath, "pilates-teaser");
+    const repeated = await makeIdempotencyKey("user-1", longPath, "pilates-teaser");
+    const otherExercise = await makeIdempotencyKey("user-1", longPath, "pilates-swan");
     expect(first).toBe(repeated);
     expect(first).not.toBe(otherExercise);
     expect(first).toMatch(/^pv:[a-f0-9]{64}$/);
@@ -50,12 +38,8 @@ describe("fisiovision integration contract", () => {
 
   it("traduz códigos de erro conhecidos para PT-BR", () => {
     expect(translateFisiovisionError("rate_limited")).toMatch(/análises/i);
-    expect(translateFisiovisionError("service_unavailable")).toMatch(
-      /indisponível/i,
-    );
-    expect(translateFisiovisionError("config_missing")).toMatch(
-      /não configurada/i,
-    );
+    expect(translateFisiovisionError("service_unavailable")).toMatch(/indisponível/i);
+    expect(translateFisiovisionError("config_missing")).toMatch(/não configurada/i);
     expect(translateFisiovisionError("forbidden")).toMatch(/permissão/i);
     expect(translateFisiovisionError("invalid_video")).toMatch(/vídeo/i);
     expect(translateFisiovisionError(undefined)).toMatch(/falha/i);

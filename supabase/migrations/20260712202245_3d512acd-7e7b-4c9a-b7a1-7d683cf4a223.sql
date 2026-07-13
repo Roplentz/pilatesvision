@@ -39,30 +39,7 @@ CREATE POLICY clinical_media_del ON storage.objects
     AND (storage.foldername(name))[1] = (public.current_user_clinic_id())::text
   );
 
--- 2. Renomear constraints legadas students_* -> patients_* (cosmético, não destrutivo).
-DO $$
-DECLARE
-  r record;
-  target_name text;
-BEGIN
-  FOR r IN
-    SELECT conname, conrelid, conrelid::regclass::text AS tbl
-    FROM pg_constraint
-    WHERE conname LIKE 'students_%'
-       OR conname LIKE 'assessments_student_id_%'
-       OR conname LIKE 'exercise_results_student_id_%'
-       OR conname LIKE 'movement_results_student_id_%'
-       OR conname LIKE 'postural_results_student_id_%'
-  LOOP
-    target_name := replace(replace(r.conname, 'students_', 'patients_'), 'student_id', 'patient_id');
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_constraint
-      WHERE conname = target_name
-    ) THEN
-      EXECUTE format(
-        'ALTER TABLE %s RENAME CONSTRAINT %I TO %I',
-        r.tbl, r.conname, target_name
-      );
-    END IF;
-  END LOOP;
-END $$;
+-- 2. Constraint names are intentionally preserved.
+-- Renaming legacy PK/FK constraints is cosmetic and can collide with indexes
+-- already created by the patient compatibility migrations.
+

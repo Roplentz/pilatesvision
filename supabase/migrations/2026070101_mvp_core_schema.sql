@@ -21,6 +21,13 @@ create table if not exists public.clinics (
   updated_at timestamptz not null default now()
 );
 
+-- Reconcile the legacy clinics table created by earlier migrations. The
+-- CREATE TABLE IF NOT EXISTS above does not add columns to an existing table.
+alter table public.clinics
+  add column if not exists owner_user_id uuid references auth.users(id) on delete set null;
+alter table public.clinics
+  add column if not exists updated_at timestamptz not null default now();
+
 create table if not exists public.professionals (
   id uuid primary key default gen_random_uuid(),
   clinic_id uuid not null references public.clinics(id) on delete cascade,

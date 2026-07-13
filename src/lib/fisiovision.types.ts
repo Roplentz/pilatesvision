@@ -61,6 +61,7 @@ export const FISIOVISION_ERROR_MESSAGES: Record<string, string> = {
   config_missing: "Integração de análise não configurada.",
   invalid_exercise: "Exercício não liberado para análise automática.",
   invalid_video_path: "Vídeo fora do escopo permitido.",
+  invalid_video: "O arquivo precisa ser um vídeo MP4, MOV ou WEBM de até 50MB.",
   upstream_error: "Falha ao comunicar com o serviço de análise.",
 };
 

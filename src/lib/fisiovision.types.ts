@@ -25,11 +25,19 @@ export type FisiovisionAnalysisStatus =
   | "completed"
   | "failed";
 
+export type FisiovisionJson =
+  | string
+  | number
+  | boolean
+  | null
+  | { [k: string]: FisiovisionJson }
+  | FisiovisionJson[];
+
 export interface FisiovisionAnalysisDTO {
   id: string;
   status: FisiovisionAnalysisStatus;
   exerciseId: FisiovisionExerciseId | string;
-  result: unknown | null;
+  result: FisiovisionJson | null;
   error: { code?: string; message?: string } | null;
   createdAt: string;
   updatedAt: string;

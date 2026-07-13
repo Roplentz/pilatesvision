@@ -57,7 +57,7 @@ BEGIN
     target_name := replace(replace(r.conname, 'students_', 'patients_'), 'student_id', 'patient_id');
     IF NOT EXISTS (
       SELECT 1 FROM pg_constraint
-      WHERE conrelid = r.conrelid AND conname = target_name
+      WHERE conname = target_name
     ) THEN
       EXECUTE format(
         'ALTER TABLE %s RENAME CONSTRAINT %I TO %I',

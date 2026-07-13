@@ -60,3 +60,4 @@ As rotas legadas de avaliação foram removidas. O endpoint público legado `/ap
 - `rls_isolation.sql` conclui sem exceção.
 - Playwright autenticado completa a jornada A/B.
 - Nenhum dado fictício é inserido na produção.
+

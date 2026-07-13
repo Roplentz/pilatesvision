@@ -38,3 +38,4 @@ describe("fisiovision integration contract", () => {
     expect(translateFisiovisionError(undefined)).toMatch(/falha/i);
   });
 });
+

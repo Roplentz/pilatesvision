@@ -8,7 +8,9 @@ BEGIN
     'prescribed_exercises','reports','exercise_library','pose_captures',
     'platform_admins'
   ] LOOP
-    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+    IF to_regclass(format('public.%I', t)) IS NOT NULL THEN
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+    END IF;
   END LOOP;
 END $$;
 
@@ -33,9 +35,15 @@ BEGIN
   END LOOP;
 END $$;
 
-DROP POLICY IF EXISTS "platform_admins_select_self" ON public.platform_admins;
-CREATE POLICY "platform_admins_select_self" ON public.platform_admins
-  FOR SELECT TO authenticated USING (user_id = auth.uid());
+DO $policy$
+BEGIN
+  IF to_regclass('public.platform_admins') IS NOT NULL THEN
+    EXECUTE 'DROP POLICY IF EXISTS "platform_admins_select_self" ON public.platform_admins';
+    EXECUTE 'CREATE POLICY "platform_admins_select_self" ON public.platform_admins
+      FOR SELECT TO authenticated USING (user_id = auth.uid())';
+  END IF;
+END
+$policy$;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.patients TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.assessments TO authenticated;
@@ -50,7 +58,13 @@ GRANT SELECT ON public.exercise_library TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.clinics TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.profiles TO authenticated;
 GRANT SELECT ON public.user_roles TO authenticated;
-GRANT SELECT ON public.platform_admins TO authenticated;
+DO $grant$
+BEGIN
+  IF to_regclass('public.platform_admins') IS NOT NULL THEN
+    GRANT SELECT ON public.platform_admins TO authenticated;
+  END IF;
+END
+$grant$;
 
 CREATE INDEX IF NOT EXISTS idx_patients_clinic_id ON public.patients(clinic_id);
 CREATE INDEX IF NOT EXISTS idx_assessments_clinic_id ON public.assessments(clinic_id);

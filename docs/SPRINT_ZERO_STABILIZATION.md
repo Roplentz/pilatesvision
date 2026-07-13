@@ -4,12 +4,12 @@ Matriz de entregas, comandos, evidências, limitações e critérios de aceite.
 
 ## Entregas
 
-| # | Entrega | Evidência atual | Status |
-| --- | --- | --- | --- |
-| A | Banco oficial | Migrations aditivas aplicadas no banco atual; bootstrap documentado | ⚠️ produção estabilizada; reconstrução limpa ainda não executada |
-| B | Segurança multi-clínica | Testes estáticos no CI; SQL com SELECT/UPDATE/DELETE cruzados pronto para Supabase local | ⚠️ teste SQL real ainda não executado |
-| C | CI | Bun fixado, format:check, lint:check, typecheck, test:run e build | ✅ local; GitHub Actions deve ser confirmado no commit |
-| D | Jornada com dois usuários/pacientes | Vitest em memória e spec Playwright opt-in | ⚠️ simulada; Playwright autenticado ainda não executado |
+| #   | Entrega                             | Evidência atual                                                                          | Status                                                           |
+| --- | ----------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| A   | Banco oficial                       | Migrations aditivas aplicadas no banco atual; bootstrap documentado                      | ⚠️ produção estabilizada; reconstrução limpa ainda não executada |
+| B   | Segurança multi-clínica             | Testes estáticos no CI; SQL com SELECT/UPDATE/DELETE cruzados pronto para Supabase local | ⚠️ teste SQL real ainda não executado                            |
+| C   | CI                                  | Bun fixado, format:check, lint:check, typecheck, test:run e build                        | ✅ local; GitHub Actions deve ser confirmado no commit           |
+| D   | Jornada com dois usuários/pacientes | Vitest em memória e spec Playwright opt-in                                               | ⚠️ simulada; Playwright autenticado ainda não executado          |
 
 ## Entrega 1 — evidências
 
@@ -60,4 +60,3 @@ As rotas legadas de avaliação foram removidas. O endpoint público legado `/ap
 - `rls_isolation.sql` conclui sem exceção.
 - Playwright autenticado completa a jornada A/B.
 - Nenhum dado fictício é inserido na produção.
-

@@ -229,7 +229,7 @@ export const createFisiovisionAnalysis = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     try {
-      const { supabase, userId } = context as {
+      const { supabase, userId } = context as unknown as {
         supabase: {
           rpc: (fn: string) => Promise<{ data: string | null; error: unknown }>;
         };

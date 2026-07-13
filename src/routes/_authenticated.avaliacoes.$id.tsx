@@ -32,6 +32,7 @@ import { SignedClinicalMedia } from "@/components/SignedClinicalMedia";
 import { usePatientConsent } from "@/lib/patientConsentsStore";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { PoseCapture } from "@/components/PoseCapture";
+import { FisiovisionAnalyzer } from "@/components/FisiovisionAnalyzer";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
 import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
@@ -935,6 +936,16 @@ function MovementSection({
                         : null
                     }
                     onSaved={onSaved}
+                  />
+                </div>
+              )}
+              {r.video_url && (
+                <div className="mt-4">
+                  <FisiovisionAnalyzer
+                    clinicId={clinicId}
+                    patientId={patientId}
+                    assessmentId={assessmentId}
+                    initialVideoPath={r.video_url}
                   />
                 </div>
               )}

@@ -5,6 +5,7 @@ import {
   type FisiovisionAnalysisDTO,
   type FisiovisionAnalysisStatus,
   type FisiovisionExerciseId,
+  type FisiovisionJson,
 } from "./fisiovision.types";
 
 const CLINICAL_MEDIA_BUCKET = "clinical-media";
@@ -172,7 +173,7 @@ export const createFisiovisionAnalysis = createServerFn({ method: "POST" })
       const body = (await upstreamRes.json().catch(() => ({}))) as {
         id?: string;
         status?: string;
-        result?: unknown;
+        result?: FisiovisionJson;
         error?: { code?: string; message?: string } | null;
       };
       if (!body.id) throw new HandledError("upstream_error", 502, "resposta sem id");
@@ -263,7 +264,7 @@ export const getFisiovisionAnalysis = createServerFn({ method: "GET" })
       const body = (await upstreamRes.json().catch(() => ({}))) as {
         id?: string;
         status?: string;
-        result?: unknown;
+        result?: FisiovisionJson;
         error?: { code?: string; message?: string } | null;
       };
       const status = normalizeStatus(body.status);

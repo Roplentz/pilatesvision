@@ -9,7 +9,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { AlertCircle, Loader2, RefreshCw, Sparkles, Upload } from "lucide-react";
+import {
+  AlertCircle,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +53,10 @@ const POLL_TIMEOUT_MS = 5 * 60 * 1000; // 5 min
 const POLL_START_MS = 2000;
 const POLL_MAX_MS = 15000;
 
-function statusBadge(s: FisiovisionAnalysisStatus): { label: string; variant: "default" | "secondary" | "destructive" | "outline" } {
+function statusBadge(s: FisiovisionAnalysisStatus): {
+  label: string;
+  variant: "default" | "secondary" | "destructive" | "outline";
+} {
   switch (s) {
     case "queued":
       return { label: "Na fila", variant: "outline" };
@@ -84,7 +93,9 @@ export function FisiovisionAnalyzer({
     FISIOVISION_ALLOWED_EXERCISES[0],
   );
   const [file, setFile] = useState<File | null>(null);
-  const [videoPath, setVideoPath] = useState<string | null>(initialVideoPath ?? null);
+  const [videoPath, setVideoPath] = useState<string | null>(
+    initialVideoPath ?? null,
+  );
   const [uploadPct, setUploadPct] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -97,9 +108,12 @@ export function FisiovisionAnalyzer({
     setVideoPath(initialVideoPath ?? null);
   }, [initialVideoPath]);
 
-  useEffect(() => () => {
-    if (pollingRef.current) pollingRef.current.cancelled = true;
-  }, []);
+  useEffect(
+    () => () => {
+      if (pollingRef.current) pollingRef.current.cancelled = true;
+    },
+    [],
+  );
 
   const configError = errorCode === "config_missing";
 
@@ -186,7 +200,12 @@ export function FisiovisionAnalyzer({
         const code = extractErrorCode(err);
         setErrorCode(code);
         setErrorMsg(translateFisiovisionError(code));
-        if (code === "unauthorized" || code === "forbidden" || code === "not_found") return;
+        if (
+          code === "unauthorized" ||
+          code === "forbidden" ||
+          code === "not_found"
+        )
+          return;
       }
       wait = Math.min(POLL_MAX_MS, Math.round(wait * 1.5));
     }
@@ -244,7 +263,9 @@ export function FisiovisionAnalyzer({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
-          <span className="text-sm font-medium">Análise avançada FisioVision</span>
+          <span className="text-sm font-medium">
+            Análise avançada FisioVision
+          </span>
           <Badge variant="outline" className="text-[10px]">
             apoio à decisão — não é diagnóstico
           </Badge>
@@ -258,7 +279,9 @@ export function FisiovisionAnalyzer({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <label className="text-xs font-medium text-muted-foreground">Exercício</label>
+          <label className="text-xs font-medium text-muted-foreground">
+            Exercício
+          </label>
           <Select
             value={exerciseId}
             onValueChange={(v) => setExerciseId(v as FisiovisionExerciseId)}
@@ -283,7 +306,9 @@ export function FisiovisionAnalyzer({
           </label>
           {videoPath ? (
             <div className="flex items-center justify-between rounded-md border border-border/60 bg-background/40 px-3 py-2 text-xs">
-              <span className="truncate text-muted-foreground">Vídeo já enviado.</span>
+              <span className="truncate text-muted-foreground">
+                Vídeo já enviado.
+              </span>
               <Button
                 type="button"
                 size="sm"
@@ -301,7 +326,9 @@ export function FisiovisionAnalyzer({
             <label className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border/60 bg-background/40 px-3 py-2 text-xs text-muted-foreground hover:bg-background/60">
               <Upload className="h-4 w-4" />
               <span className="truncate">
-                {file ? `${file.name} · ${formatBytes(file.size)}` : "Selecionar vídeo"}
+                {file
+                  ? `${file.name} · ${formatBytes(file.size)}`
+                  : "Selecionar vídeo"}
               </span>
               <input
                 type="file"
@@ -317,7 +344,9 @@ export function FisiovisionAnalyzer({
 
       {uploading && (
         <div className="space-y-1">
-          <div className="text-[11px] text-muted-foreground">Enviando vídeo…</div>
+          <div className="text-[11px] text-muted-foreground">
+            Enviando vídeo…
+          </div>
           <Progress value={uploadPct ?? 0} />
         </div>
       )}
@@ -355,14 +384,16 @@ export function FisiovisionAnalyzer({
             <div>{errorMsg}</div>
             {configError && !isPlatformAdmin && (
               <div className="text-muted-foreground">
-                Contate o administrador da plataforma para habilitar a análise avançada.
+                Contate o administrador da plataforma para habilitar a análise
+                avançada.
               </div>
             )}
             {configError && isPlatformAdmin && (
               <div className="text-muted-foreground">
                 Configure os secrets <code>FISIOVISION_API_URL</code>,{" "}
                 <code>FISIOVISION_API_TOKEN</code> e (opcional){" "}
-                <code>FISIOVISION_CONSUMER_ID</code> em Project Settings → Secrets.
+                <code>FISIOVISION_CONSUMER_ID</code> em Project Settings →
+                Secrets.
               </div>
             )}
           </div>
@@ -381,7 +412,8 @@ export function FisiovisionAnalyzer({
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        Estimativa automática — apoio à decisão profissional. Não substitui avaliação clínica.
+        Estimativa automática — apoio à decisão profissional. Não substitui
+        avaliação clínica.
       </p>
     </div>
   );

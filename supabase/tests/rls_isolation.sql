@@ -25,7 +25,7 @@ VALUES
   ('00000000-0000-0000-0000-0000000000b1', 'User B', '00000000-0000-0000-0000-00000000cb01', 'owner')
 ON CONFLICT (id) DO UPDATE SET clinic_id = EXCLUDED.clinic_id;
 
-INSERT INTO public.patients (id, clinic_id, full_name)
+INSERT INTO public.patients (id, clinic_id, name)
 VALUES
   ('00000000-0000-0000-0000-00000000aa01', '00000000-0000-0000-0000-00000000ca01', 'Paciente A'),
   ('00000000-0000-0000-0000-00000000bb01', '00000000-0000-0000-0000-00000000cb01', 'Paciente B')
@@ -43,7 +43,7 @@ BEGIN
   SELECT count(*) INTO n FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000bb01';
   IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user A leaked patient B'; END IF;
 
-  UPDATE public.patients SET full_name = 'INTRUSAO A' WHERE id = '00000000-0000-0000-0000-00000000bb01';
+  UPDATE public.patients SET name = 'INTRUSAO A' WHERE id = '00000000-0000-0000-0000-00000000bb01';
   GET DIAGNOSTICS n = ROW_COUNT;
   IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user A updated patient B'; END IF;
 
@@ -63,7 +63,7 @@ BEGIN
   SELECT count(*) INTO n FROM public.patients WHERE id = '00000000-0000-0000-0000-00000000aa01';
   IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user B leaked patient A'; END IF;
 
-  UPDATE public.patients SET full_name = 'INTRUSAO B' WHERE id = '00000000-0000-0000-0000-00000000aa01';
+  UPDATE public.patients SET name = 'INTRUSAO B' WHERE id = '00000000-0000-0000-0000-00000000aa01';
   GET DIAGNOSTICS n = ROW_COUNT;
   IF n <> 0 THEN RAISE EXCEPTION 'RLS FAIL: user B updated patient A'; END IF;
 

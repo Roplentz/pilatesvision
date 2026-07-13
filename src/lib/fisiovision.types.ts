@@ -19,11 +19,7 @@ export const FISIOVISION_EXERCISE_LABELS: Record<FisiovisionExerciseId, string> 
   "pilates-teaser": "Teaser",
 };
 
-export type FisiovisionAnalysisStatus =
-  | "queued"
-  | "processing"
-  | "completed"
-  | "failed";
+export type FisiovisionAnalysisStatus = "queued" | "processing" | "completed" | "failed";
 
 export type FisiovisionJson =
   | string
@@ -57,10 +53,12 @@ export const FISIOVISION_ERROR_MESSAGES: Record<string, string> = {
   forbidden: "Você não tem permissão para acessar este vídeo.",
   not_found: "Análise não encontrada.",
   rate_limited: "Muitas análises em andamento. Aguarde alguns instantes e tente novamente.",
-  service_unavailable: "Serviço de análise temporariamente indisponível. Tente novamente em instantes.",
+  service_unavailable:
+    "Serviço de análise temporariamente indisponível. Tente novamente em instantes.",
   config_missing: "Integração de análise não configurada.",
   invalid_exercise: "Exercício não liberado para análise automática.",
   invalid_video_path: "Vídeo fora do escopo permitido.",
+  invalid_video: "O arquivo precisa ser um vídeo MP4, MOV ou WEBM de até 50MB.",
   upstream_error: "Falha ao comunicar com o serviço de análise.",
 };
 

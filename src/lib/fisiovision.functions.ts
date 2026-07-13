@@ -9,7 +9,9 @@ import {
 } from "./fisiovision.types";
 
 const CLINICAL_MEDIA_BUCKET = "clinical-media";
-const SIGNED_URL_TTL_SECONDS = 15 * 60; // 15 min — tempo suficiente para o worker processar.
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const VIDEO_MIME_TYPES = new Set(["video/mp4", "video/quicktime", "video/webm"]);
 
 class HandledError extends Error {
   constructor(
@@ -21,62 +23,187 @@ class HandledError extends Error {
   }
 }
 
-function readIntegrationConfig() {
+type IntegrationConfig = {
+  apiUrl: string;
+  consumerId: string;
+  staticToken?: string;
+  jwt?: {
+    privateKey: string;
+    keyId: string;
+    issuer: string;
+    audience: string;
+    subject: string;
+  };
+};
+
+function readIntegrationConfig(): IntegrationConfig {
   const apiUrl = process.env.FISIOVISION_API_URL;
-  const token = process.env.FISIOVISION_API_TOKEN;
   const consumerId = process.env.FISIOVISION_CONSUMER_ID || "pilatesvision";
-  if (!apiUrl || !token) {
+  const staticToken = process.env.FISIOVISION_API_TOKEN;
+  const privateKey = process.env.FISIOVISION_JWT_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const keyId = process.env.FISIOVISION_JWT_KEY_ID;
+  const issuer = process.env.FISIOVISION_JWT_ISSUER;
+  const audience = process.env.FISIOVISION_JWT_AUDIENCE;
+  const subject = process.env.FISIOVISION_JWT_SUBJECT || "pilatesvision-service";
+  const jwt =
+    privateKey && keyId && issuer && audience
+      ? { privateKey, keyId, issuer, audience, subject }
+      : undefined;
+  if (!apiUrl || (!jwt && !staticToken)) {
     throw new HandledError("config_missing", 503, "FisioVision não configurado");
   }
-  return { apiUrl: apiUrl.replace(/\/$/, ""), token, consumerId };
+  let parsed: URL;
+  try {
+    parsed = new URL(apiUrl);
+  } catch {
+    throw new HandledError("config_missing", 503);
+  }
+  if (parsed.protocol !== "https:" && parsed.hostname !== "localhost") {
+    throw new HandledError("config_missing", 503, "FisioVision exige HTTPS");
+  }
+  return { apiUrl: apiUrl.replace(/\/$/, ""), consumerId, staticToken, jwt };
+}
+
+function base64url(value: string | Uint8Array): string {
+  return Buffer.from(value)
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+async function authorizationToken(config: IntegrationConfig): Promise<string> {
+  if (!config.jwt) return config.staticToken!;
+  const { createSign } = await import("node:crypto");
+  const now = Math.floor(Date.now() / 1000);
+  const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT", kid: config.jwt.keyId }));
+  const payload = base64url(
+    JSON.stringify({
+      sub: config.jwt.subject,
+      iss: config.jwt.issuer,
+      aud: config.jwt.audience,
+      iat: now,
+      nbf: now - 5,
+      exp: now + 300,
+      consumers: [config.consumerId],
+    }),
+  );
+  const signingInput = `${header}.${payload}`;
+  const signer = createSign("RSA-SHA256");
+  signer.update(signingInput);
+  signer.end();
+  return `${signingInput}.${base64url(signer.sign(config.jwt.privateKey))}`;
+}
+
+export async function makeIdempotencyKey(
+  userId: string,
+  videoPath: string,
+  exerciseId: string,
+): Promise<string> {
+  const { createHash } = await import("node:crypto");
+  const digest = createHash("sha256")
+    .update(`${userId}\0${exerciseId}\0${videoPath}`, "utf8")
+    .digest("hex");
+  return `pv:${digest}`;
 }
 
 function normalizeStatus(raw: unknown): FisiovisionAnalysisStatus {
   const s = String(raw ?? "").toLowerCase();
   if (s === "queued" || s === "pending") return "queued";
   if (s === "processing" || s === "running") return "processing";
-  if (s === "completed" || s === "done" || s === "success" || s === "succeeded") return "completed";
-  if (s === "failed" || s === "error" || s === "canceled") return "failed";
+  if (["completed", "done", "success", "succeeded"].includes(s)) return "completed";
+  if (["failed", "error", "canceled", "cancelled"].includes(s)) return "failed";
   return "queued";
 }
 
-function mapUpstreamStatus(httpStatus: number): HandledError {
-  if (httpStatus === 400) return new HandledError("bad_request", 400);
-  if (httpStatus === 401) return new HandledError("unauthorized", 401);
-  if (httpStatus === 403) return new HandledError("forbidden", 403);
-  if (httpStatus === 404) return new HandledError("not_found", 404);
-  if (httpStatus === 429) return new HandledError("rate_limited", 429);
-  if (httpStatus === 503) return new HandledError("service_unavailable", 503);
-  return new HandledError("upstream_error", 502, `Upstream ${httpStatus}`);
+function mapUpstreamStatus(status: number): HandledError {
+  const known: Record<number, [string, number]> = {
+    400: ["bad_request", 400],
+    401: ["unauthorized", 401],
+    403: ["forbidden", 403],
+    404: ["not_found", 404],
+    429: ["rate_limited", 429],
+    503: ["service_unavailable", 503],
+  };
+  const [code, httpStatus] = known[status] ?? ["upstream_error", 502];
+  return new HandledError(code, httpStatus);
 }
 
-async function assertVideoPathBelongsToClinic(supabase: {
-  from: (t: string) => {
-    select: (
-      c: string,
-    ) => { eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: unknown }> } };
+function parseClinicalPath(path: string) {
+  if (path.includes("..") || path.startsWith("/") || path.includes("\\"))
+    throw new HandledError("invalid_video_path", 400);
+  const parts = path.split("/");
+  if (parts.length !== 4 || parts.some((part) => !part))
+    throw new HandledError("invalid_video_path", 400);
+  return {
+    clinicId: parts[0]!,
+    patientId: parts[1]!,
+    assessmentId: parts[2]!,
+    fileName: parts[3]!,
+    folder: parts.slice(0, 3).join("/"),
   };
-}, userId: string, videoPath: string) {
-  // path canônico: {clinicId}/{patientId}/{assessmentId}/{arquivo}
-  const parts = videoPath.split("/").filter(Boolean);
-  if (parts.length < 2) throw new HandledError("invalid_video_path", 400);
-  const pathClinicId = parts[0];
-  const rpc = await (
-    supabase as unknown as {
-      rpc: (fn: string) => Promise<{ data: string | null; error: unknown }>;
-    }
-  ).rpc("current_user_clinic_id");
-  const clinicId = rpc?.data ?? null;
-  if (!clinicId || clinicId !== pathClinicId) {
+}
+
+async function validateClinicalVideo(
+  supabase: {
+    rpc: (fn: string) => Promise<{ data: string | null; error: unknown }>;
+  },
+  admin: any,
+  path: string,
+  requestedPatientId: string | null,
+  requestedAssessmentId: string | null,
+) {
+  const parsed = parseClinicalPath(path);
+  const clinic = await supabase.rpc("current_user_clinic_id");
+  if (clinic.error || !clinic.data || clinic.data !== parsed.clinicId)
+    throw new HandledError("invalid_video_path", 403);
+  if (requestedPatientId && requestedPatientId !== parsed.patientId)
+    throw new HandledError("invalid_video_path", 403);
+  if (requestedAssessmentId && requestedAssessmentId !== parsed.assessmentId)
+    throw new HandledError("invalid_video_path", 403);
+  const assessment = await admin
+    .from("assessments")
+    .select("id,clinic_id,patient_id")
+    .eq("id", parsed.assessmentId)
+    .maybeSingle();
+  if (
+    assessment.error ||
+    !assessment.data ||
+    assessment.data.clinic_id !== parsed.clinicId ||
+    assessment.data.patient_id !== parsed.patientId
+  ) {
     throw new HandledError("invalid_video_path", 403);
   }
-  void userId;
+  const listed = await admin.storage
+    .from(CLINICAL_MEDIA_BUCKET)
+    .list(parsed.folder, { search: parsed.fileName, limit: 10 });
+  const object = listed.data?.find((item: { name: string }) => item.name === parsed.fileName);
+  if (listed.error || !object) throw new HandledError("invalid_video_path", 404);
+  const size = Number(object.metadata?.size ?? 0);
+  const mime = String(
+    object.metadata?.mimetype ?? object.metadata?.contentType ?? "",
+  ).toLowerCase();
+  if (
+    !VIDEO_MIME_TYPES.has(mime) ||
+    !Number.isFinite(size) ||
+    size <= 0 ||
+    size > MAX_VIDEO_BYTES
+  ) {
+    throw new HandledError("invalid_video", 400);
+  }
+  return parsed;
 }
 
-function makeIdempotencyKey(userId: string, videoPath: string, exerciseId: string): string {
-  // Estável por (usuário, vídeo, exercício) — garante que reenviar o mesmo pedido
-  // não crie uma segunda análise no upstream.
-  return `pv:${userId}:${exerciseId}:${videoPath}`;
+async function fetchUpstream(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: AbortSignal.timeout(15_000),
+      redirect: "error",
+    });
+  } catch {
+    throw new HandledError("service_unavailable", 503);
+  }
 }
 
 export const createFisiovisionAnalysis = createServerFn({ method: "POST" })
@@ -88,14 +215,10 @@ export const createFisiovisionAnalysis = createServerFn({ method: "POST" })
       assessmentId?: string | null;
       patientId?: string | null;
     }) => {
-      if (!input || typeof input !== "object") throw new Error("payload inválido");
-      if (typeof input.videoPath !== "string" || input.videoPath.length === 0)
-        throw new Error("videoPath obrigatório");
-      if (
-        !(FISIOVISION_ALLOWED_EXERCISES as readonly string[]).includes(input.exerciseId)
-      ) {
+      if (!input || typeof input.videoPath !== "string" || !input.videoPath)
+        throw new HandledError("invalid_video_path", 400);
+      if (!(FISIOVISION_ALLOWED_EXERCISES as readonly string[]).includes(input.exerciseId))
         throw new HandledError("invalid_exercise", 400);
-      }
       return {
         exerciseId: input.exerciseId as FisiovisionExerciseId,
         videoPath: input.videoPath,
@@ -106,202 +229,138 @@ export const createFisiovisionAnalysis = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     try {
-      const { supabase, userId } = context as { supabase: unknown; userId: string };
-      const authed = supabase as {
-        rpc: (fn: string) => Promise<{ data: string | null; error: unknown }>;
+      const { supabase, userId } = context as unknown as {
+        supabase: {
+          rpc: (fn: string) => Promise<{ data: string | null; error: unknown }>;
+        };
+        userId: string;
       };
-      // 1) Valida escopo do path.
-      await assertVideoPathBelongsToClinic(
-        supabase as never,
-        userId,
-        data.videoPath,
-      );
-
-      const config = readIntegrationConfig();
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-      // 2) Signed URL com TTL curto — nunca retorna ao browser.
+      const clinical = await validateClinicalVideo(
+        supabase,
+        supabaseAdmin,
+        data.videoPath,
+        data.patientId,
+        data.assessmentId,
+      );
+      const config = readIntegrationConfig();
+      const idempotencyKey = await makeIdempotencyKey(userId, data.videoPath, data.exerciseId);
+      const existing = await supabaseAdmin
+        .from("fisiovision_analyses")
+        .select("id,status,exercise_id,result,error,created_at,updated_at,metadata")
+        .eq("idempotency_key", idempotencyKey)
+        .maybeSingle();
+      if (
+        existing.data &&
+        (existing.data.metadata as { userId?: string } | null)?.userId === userId
+      )
+        return toDTO(existing.data as never);
       const signed = await supabaseAdmin.storage
         .from(CLINICAL_MEDIA_BUCKET)
         .createSignedUrl(data.videoPath, SIGNED_URL_TTL_SECONDS);
-      if (signed.error || !signed.data?.signedUrl) {
-        throw new HandledError("invalid_video_path", 404, signed.error?.message);
-      }
-
-      const idempotencyKey = makeIdempotencyKey(userId, data.videoPath, data.exerciseId);
-
-      // 3) Idempotência local: reaproveita registro anterior se existir.
-      const existing = await supabaseAdmin
-        .from("fisiovision_analyses")
-        .select("id,status,exercise_id,result,error,created_at,updated_at")
-        .eq("idempotency_key", idempotencyKey)
-        .maybeSingle();
-      if (existing.data && !existing.error) {
-        return toDTO(existing.data as never);
-      }
-
-      // 4) Chama upstream.
-      const clinicRpc = await authed.rpc("current_user_clinic_id");
-      const clinicId = clinicRpc?.data ?? null;
-
-      const upstreamRes = await fetch(
+      if (signed.error || !signed.data?.signedUrl)
+        throw new HandledError("invalid_video_path", 404);
+      const token = await authorizationToken(config);
+      const metadata: Record<string, string> = {
+        source: "pilatesvision",
+        userId,
+        clinicId: clinical.clinicId,
+        patientId: clinical.patientId,
+        assessmentId: clinical.assessmentId,
+      };
+      const response = await fetchUpstream(
         `${config.apiUrl}/v1/consumers/${encodeURIComponent(config.consumerId)}/analyses`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${config.token}`,
+            Authorization: `Bearer ${token}`,
             "Idempotency-Key": idempotencyKey,
           },
           body: JSON.stringify({
-            idempotencyKey,
             exerciseId: data.exerciseId,
             videoUrl: signed.data.signedUrl,
-            metadata: {
-              source: "pilatesvision",
-              userId,
-              clinicId,
-              assessmentId: data.assessmentId,
-              patientId: data.patientId,
-            },
+            idempotencyKey,
+            metadata,
           }),
         },
       );
-
-      if (!upstreamRes.ok) throw mapUpstreamStatus(upstreamRes.status);
-
-      const body = (await upstreamRes.json().catch(() => ({}))) as {
+      if (!response.ok) throw mapUpstreamStatus(response.status);
+      const body = (await response.json()) as {
         id?: string;
         status?: string;
         result?: FisiovisionJson;
         error?: { code?: string; message?: string } | null;
+        createdAt?: string;
+        updatedAt?: string;
       };
-      if (!body.id) throw new HandledError("upstream_error", 502, "resposta sem id");
-
-      // 5) Persiste referência mínima. Não guardamos a signed URL (curta).
-      const now = new Date().toISOString();
-      const insert = await supabaseAdmin
-        .from("fisiovision_analyses")
-        .insert({
-          id: body.id,
-          consumer_id: config.consumerId,
-          exercise_id: data.exerciseId,
-          status: normalizeStatus(body.status),
-          video_url: data.videoPath, // path interno, NÃO signed URL
-          idempotency_key: idempotencyKey,
-          metadata: {
-            userId,
-            clinicId,
-            assessmentId: data.assessmentId,
-            patientId: data.patientId,
-          },
-          result: (body.result ?? null) as never,
-          error: (body.error ?? null) as never,
-          created_at: now,
-          updated_at: now,
-        })
-        .select("id,status,exercise_id,result,error,created_at,updated_at")
-        .single();
-
-      if (insert.error || !insert.data) {
-        // Se falhou a persistência local mas o upstream aceitou, ainda retornamos DTO.
-        return {
-          id: body.id,
-          status: normalizeStatus(body.status),
-          exerciseId: data.exerciseId,
-          result: body.result ?? null,
-          error: body.error ?? null,
-          createdAt: now,
-          updatedAt: now,
-        } satisfies FisiovisionAnalysisDTO;
-      }
-      return toDTO(insert.data as never);
-    } catch (e) {
-      throw serializeHandled(e);
+      if (!body.id) throw new HandledError("upstream_error", 502);
+      return {
+        id: body.id,
+        status: normalizeStatus(body.status),
+        exerciseId: data.exerciseId,
+        result: body.result ?? null,
+        error: body.error ?? null,
+        createdAt: body.createdAt ?? new Date().toISOString(),
+        updatedAt: body.updatedAt ?? new Date().toISOString(),
+      } satisfies FisiovisionAnalysisDTO;
+    } catch (error) {
+      throw serializeHandled(error);
     }
   });
 
 export const getFisiovisionAnalysis = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => {
-    if (!input?.id || typeof input.id !== "string")
-      throw new Error("id obrigatório");
+    if (!input?.id || typeof input.id !== "string") throw new HandledError("bad_request", 400);
     return { id: input.id };
   })
   .handler(async ({ data, context }) => {
     try {
       const { userId } = context as { userId: string };
-      const config = readIntegrationConfig();
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-      // 1) Confere ownership via metadata.userId.
       const local = await supabaseAdmin
         .from("fisiovision_analyses")
         .select("id,status,exercise_id,result,error,metadata,created_at,updated_at")
         .eq("id", data.id)
         .maybeSingle();
       if (!local.data) throw new HandledError("not_found", 404);
-      const meta = (local.data as { metadata?: { userId?: string } }).metadata ?? {};
-      if (meta.userId && meta.userId !== userId) {
+      if ((local.data.metadata as { userId?: string } | null)?.userId !== userId)
         throw new HandledError("forbidden", 403);
-      }
-
-      // 2) Consulta upstream.
-      const upstreamRes = await fetch(
+      const config = readIntegrationConfig();
+      const token = await authorizationToken(config);
+      const response = await fetchUpstream(
         `${config.apiUrl}/v1/consumers/${encodeURIComponent(config.consumerId)}/analyses/${encodeURIComponent(data.id)}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${config.token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
-
-      if (upstreamRes.status === 404) {
-        // Upstream perdeu o registro — retorna o snapshot local.
-        return toDTO(local.data as never);
-      }
-      if (!upstreamRes.ok) throw mapUpstreamStatus(upstreamRes.status);
-
-      const body = (await upstreamRes.json().catch(() => ({}))) as {
-        id?: string;
+      if (response.status === 404) throw new HandledError("not_found", 404);
+      if (!response.ok) throw mapUpstreamStatus(response.status);
+      const body = (await response.json()) as {
         status?: string;
         result?: FisiovisionJson;
         error?: { code?: string; message?: string } | null;
       };
       const status = normalizeStatus(body.status);
-
-      // 3) Sincroniza local se mudou.
-      const before = local.data as {
-        status: string;
-        result: unknown | null;
-        error: unknown | null;
-      };
-      const changed =
-        before.status !== status ||
-        JSON.stringify(before.result ?? null) !== JSON.stringify(body.result ?? null) ||
-        JSON.stringify(before.error ?? null) !== JSON.stringify(body.error ?? null);
-      if (changed) {
-        await supabaseAdmin
-          .from("fisiovision_analyses")
-          .update({
-            status,
-            result: (body.result ?? null) as never,
-            error: (body.error ?? null) as never,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", data.id);
-      }
-
+      await supabaseAdmin
+        .from("fisiovision_analyses")
+        .update({
+          status,
+          result: body.result ?? null,
+          error: body.error ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", data.id);
       return {
         id: data.id,
         status,
-        exerciseId: (local.data as { exercise_id: string }).exercise_id,
+        exerciseId: local.data.exercise_id,
         result: body.result ?? null,
         error: body.error ?? null,
-        createdAt: (local.data as { created_at: string }).created_at,
+        createdAt: local.data.created_at,
         updatedAt: new Date().toISOString(),
       } satisfies FisiovisionAnalysisDTO;
-    } catch (e) {
-      throw serializeHandled(e);
+    } catch (error) {
+      throw serializeHandled(error);
     }
   });
 
@@ -325,16 +384,13 @@ function toDTO(row: {
   };
 }
 
-function serializeHandled(e: unknown): Error {
-  if (e instanceof HandledError) {
-    const err = new Error(e.code);
-    (err as unknown as { code: string; httpStatus: number }).code = e.code;
-    (err as unknown as { code: string; httpStatus: number }).httpStatus = e.httpStatus;
-    return err;
-  }
-  console.error("[fisiovision] erro não tratado", e);
-  const err = new Error("upstream_error");
-  (err as unknown as { code: string; httpStatus: number }).code = "upstream_error";
-  (err as unknown as { code: string; httpStatus: number }).httpStatus = 502;
-  return err;
+function serializeHandled(error: unknown): Error {
+  const handled = error instanceof HandledError ? error : new HandledError("upstream_error", 502);
+  if (!(error instanceof HandledError)) console.error("[fisiovision] erro não tratado", error);
+  const serialized = new Error(handled.code);
+  Object.assign(serialized, {
+    code: handled.code,
+    httpStatus: handled.httpStatus,
+  });
+  return serialized;
 }

@@ -29,10 +29,7 @@ import {
   type FisiovisionAnalysisStatus,
   type FisiovisionExerciseId,
 } from "@/lib/fisiovision.types";
-import {
-  createFisiovisionAnalysis,
-  getFisiovisionAnalysis,
-} from "@/lib/fisiovision.functions";
+import { createFisiovisionAnalysis, getFisiovisionAnalysis } from "@/lib/fisiovision.functions";
 
 interface Props {
   clinicId: string;
@@ -47,7 +44,10 @@ const POLL_TIMEOUT_MS = 5 * 60 * 1000; // 5 min
 const POLL_START_MS = 2000;
 const POLL_MAX_MS = 15000;
 
-function statusBadge(s: FisiovisionAnalysisStatus): { label: string; variant: "default" | "secondary" | "destructive" | "outline" } {
+function statusBadge(s: FisiovisionAnalysisStatus): {
+  label: string;
+  variant: "default" | "secondary" | "destructive" | "outline";
+} {
   switch (s) {
     case "queued":
       return { label: "Na fila", variant: "outline" };
@@ -97,9 +97,12 @@ export function FisiovisionAnalyzer({
     setVideoPath(initialVideoPath ?? null);
   }, [initialVideoPath]);
 
-  useEffect(() => () => {
-    if (pollingRef.current) pollingRef.current.cancelled = true;
-  }, []);
+  useEffect(
+    () => () => {
+      if (pollingRef.current) pollingRef.current.cancelled = true;
+    },
+    [],
+  );
 
   const configError = errorCode === "config_missing";
 
@@ -135,13 +138,11 @@ export function FisiovisionAnalyzer({
       });
       // Supabase JS não expõe progresso real; simulamos por chunks pequenos.
       setUploadPct(10);
-      const { error } = await supabase.storage
-        .from(CLINICAL_MEDIA_BUCKET)
-        .upload(path, file, {
-          contentType: file.type,
-          upsert: false,
-          cacheControl: "3600",
-        });
+      const { error } = await supabase.storage.from(CLINICAL_MEDIA_BUCKET).upload(path, file, {
+        contentType: file.type,
+        upsert: false,
+        cacheControl: "3600",
+      });
       setUploadPct(100);
       if (error) {
         toast.error(`Falha no upload: ${error.message}`);
@@ -361,8 +362,8 @@ export function FisiovisionAnalyzer({
             {configError && isPlatformAdmin && (
               <div className="text-muted-foreground">
                 Configure os secrets <code>FISIOVISION_API_URL</code>,{" "}
-                <code>FISIOVISION_API_TOKEN</code> e (opcional){" "}
-                <code>FISIOVISION_CONSUMER_ID</code> em Project Settings → Secrets.
+                <code>FISIOVISION_API_TOKEN</code> e (opcional) <code>FISIOVISION_CONSUMER_ID</code>{" "}
+                em Project Settings → Secrets.
               </div>
             )}
           </div>
@@ -371,9 +372,7 @@ export function FisiovisionAnalyzer({
 
       {analysis?.status === "completed" && analysis.result && (
         <details className="rounded-md border border-border/40 bg-background/40 p-2 text-xs">
-          <summary className="cursor-pointer text-muted-foreground">
-            Resultado bruto (JSON)
-          </summary>
+          <summary className="cursor-pointer text-muted-foreground">Resultado bruto (JSON)</summary>
           <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap text-[11px]">
             {JSON.stringify(analysis.result, null, 2)}
           </pre>

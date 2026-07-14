@@ -1289,18 +1289,26 @@ function ExerciseSection({
               )}
               {r.video_url && (
                 <div className="mt-4">
-                  <VideoPoseAnalyzer
-                    resultId={r.id}
-                    table="exercise_results"
-                    context="pilates"
-                    videoPath={r.video_url}
-                    initialSummary={
-                      isAutoMetricsSummary(r.metrics)
-                        ? (r.metrics as unknown as AutoMetricsSummary)
-                        : null
-                    }
-                    onSaved={onSaved}
-                  />
+                  <ClientOnly fallback={null}>
+                    <LocalErrorBoundary
+                      boundaryId="video-pose-analyzer-exercise"
+                      title="Análise biomecânica indisponível"
+                      message="Não foi possível iniciar a análise automática deste vídeo. Tente recapturar ou reanalisar em instantes."
+                    >
+                      <VideoPoseAnalyzer
+                        resultId={r.id}
+                        table="exercise_results"
+                        context="pilates"
+                        videoPath={r.video_url}
+                        initialSummary={
+                          isAutoMetricsSummary(r.metrics)
+                            ? (r.metrics as unknown as AutoMetricsSummary)
+                            : null
+                        }
+                        onSaved={onSaved}
+                      />
+                    </LocalErrorBoundary>
+                  </ClientOnly>
                 </div>
               )}
               {r.image_url && (

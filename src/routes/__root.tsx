@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -39,34 +39,65 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const attemptsRef = useRef(0);
+  const [autoRetrying, setAutoRetrying] = useState(true);
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
+
+  // Retry automático leve para falhas transitórias (ex.: 500 fugaz durante
+  // restart do Vite ao detectar mudanças em .env). Só mostramos a tela dura
+  // de erro se, após até 2 tentativas com backoff curto, ainda falhar.
+  useEffect(() => {
+    if (attemptsRef.current >= 2) {
+      setAutoRetrying(false);
+      return;
+    }
+    const delay = attemptsRef.current === 0 ? 400 : 1200;
+    const id = window.setTimeout(() => {
+      attemptsRef.current += 1;
+      router.invalidate();
+      reset();
+    }, delay);
+    return () => window.clearTimeout(id);
+  }, [error, router, reset]);
+
+  if (autoRetrying) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="max-w-md text-center text-sm text-muted-foreground">
+          Recarregando…
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Não foi possível carregar esta página
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Ocorreu um problema temporário. Tente novamente ou volte para o início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
+              attemptsRef.current = 0;
+              setAutoRetrying(true);
               router.invalidate();
               reset();
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Tentar novamente
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Ir para o início
           </a>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ClientOnly } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Activity,
@@ -33,6 +34,7 @@ import { usePatientConsent } from "@/lib/patientConsentsStore";
 import { VideoPoseAnalyzer } from "@/components/VideoPoseAnalyzer";
 import { PoseCapture } from "@/components/PoseCapture";
 import { FisiovisionAnalyzer } from "@/components/FisiovisionAnalyzer";
+import { LocalErrorBoundary } from "@/components/LocalErrorBoundary";
 import { isAutoMetricsSummary, type AutoMetricsSummary } from "@/lib/poseMetrics";
 import { ExerciseCatalogPicker } from "@/components/ExerciseCatalogPicker";
 import type { ExerciseCatalogItem } from "@/lib/exerciseCatalog";
@@ -437,14 +439,28 @@ function AvaliacaoDetailPage() {
             </TabsContent>
           )}
           <TabsContent value="capture" className="mt-4">
-            <PoseCapture
-              assessmentId={assessment.id}
-              clinicId={assessment.clinic_id}
-              patientId={assessment.patient_id}
-              consentImageUse={consentImageUse}
-              editable={isDraft}
-              onSaved={reload}
-            />
+            <ClientOnly
+              fallback={
+                <div className="rounded-xl border border-border/60 bg-card/40 p-6 text-sm text-muted-foreground">
+                  Preparando captura por câmera…
+                </div>
+              }
+            >
+              <LocalErrorBoundary
+                boundaryId="pose-capture"
+                title="Captura por câmera indisponível"
+                message="A análise biomecânica (beta) falhou ao iniciar. Tente novamente ou refaça a captura mais tarde — o restante da avaliação continua funcionando normalmente."
+              >
+                <PoseCapture
+                  assessmentId={assessment.id}
+                  clinicId={assessment.clinic_id}
+                  patientId={assessment.patient_id}
+                  consentImageUse={consentImageUse}
+                  editable={isDraft}
+                  onSaved={reload}
+                />
+              </LocalErrorBoundary>
+            </ClientOnly>
           </TabsContent>
         </Tabs>
 
@@ -925,18 +941,26 @@ function MovementSection({
               )}
               {r.video_url && (
                 <div className="mt-4">
-                  <VideoPoseAnalyzer
-                    resultId={r.id}
-                    table="movement_results"
-                    context="squat"
-                    videoPath={r.video_url}
-                    initialSummary={
-                      isAutoMetricsSummary(r.metrics)
-                        ? (r.metrics as unknown as AutoMetricsSummary)
-                        : null
-                    }
-                    onSaved={onSaved}
-                  />
+                  <ClientOnly fallback={null}>
+                    <LocalErrorBoundary
+                      boundaryId="video-pose-analyzer-movement"
+                      title="Análise biomecânica indisponível"
+                      message="Não foi possível iniciar a análise automática deste vídeo. Tente recapturar ou reanalisar em instantes."
+                    >
+                      <VideoPoseAnalyzer
+                        resultId={r.id}
+                        table="movement_results"
+                        context="squat"
+                        videoPath={r.video_url}
+                        initialSummary={
+                          isAutoMetricsSummary(r.metrics)
+                            ? (r.metrics as unknown as AutoMetricsSummary)
+                            : null
+                        }
+                        onSaved={onSaved}
+                      />
+                    </LocalErrorBoundary>
+                  </ClientOnly>
                 </div>
               )}
               {r.video_url && (
@@ -1265,18 +1289,26 @@ function ExerciseSection({
               )}
               {r.video_url && (
                 <div className="mt-4">
-                  <VideoPoseAnalyzer
-                    resultId={r.id}
-                    table="exercise_results"
-                    context="pilates"
-                    videoPath={r.video_url}
-                    initialSummary={
-                      isAutoMetricsSummary(r.metrics)
-                        ? (r.metrics as unknown as AutoMetricsSummary)
-                        : null
-                    }
-                    onSaved={onSaved}
-                  />
+                  <ClientOnly fallback={null}>
+                    <LocalErrorBoundary
+                      boundaryId="video-pose-analyzer-exercise"
+                      title="Análise biomecânica indisponível"
+                      message="Não foi possível iniciar a análise automática deste vídeo. Tente recapturar ou reanalisar em instantes."
+                    >
+                      <VideoPoseAnalyzer
+                        resultId={r.id}
+                        table="exercise_results"
+                        context="pilates"
+                        videoPath={r.video_url}
+                        initialSummary={
+                          isAutoMetricsSummary(r.metrics)
+                            ? (r.metrics as unknown as AutoMetricsSummary)
+                            : null
+                        }
+                        onSaved={onSaved}
+                      />
+                    </LocalErrorBoundary>
+                  </ClientOnly>
                 </div>
               )}
               {r.image_url && (

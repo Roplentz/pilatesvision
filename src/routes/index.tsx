@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-pilates.jpg";
+import heroVideo from "@/assets/hero-pilates.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -203,11 +203,14 @@ function Hero() {
         >
           <div className="absolute -inset-6 rounded-3xl bg-gradient-primary opacity-20 blur-3xl" />
           <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-surface shadow-elevated">
-            <img
-              src={heroImage}
-              alt="Análise biomecânica de Pilates por IA"
-              width={1536}
-              height={1280}
+            <video
+              src={heroVideo.url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-label="Análise biomecânica de Pilates por IA"
               className="h-full w-full object-cover"
             />
             <FloatingStat className="left-4 top-4" label="Simetria pélvica" value="94%" />

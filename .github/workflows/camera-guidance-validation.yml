@@ -28,7 +28,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Check camera component format
-        run: bunx prettier --check src/components/PoseCapture.tsx
+        run: bunx prettier@3.7.3 --check src/components/PoseCapture.tsx
 
       - name: Lint camera component
         run: bunx eslint src/components/PoseCapture.tsx

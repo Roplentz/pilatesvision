@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/camera-guidance-mvp
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read

@@ -1,0 +1,25 @@
+name: P0 Source Export
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Archive source
+        run: tar --exclude=.git --exclude=source.tar.gz -czf source.tar.gz .
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: p0-source
+          path: source.tar.gz
+          retention-days: 1

@@ -1,61 +1,42 @@
-name: P0 Diagnostics
+name: P0 Normalize Branch
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - agent/p0-stabilization
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  export-source:
+  normalize:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout P0 branch
         uses: actions/checkout@v4
-      - name: Archive source
-        run: git archive --format=tar.gz --output=source.tar.gz HEAD
-      - name: Upload source archive
-        uses: actions/upload-artifact@v4
         with:
-          name: p0-source
-          path: source.tar.gz
-          retention-days: 1
-
-  debug-supabase:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+          ref: agent/p0-stabilization
+          fetch-depth: 0
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: latest
-      - name: Docker diagnostics
+          bun-version: "1.2.22"
+      - name: Refresh dependency lock
+        run: bun install
+      - name: Normalize repository formatting
+        run: bun run format
+      - name: Remove temporary workflow
+        run: rm .github/workflows/p0-export.yml
+      - name: Commit normalized files
         run: |
-          docker version
-          docker info
-      - name: Capture Supabase startup
-        id: startup
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          supabase start -x studio,imgproxy,inbucket,edge-runtime,logflare,vector --debug 2>&1 | tee supabase-start.log
-      - name: Capture status
-        if: always()
-        run: supabase status --debug 2>&1 | tee -a supabase-start.log || true
-      - name: Upload diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: supabase-start-log
-          path: supabase-start.log
-          retention-days: 1
-      - name: Fail when startup failed
-        if: steps.startup.outcome == 'failure'
-        run: exit 1
-      - name: Stop Supabase
-        if: always()
-        run: supabase stop --no-backup || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No normalization changes required."
+            exit 0
+          fi
+          git commit -m "chore: normalize formatting and refresh lockfile"
+          git push origin HEAD:agent/p0-stabilization

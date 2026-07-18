@@ -4,14 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Users,
-  Archive,
-  ClipboardCheck,
-  FileText,
-  Plus,
-  ArrowRight,
-} from "lucide-react";
+import { Users, Archive, ClipboardCheck, FileText, Plus, ArrowRight } from "lucide-react";
 import { usePatients, usePatientCounts } from "@/lib/patientsStore";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";

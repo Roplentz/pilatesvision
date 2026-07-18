@@ -65,9 +65,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   if (autoRetrying) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-md text-center text-sm text-muted-foreground">
-          Recarregando…
-        </div>
+        <div className="max-w-md text-center text-sm text-muted-foreground">Recarregando…</div>
       </div>
     );
   }

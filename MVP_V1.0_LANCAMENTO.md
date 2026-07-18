@@ -9,6 +9,7 @@
 ## 1. Escopo travado
 
 ### DENTRO do MVP v1.0
+
 - **Fluxo clínico central (já existe):** login → consentimento → avaliação
   **postural + dinâmica** → relatório → **PDF** (rascunho e finalizado).
 - **Motor Biomecânico de agachamento (LOCAL), como "beta / estimativa"**, claramente
@@ -16,6 +17,7 @@
   error boundary próprio; câmera/MediaPipe só no cliente).
 
 ### FORA do MVP v1.0 (adiado para v1.1+)
+
 - **Análise de vídeo em NUVEM / FisioVision** → feature flag **desligada**. Entra na
   v1.1 após DPA + consentimento LGPD específico + retenção (ver
   `docs/ARQUITETURA_MOTOR_HIBRIDO.md`).
@@ -28,6 +30,7 @@
 Nada disso é feature — é o que torna o produto crível. Ordem = caminho crítico.
 
 **P0 — Estabilidade (bloqueia tudo)**
+
 - [ ] Tela de erro raiz eliminada: MediaPipe/`getUserMedia` só no cliente (import
       dinâmico, client-only, sem acesso a `window`/`navigator` no SSR).
 - [ ] Error boundary raiz resiliente a 500 transitório (retry/fallback CSR) — um blip
@@ -35,6 +38,7 @@ Nada disso é feature — é o que torna o produto crível. Ordem = caminho crí
 - [ ] Motor de agachamento isolado: falha nele **não** derruba a página.
 
 **P0 — QA ponta a ponta (o gate real)**
+
 - [ ] Um passe limpo, gravado: login → consentimento → avaliação postural → avaliação
       dinâmica → captura agachamento (beta) → relatório → PDF rascunho → PDF finalizado.
 - [ ] Botão "Exportar PDF" só aparece após "Finalizado"; PDF correto nos dois estados.
@@ -42,12 +46,14 @@ Nada disso é feature — é o que torna o produto crível. Ordem = caminho crí
       insuficiente + opção de recaptura.
 
 **P1 — Segurança / dados (credibilidade "meus dados estão seguros")**
+
 - [ ] Leaked Password Protection ativado (Auth).
 - [ ] Políticas RLS duplicadas consolidadas (`clinics`, `profiles`).
 - [ ] RLS multi-tenant confirmada (usuário só vê dados da própria clínica).
 - [ ] Vídeo nunca sai do dispositivo no caminho local (verificado).
 
 **P1 — Higiene**
+
 - [ ] Remover `backup_pre_reconciliacao_2026-07-06.json` (PII de teste) e
       `pilatesvision-app--main.zip` do disco.
 - [ ] Confirmar conector GitHub e sincronização.
@@ -57,6 +63,7 @@ Nada disso é feature — é o que torna o produto crível. Ordem = caminho crí
 ## 3. Critérios de aceite do "agachamento beta"
 
 Para o beta poder aparecer no MVP (senão, esconder e lançar sem ele):
+
 - [ ] Rótulo visível "Beta — estimativa 2D, apoio à decisão, confirmar profissional".
 - [ ] Linguagem prudente: "deslocamento frontal aparente do joelho", nunca "valgo"/diagnóstico.
 - [ ] Testes determinísticos do núcleo (`poseMetrics.ts`): 0/1/3 repetições, ruído,

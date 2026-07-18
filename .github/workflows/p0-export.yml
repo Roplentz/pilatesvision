@@ -1,4 +1,4 @@
-name: P0 Source Export
+name: P0 Diagnostics
 
 on:
   pull_request:
@@ -23,3 +23,39 @@ jobs:
           name: p0-source
           path: source.tar.gz
           retention-days: 1
+
+  debug-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Docker diagnostics
+        run: |
+          docker version
+          docker info
+      - name: Capture Supabase startup
+        id: startup
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          supabase start -x studio,imgproxy,inbucket,edge-runtime,logflare,vector --debug 2>&1 | tee supabase-start.log
+      - name: Capture status
+        if: always()
+        run: supabase status --debug 2>&1 | tee -a supabase-start.log || true
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-start-log
+          path: supabase-start.log
+          retention-days: 1
+      - name: Fail when startup failed
+        if: steps.startup.outcome == 'failure'
+        run: exit 1
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop --no-backup || true

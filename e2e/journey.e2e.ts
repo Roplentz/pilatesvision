@@ -102,7 +102,9 @@ test("jornada clínica completa gera e armazena PDF", async ({ page }) => {
   await page.getByPlaceholder("Achado (ex.: elevação D)").fill("Assimetria aparente leve");
   await page.getByPlaceholder("Notas (opcional)").fill("Confirmar clinicamente");
   await page.getByRole("button", { name: "Adicionar achado" }).click();
-  await page.getByLabel("Observações do profissional").fill("Registro observacional inicial.");
+  await page
+    .getByPlaceholder("Descreva contexto, hipóteses e sugestões de suporte à decisão.")
+    .fill("Registro observacional inicial.");
   await page.getByRole("button", { name: "Salvar vista" }).click();
   await expect(page.getByText("Assimetria aparente leve")).toBeVisible();
 

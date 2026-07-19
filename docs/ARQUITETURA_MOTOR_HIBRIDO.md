@@ -2,7 +2,7 @@
 
 > **Status:** proposta de arquitetura (spec para implementação no Lovable).
 > **Data:** 2026-07-13 · **Autor da concepção do motor:** Rodrigo Plentz.
-> **Decisão de produto:** *híbrido consentido* — motor local é o padrão; a nuvem
+> **Decisão de produto:** _híbrido consentido_ — motor local é o padrão; a nuvem
 > (FisioVision) é um **modo opt-in explícito**, atrás de feature flag, e só acende
 > com consentimento LGPD específico + DPA + política de retenção fechados.
 > **Regra de ouro:** o caminho nuvem **nunca** é o default e **nunca** dispara sozinho.
@@ -55,19 +55,19 @@ export type EngineSource = "local" | "cloud";
 
 export interface BiomechResult {
   schemaVersion: "biomech-hybrid-v1";
-  source: EngineSource;                 // "local" | "cloud"
-  exerciseId: string;                   // ex.: "squat", "pilates-the-hundred"
-  modelVersion: string;                 // versão do motor/modelo que gerou
-  createdAt: string;                    // ISO
+  source: EngineSource; // "local" | "cloud"
+  exerciseId: string; // ex.: "squat", "pilates-the-hundred"
+  modelVersion: string; // versão do motor/modelo que gerou
+  createdAt: string; // ISO
   quality: {
     totalFrames: number;
     validFrames: number;
-    validRate: number;                  // 0..1
-    confidence: number;                 // 0..1
+    validRate: number; // 0..1
+    confidence: number; // 0..1
   };
-  reps: BiomechRep[];                    // vazio se não aplicável
-  summary: Record<string, number>;      // medianas/P5/P95 robustas (sem NaN/Infinity)
-  disclaimers: string[];                 // "estimativa 2D; apoio à decisão; confirmar profissional"
+  reps: BiomechRep[]; // vazio se não aplicável
+  summary: Record<string, number>; // medianas/P5/P95 robustas (sem NaN/Infinity)
+  disclaimers: string[]; // "estimativa 2D; apoio à decisão; confirmar profissional"
   // rastreabilidade da nuvem (nulo no local):
   cloud?: { analysisId: string; consentId: string; provider: "fisiovision" } | null;
 }
@@ -75,7 +75,7 @@ export interface BiomechResult {
 export interface BiomechRep {
   index: number;
   phases?: { descent?: number; bottom?: number; ascent?: number }; // segundos
-  metrics: Record<string, number>;      // por exercício
+  metrics: Record<string, number>; // por exercício
   confidence: number;
 }
 ```
@@ -103,13 +103,13 @@ silenciosamente para a nuvem.
 // src/lib/biomech/analysisEngine.ts (esboço)
 export async function runAnalysis(input: AnalysisInput): Promise<BiomechResult> {
   if (hasLocalEngine(input.exerciseId)) {
-    return runLocal(input);                 // MediaPipe no navegador
+    return runLocal(input); // MediaPipe no navegador
   }
   const gate = await checkCloudGate(input); // 3 condições
   if (!gate.ok) {
-    throw new AnalysisBlocked(gate.reason);  // motivo p/ UI
+    throw new AnalysisBlocked(gate.reason); // motivo p/ UI
   }
-  return runCloud(input, gate.consentId);    // Edge Function server-only
+  return runCloud(input, gate.consentId); // Edge Function server-only
 }
 ```
 
@@ -162,6 +162,7 @@ export async function runAnalysis(input: AnalysisInput): Promise<BiomechResult> 
 ## 10. Escopo estrito desta entrega (para o Lovable)
 
 Fazer:
+
 1. `src/lib/biomech/types.ts` (contrato `BiomechResult`).
 2. `src/lib/biomech/analysisEngine.ts` (roteador + portão).
 3. Adaptar o motor local atual (`poseMetrics.ts`) para emitir `BiomechResult`
@@ -170,6 +171,7 @@ Fazer:
 5. Testes determinísticos do roteador (local escolhido; nuvem bloqueada sem portão).
 
 Não fazer (fica atrás da flag/pós-jurídico):
+
 - Não acender o caminho nuvem em produção sem o checklist §8.
 - Não alterar consentimentos/relatórios clínicos existentes.
 - Não criar migration destrutiva; usar campos JSON existentes.
@@ -186,4 +188,4 @@ Não fazer (fica atrás da flag/pós-jurídico):
 > substitui** avaliação profissional.
 > ☐ Autorizo o envio deste vídeo para análise em nuvem nesta avaliação.
 
-*(Texto base — requer revisão jurídica/DPO antes de produção.)*
+_(Texto base — requer revisão jurídica/DPO antes de produção.)_

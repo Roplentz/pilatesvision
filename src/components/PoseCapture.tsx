@@ -31,8 +31,7 @@ import {
 
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const WASM_URL =
-  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm";
+const WASM_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm";
 
 type Orientation = "frontal" | "lateral";
 type CameraFacing = "user" | "environment";
@@ -117,10 +116,7 @@ const KEY_LM = [
   LM.RIGHT_ANKLE,
 ];
 
-function evaluateQuality(
-  lms: Landmark[] | null,
-  orientation: Orientation,
-): QualityStatus {
+function evaluateQuality(lms: Landmark[] | null, orientation: Orientation): QualityStatus {
   if (!lms || lms.length < 29) {
     return {
       ok: false,
@@ -137,9 +133,7 @@ function evaluateQuality(
   }
 
   const key = KEY_LM.map((i) => lms[i]).filter(Boolean) as Landmark[];
-  const meanVis =
-    key.reduce((acc, p) => acc + (p.visibility ?? 0), 0) /
-    Math.max(1, key.length);
+  const meanVis = key.reduce((acc, p) => acc + (p.visibility ?? 0), 0) / Math.max(1, key.length);
   const visibilityOk = meanVis >= VISIBILITY_THRESHOLD;
 
   const nose = lms[LM.NOSE];
@@ -150,14 +144,10 @@ function evaluateQuality(
   const lh = lms[LM.LEFT_HIP];
   const rh = lms[LM.RIGHT_HIP];
 
-  const inFrame = (p?: Landmark) =>
-    !!p && p.x >= 0.03 && p.x <= 0.97 && p.y >= 0.03 && p.y <= 0.97;
+  const inFrame = (p?: Landmark) => !!p && p.x >= 0.03 && p.x <= 0.97 && p.y >= 0.03 && p.y <= 0.97;
   const headVisible = inFrame(nose) && (nose?.visibility ?? 0) > 0.3;
   const feetVisible =
-    inFrame(la) &&
-    inFrame(ra) &&
-    (la?.visibility ?? 0) > 0.3 &&
-    (ra?.visibility ?? 0) > 0.3;
+    inFrame(la) && inFrame(ra) && (la?.visibility ?? 0) > 0.3 && (ra?.visibility ?? 0) > 0.3;
   const fullBody = headVisible && feetVisible;
 
   // A distância real varia entre lentes e ambientes. Usamos o tamanho relativo da pessoa no quadro.
@@ -167,8 +157,7 @@ function evaluateQuality(
 
   const centerPoints = [ls, rs, lh, rh].filter(Boolean) as Landmark[];
   const bodyCenterX =
-    centerPoints.reduce((acc, point) => acc + point.x, 0) /
-    Math.max(1, centerPoints.length);
+    centerPoints.reduce((acc, point) => acc + point.x, 0) / Math.max(1, centerPoints.length);
   const centeredOk = bodyCenterX >= 0.28 && bodyCenterX <= 0.72;
 
   // Apenas aviso: uma assimetria clínica verdadeira não deve bloquear a captura.
@@ -189,26 +178,20 @@ function evaluateQuality(
   const reasons: string[] = [];
   if (!headVisible) reasons.push("Mostre o topo da cabeça");
   if (!feetVisible) reasons.push("Mostre os pés completamente");
-  if (!fullBody && headVisible && feetVisible)
-    reasons.push("Corpo incompleto no quadro");
-  if (!visibilityOk)
-    reasons.push("Melhore a iluminação e deixe o corpo visível");
+  if (!fullBody && headVisible && feetVisible) reasons.push("Corpo incompleto no quadro");
+  if (!visibilityOk) reasons.push("Melhore a iluminação e deixe o corpo visível");
   if (!distanceOk) {
     reasons.push(personHeight < 0.55 ? "Aproxime a câmera" : "Afaste a câmera");
   }
   if (!centeredOk) reasons.push("Centralize o corpo no quadro");
   if (!orientationOk) {
     reasons.push(
-      orientation === "frontal"
-        ? "Fique de frente para a câmera"
-        : "Fique de lado para a câmera",
+      orientation === "frontal" ? "Fique de frente para a câmera" : "Fique de lado para a câmera",
     );
   }
-  if (!cameraLevelOk)
-    reasons.push("Confira se o celular está nivelado e paralelo ao chão");
+  if (!cameraLevelOk) reasons.push("Confira se o celular está nivelado e paralelo ao chão");
 
-  const ok =
-    fullBody && visibilityOk && orientationOk && distanceOk && centeredOk;
+  const ok = fullBody && visibilityOk && orientationOk && distanceOk && centeredOk;
   const message = ok
     ? cameraLevelOk
       ? "Enquadramento adequado — pode iniciar"
@@ -238,9 +221,7 @@ export function PoseCapture({
   onSaved,
 }: Props) {
   const [preset, setPreset] = useState<MovementPreset>(PRESETS[0]);
-  const [orientation, setOrientation] = useState<Orientation>(
-    PRESETS[0].idealView,
-  );
+  const [orientation, setOrientation] = useState<Orientation>(PRESETS[0].idealView);
   const [cameraFacing, setCameraFacing] = useState<CameraFacing>("environment");
   const [videoInputs, setVideoInputs] = useState<MediaDeviceInfo[]>([]);
   const [switchingCamera, setSwitchingCamera] = useState(false);
@@ -345,12 +326,7 @@ export function PoseCapture({
   }, [stopCamera]);
 
   const drawOverlay = useCallback(
-    (
-      lms: Landmark[] | null,
-      w: number,
-      h: number,
-      currentQuality: QualityStatus,
-    ) => {
+    (lms: Landmark[] | null, w: number, h: number, currentQuality: QualityStatus) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       canvas.width = w;
@@ -418,8 +394,7 @@ export function PoseCapture({
       await openCameraStream(cameraFacing);
 
       if (!landmarkerRef.current) {
-        const { FilesetResolver, PoseLandmarker } =
-          await import("@mediapipe/tasks-vision");
+        const { FilesetResolver, PoseLandmarker } = await import("@mediapipe/tasks-vision");
         const fileset = await FilesetResolver.forVisionTasks(WASM_URL);
         const landmarker = await PoseLandmarker.createFromOptions(fileset, {
           baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
@@ -445,22 +420,14 @@ export function PoseCapture({
               : null;
           const currentQuality = evaluateQuality(lms, orientationRef.current);
           setQuality(currentQuality);
-          drawOverlay(
-            lms,
-            video.videoWidth || 1280,
-            video.videoHeight || 720,
-            currentQuality,
-          );
+          drawOverlay(lms, video.videoWidth || 1280, video.videoHeight || 720, currentQuality);
           if (recordingRef.current && lms) {
             framesRef.current.push({
               t: ts - startedAtRef.current,
               lm: lms.map((point) => ({
                 x: Math.round(point.x * 10000) / 10000,
                 y: Math.round(point.y * 10000) / 10000,
-                z:
-                  point.z !== undefined
-                    ? Math.round(point.z * 10000) / 10000
-                    : undefined,
+                z: point.z !== undefined ? Math.round(point.z * 10000) / 10000 : undefined,
                 v:
                   point.visibility !== undefined
                     ? Math.round(point.visibility * 100) / 100
@@ -474,36 +441,22 @@ export function PoseCapture({
       };
       rafRef.current = requestAnimationFrame(loop);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Falha ao iniciar a câmera.";
+      const message = error instanceof Error ? error.message : "Falha ao iniciar a câmera.";
       setEngineError(message);
       toast.error(message);
       stopCamera();
     } finally {
       setEngineLoading(false);
     }
-  }, [
-    cameraFacing,
-    consentImageUse,
-    drawOverlay,
-    openCameraStream,
-    stopCamera,
-  ]);
+  }, [cameraFacing, consentImageUse, drawOverlay, openCameraStream, stopCamera]);
 
   const switchCamera = useCallback(
     async (requestedFacing?: CameraFacing) => {
-      if (
-        !cameraOn ||
-        switchingCamera ||
-        recordingRef.current ||
-        countdown !== null
-      )
-        return;
+      if (!cameraOn || switchingCamera || recordingRef.current || countdown !== null) return;
 
       const previousFacing = cameraFacing;
       const nextFacing =
-        requestedFacing ??
-        (cameraFacing === "environment" ? "user" : "environment");
+        requestedFacing ?? (cameraFacing === "environment" ? "user" : "environment");
       if (nextFacing === previousFacing) return;
 
       setSwitchingCamera(true);
@@ -524,9 +477,7 @@ export function PoseCapture({
           setCameraOn(false);
         }
         const message =
-          error instanceof Error
-            ? error.message
-            : "Não foi possível alternar a câmera.";
+          error instanceof Error ? error.message : "Não foi possível alternar a câmera.";
         toast.error(message);
       } finally {
         setSwitchingCamera(false);
@@ -644,8 +595,7 @@ export function PoseCapture({
           camera_facing: cameraFacing,
           visibility_threshold: VISIBILITY_THRESHOLD,
           biomechanics: biomechanics ?? undefined,
-          analysis_kind:
-            preset.key === "agachamento" ? "biomechanics-mvp-v1" : "basic",
+          analysis_kind: preset.key === "agachamento" ? "biomechanics-mvp-v1" : "basic",
           note: "Estimativa 2D — apoio à decisão, requer confirmação clínica.",
         },
         landmarks: frames,
@@ -661,21 +611,11 @@ export function PoseCapture({
       framesRef.current = [];
       onSaved?.();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Falha ao salvar captura.",
-      );
+      toast.error(error instanceof Error ? error.message : "Falha ao salvar captura.");
     } finally {
       setSaving(false);
     }
-  }, [
-    assessmentId,
-    cameraFacing,
-    clinicId,
-    onSaved,
-    patientId,
-    preset,
-    quality,
-  ]);
+  }, [assessmentId, cameraFacing, clinicId, onSaved, patientId, preset, quality]);
 
   if (!editable) {
     return (
@@ -688,13 +628,10 @@ export function PoseCapture({
   if (!consentImageUse) {
     return (
       <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-6 text-sm">
-        <div className="mb-1 font-medium text-amber-100">
-          Consentimento necessário
-        </div>
+        <div className="mb-1 font-medium text-amber-100">Consentimento necessário</div>
         <p className="text-amber-100/80">
-          A captura por câmera exige o consentimento de uso de imagem do
-          paciente. Nenhum vídeo é gravado — apenas a série temporal de pontos
-          do corpo é armazenada.
+          A captura por câmera exige o consentimento de uso de imagem do paciente. Nenhum vídeo é
+          gravado — apenas a série temporal de pontos do corpo é armazenada.
         </p>
       </div>
     );
@@ -703,8 +640,7 @@ export function PoseCapture({
   const hasMultipleCameras = videoInputs.length > 1;
   const cameraLabel = cameraFacing === "environment" ? "Traseira" : "Frontal";
   const blockingReasons = quality?.reasons.filter(
-    (reason) =>
-      reason !== "Confira se o celular está nivelado e paralelo ao chão",
+    (reason) => reason !== "Confira se o celular está nivelado e paralelo ao chão",
   );
   const guidanceDetails = quality?.ok
     ? quality.cameraLevelOk
@@ -724,8 +660,8 @@ export function PoseCapture({
           <div>
             <div className="font-medium">Prepare a câmera antes da captura</div>
             <p className="mt-1 text-sm text-muted-foreground">
-              A distância em metros é apenas uma referência. O indicador verde
-              confirma o enquadramento adequado para a lente utilizada.
+              A distância em metros é apenas uma referência. O indicador verde confirma o
+              enquadramento adequado para a lente utilizada.
             </p>
           </div>
         </div>
@@ -733,15 +669,13 @@ export function PoseCapture({
           <div className="rounded-lg border border-border/50 bg-background/50 p-3">
             <span className="font-medium">1. Estabilize o aparelho</span>
             <p className="mt-1 text-xs text-muted-foreground">
-              Use tripé ou apoio firme. Não segure o celular durante o
-              movimento.
+              Use tripé ou apoio firme. Não segure o celular durante o movimento.
             </p>
           </div>
           <div className="rounded-lg border border-border/50 bg-background/50 p-3">
             <span className="font-medium">2. Ajuste a altura</span>
             <p className="mt-1 text-xs text-muted-foreground">
-              Posicione a lente aproximadamente na altura do quadril e paralela
-              ao chão.
+              Posicione a lente aproximadamente na altura do quadril e paralela ao chão.
             </p>
           </div>
           <div className="rounded-lg border border-border/50 bg-background/50 p-3">
@@ -759,15 +693,14 @@ export function PoseCapture({
           <div className="rounded-lg border border-border/50 bg-background/50 p-3">
             <span className="font-medium">5. Evite distorções</span>
             <p className="mt-1 text-xs text-muted-foreground">
-              Não use zoom digital e, quando possível, prefira a câmera traseira
-              principal.
+              Não use zoom digital e, quando possível, prefira a câmera traseira principal.
             </p>
           </div>
           <div className="rounded-lg border border-border/50 bg-background/50 p-3">
             <span className="font-medium">6. Aguarde o verde</span>
             <p className="mt-1 text-xs text-muted-foreground">
-              A captura só será liberada quando posição, distância e
-              visibilidade estiverem adequadas.
+              A captura só será liberada quando posição, distância e visibilidade estiverem
+              adequadas.
             </p>
           </div>
         </div>
@@ -776,14 +709,11 @@ export function PoseCapture({
       <div className="rounded-xl border border-border/60 bg-card/40 p-4">
         <div className="grid gap-3 md:grid-cols-4">
           <div>
-            <div className="mb-1.5 text-xs text-muted-foreground">
-              Movimento avaliado
-            </div>
+            <div className="mb-1.5 text-xs text-muted-foreground">Movimento avaliado</div>
             <Select
               value={preset.key}
               onValueChange={(value) => {
-                const nextPreset =
-                  PRESETS.find((item) => item.key === value) ?? PRESETS[0];
+                const nextPreset = PRESETS.find((item) => item.key === value) ?? PRESETS[0];
                 setPreset(nextPreset);
                 setOrientation(nextPreset.idealView);
               }}
@@ -800,14 +730,10 @@ export function PoseCapture({
                 ))}
               </SelectContent>
             </Select>
-            <div className="mt-1 text-xs text-muted-foreground">
-              {preset.hint}
-            </div>
+            <div className="mt-1 text-xs text-muted-foreground">{preset.hint}</div>
           </div>
           <div>
-            <div className="mb-1.5 text-xs text-muted-foreground">
-              Orientação
-            </div>
+            <div className="mb-1.5 text-xs text-muted-foreground">Orientação</div>
             <Select
               value={orientation}
               onValueChange={(value) => setOrientation(value as Orientation)}
@@ -837,20 +763,13 @@ export function PoseCapture({
                   setCameraFacing(nextFacing);
                 }
               }}
-              disabled={
-                recording ||
-                countdown !== null ||
-                engineLoading ||
-                switchingCamera
-              }
+              disabled={recording || countdown !== null || engineLoading || switchingCamera}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="environment">
-                  Traseira — recomendada
-                </SelectItem>
+                <SelectItem value="environment">Traseira — recomendada</SelectItem>
                 <SelectItem value="user">Frontal</SelectItem>
               </SelectContent>
             </Select>
@@ -877,12 +796,7 @@ export function PoseCapture({
                 Ligar câmera
               </Button>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={stopCamera}
-                className="w-full"
-              >
+              <Button variant="outline" size="sm" onClick={stopCamera} className="w-full">
                 Desligar câmera
               </Button>
             )}
@@ -898,10 +812,7 @@ export function PoseCapture({
             playsInline
             muted
           />
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 h-full w-full object-contain"
-          />
+          <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-contain" />
           {!cameraOn && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -911,9 +822,7 @@ export function PoseCapture({
           )}
           {countdown !== null && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-              <div className="font-display text-8xl font-semibold text-white">
-                {countdown}
-              </div>
+              <div className="font-display text-8xl font-semibold text-white">{countdown}</div>
             </div>
           )}
           {cameraOn && (
@@ -962,9 +871,7 @@ export function PoseCapture({
                   ) : (
                     <CircleAlert className="h-5 w-5 shrink-0" />
                   )}
-                  <span>
-                    {quality?.message ?? "Aguardando detecção do corpo…"}
-                  </span>
+                  <span>{quality?.message ?? "Aguardando detecção do corpo…"}</span>
                 </div>
                 <div className="mt-1 text-xs opacity-85">{guidanceDetails}</div>
               </div>
@@ -982,10 +889,8 @@ export function PoseCapture({
       {cameraOn && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs text-muted-foreground">
-            Visibilidade média:{" "}
-            {Math.round((quality?.meanVisibility ?? 0) * 100)}% · limite mínimo{" "}
-            {Math.round(VISIBILITY_THRESHOLD * 100)}% · câmera{" "}
-            {cameraLabel.toLowerCase()}
+            Visibilidade média: {Math.round((quality?.meanVisibility ?? 0) * 100)}% · limite mínimo{" "}
+            {Math.round(VISIBILITY_THRESHOLD * 100)}% · câmera {cameraLabel.toLowerCase()}
           </div>
           <div className="flex items-center gap-2">
             {!recording ? (
@@ -993,22 +898,12 @@ export function PoseCapture({
                 variant="hero"
                 size="sm"
                 onClick={startRecording}
-                disabled={
-                  !quality?.ok ||
-                  countdown !== null ||
-                  saving ||
-                  switchingCamera
-                }
+                disabled={!quality?.ok || countdown !== null || saving || switchingCamera}
               >
                 <Play className="h-4 w-4" /> Iniciar captura
               </Button>
             ) : (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={finishRecording}
-                disabled={saving}
-              >
+              <Button variant="destructive" size="sm" onClick={finishRecording} disabled={saving}>
                 {saving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -1023,9 +918,9 @@ export function PoseCapture({
 
       {quality?.ok && !quality.cameraLevelOk && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-100">
-          A captura está liberada, mas confira visualmente se o aparelho está
-          nivelado. A inclinação de ombros ou quadris pode representar uma
-          assimetria real e, por isso, não bloqueia o exame.
+          A captura está liberada, mas confira visualmente se o aparelho está nivelado. A inclinação
+          de ombros ou quadris pode representar uma assimetria real e, por isso, não bloqueia o
+          exame.
         </div>
       )}
 
@@ -1038,15 +933,14 @@ export function PoseCapture({
 
       {lastSavedId && (
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-100">
-          Série de landmarks salva. Nenhum vídeo foi armazenado — apenas
-          coordenadas para apoio à decisão clínica.
+          Série de landmarks salva. Nenhum vídeo foi armazenado — apenas coordenadas para apoio à
+          decisão clínica.
         </div>
       )}
 
       <p className="text-xs text-muted-foreground">
-        Estimativa de pose executada localmente no navegador (MediaPipe). O
-        vídeo não é enviado nem salvo. Apoio à decisão — requer confirmação
-        profissional.
+        Estimativa de pose executada localmente no navegador (MediaPipe). O vídeo não é enviado nem
+        salvo. Apoio à decisão — requer confirmação profissional.
       </p>
     </div>
   );

@@ -15,7 +15,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "ci": "bun run format:check && bun run lint:check && bun run typecheck && bun run test:run && bun run build"
+    "ci": "bun run format:check && bun run lint:check && bun run typecheck && bun run test:run && bun run build",
+    "test:e2e": "playwright test",
+    "test:e2e:journey": "playwright test e2e/journey.e2e.ts --project=chromium-desktop",
+    "test:e2e:camera": "playwright test e2e/camera-mobile.e2e.ts --project=chromium-mobile"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
@@ -82,6 +85,7 @@
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.7.3",
+    "@playwright/test": "^1.55.0",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

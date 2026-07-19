@@ -155,7 +155,6 @@ const APPARATUS_OPTIONS = ["Solo", "Reformer", "Cadillac", "Chair", "Barrel", "O
 
 function AvaliacaoDetailPage() {
   const { id } = Route.useParams();
-  const navigate = useNavigate();
   const { assessment, loading } = useAssessment(id);
   const { postural, movement, exercise, loading: extrasLoading, reload } = useAssessmentResults(id);
 
@@ -263,7 +262,7 @@ function AvaliacaoDetailPage() {
       });
       await finalizeAssessment(assessment.id);
       toast.success("Avaliação finalizada.");
-      navigate({ to: "/avaliacoes/$id", params: { id: assessment.id }, replace: true });
+      window.location.reload();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao finalizar.");
     } finally {

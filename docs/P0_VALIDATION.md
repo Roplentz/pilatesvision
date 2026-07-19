@@ -20,6 +20,7 @@ O workflow `CI` executa em dois jobs independentes:
    - teste SQL de isolamento entre clínicas;
    - instalação do Chromium;
    - jornada gravada de login, paciente, consentimento, avaliação, relatório e PDF;
+   - confirmação visual do novo estado após finalizar avaliação e relatório;
    - teste da seleção de câmera em viewport móvel;
    - armazenamento de vídeo, screenshots, traces e relatório Playwright como artefato do CI.
 

@@ -51,9 +51,10 @@ test.beforeAll(async () => {
 
 test("jornada clínica completa gera e armazena PDF", async ({ page }) => {
   await page.goto("/auth");
-  await page.getByLabel("E-mail").fill(email);
-  await page.getByLabel("Senha").fill(password);
-  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  const loginForm = page.locator("form");
+  await loginForm.getByLabel("E-mail").fill(email);
+  await loginForm.getByLabel("Senha").fill(password);
+  await loginForm.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 
   await page.goto("/alunos/novo");

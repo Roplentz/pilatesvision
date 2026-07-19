@@ -47,10 +47,7 @@ async function provisionAssessment() {
     .from("patients")
     .insert({
       clinic_id: clinicId,
-      created_by: userData.user.id,
       name: "Paciente Câmera E2E",
-      status: "active",
-      consent_given_at: new Date().toISOString(),
     })
     .select("id")
     .single();
@@ -72,7 +69,6 @@ async function provisionAssessment() {
     .insert({
       clinic_id: clinicId,
       patient_id: patient.id,
-      professional_id: userData.user.id,
       type: "postural_static",
       status: "draft",
       title: "Teste móvel de câmera",
@@ -92,9 +88,10 @@ test.beforeAll(async () => {
 
 test("seleção frontal e traseira permanece utilizável em viewport móvel", async ({ page }) => {
   await page.goto("/auth");
-  await page.getByLabel("E-mail").fill(email);
-  await page.getByLabel("Senha").fill(password);
-  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  const loginForm = page.locator("form");
+  await loginForm.getByLabel("E-mail").fill(email);
+  await loginForm.getByLabel("Senha").fill(password);
+  await loginForm.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
 
   await page.goto(`/avaliacoes/${assessmentId}`);

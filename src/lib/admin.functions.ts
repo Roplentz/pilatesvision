@@ -126,16 +126,7 @@ export const getShadowEngineComparison = createServerFn({ method: "GET" })
 
 export interface PatientDataExport {
   generatedAt: string;
-  clinic: Record<string, unknown> | null;
-  patient: Record<string, unknown>;
-  consents: Array<Record<string, unknown>>;
-  assessments: Array<Record<string, unknown>>;
-  posturalResults: Array<Record<string, unknown>>;
-  movementResults: Array<Record<string, unknown>>;
-  exerciseResults: Array<Record<string, unknown>>;
-  poseCaptures: Array<Record<string, unknown>>;
-  reports: Array<Record<string, unknown>>;
-  fisiovisionAnalyses: Array<Record<string, unknown>>;
+  json: string;
 }
 
 export const exportPatientData = createServerFn({ method: "POST" })
@@ -195,17 +186,19 @@ export const exportPatientData = createServerFn({ method: "POST" })
       q("fisiovision_analyses"),
     ]);
 
-    return {
-      generatedAt: new Date().toISOString(),
-      clinic: (clinic.data as Record<string, unknown>) ?? null,
-      patient: patient as Record<string, unknown>,
-      consents: (consents.data as Array<Record<string, unknown>>) ?? [],
-      assessments: (assessments.data as Array<Record<string, unknown>>) ?? [],
-      posturalResults: (postural.data as Array<Record<string, unknown>>) ?? [],
-      movementResults: (movement.data as Array<Record<string, unknown>>) ?? [],
-      exerciseResults: (exercise.data as Array<Record<string, unknown>>) ?? [],
-      poseCaptures: (poseCaps.data as Array<Record<string, unknown>>) ?? [],
-      reports: (reports.data as Array<Record<string, unknown>>) ?? [],
-      fisiovisionAnalyses: (fisio.data as Array<Record<string, unknown>>) ?? [],
+    const generatedAt = new Date().toISOString();
+    const payload = {
+      generatedAt,
+      clinic: clinic.data ?? null,
+      patient,
+      consents: consents.data ?? [],
+      assessments: assessments.data ?? [],
+      posturalResults: postural.data ?? [],
+      movementResults: movement.data ?? [],
+      exerciseResults: exercise.data ?? [],
+      poseCaptures: poseCaps.data ?? [],
+      reports: reports.data ?? [],
+      fisiovisionAnalyses: fisio.data ?? [],
     };
+    return { generatedAt, json: JSON.stringify(payload, null, 2) };
   });

@@ -177,6 +177,34 @@ function AlunoDetailPage() {
     }
   };
 
+  const exportLgpd = async () => {
+    setExporting(true);
+    try {
+      const result = await exportFn({ data: { patientId: patient.id } });
+      const blob = new Blob([result.json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const stamp = result.generatedAt.replace(/[:.]/g, "-");
+      const safeName = (patient.name || "paciente").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      a.download = `lgpd-${safeName}-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Dados exportados.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao exportar.";
+      toast.error(
+        msg === "Forbidden"
+          ? "Apenas administradores da clínica podem exportar dados do paciente."
+          : msg,
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-card/30 backdrop-blur">

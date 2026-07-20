@@ -294,6 +294,132 @@ function AdminPage() {
           </CardContent>
         </Card>
       </section>
+
+      <section>
+        <Card className="bg-surface/60">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <GitCompare className="h-4 w-4 text-primary" /> Motor sombra vs. legado
+              </CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Comparação entre o motor oficial e o FisioHub Motion Core em modo sombra.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void loadShadow()}
+              disabled={shadowLoading}
+            >
+              <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${shadowLoading ? "animate-spin" : ""}`} />
+              Atualizar
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {shadowError ? (
+              <p className="text-sm text-destructive">{shadowError}</p>
+            ) : null}
+            {shadowLoading && !shadow ? (
+              <Skeleton className="h-32 w-full" />
+            ) : shadow ? (
+              <>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <ShadowStat label="Movimentos analisados" value={shadow.totalMovementResults} />
+                  <ShadowStat label="Com motor sombra" value={shadow.withShadow} />
+                  <ShadowStat
+                    label="Concordância de reps"
+                    value={
+                      shadow.agreementRate == null
+                        ? "—"
+                        : `${Math.round(shadow.agreementRate * 100)}%`
+                    }
+                    hint={`${shadow.withComparison} comparações`}
+                  />
+                  <ShadowStat
+                    label="MAE reps totais"
+                    value={
+                      shadow.meanAbsDiffTotal == null
+                        ? "—"
+                        : shadow.meanAbsDiffTotal.toFixed(2)
+                    }
+                    hint={`Erros do motor: ${shadow.errors}`}
+                  />
+                </div>
+                {shadow.samples.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data</TableHead>
+                        <TableHead className="text-right">Legado</TableHead>
+                        <TableHead className="text-right">Sombra</TableHead>
+                        <TableHead className="text-right">Válidas (sombra)</TableHead>
+                        <TableHead className="text-right">Δ total</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {shadow.samples.map((s) => (
+                        <TableRow key={`${s.assessmentId}-${s.createdAt}`}>
+                          <TableCell className="text-xs">
+                            {new Date(s.createdAt).toLocaleString("pt-BR")}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {s.legacyReps ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {s.shadowReps ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {s.shadowValidReps ?? "—"}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {s.diffTotal ?? "—"}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={s.shadowStatus === "error" ? "destructive" : "secondary"}
+                              className="text-[10px]"
+                            >
+                              {s.shadowStatus ?? "—"}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhuma captura com motor sombra registrada ainda. Habilite a flag
+                    <code className="mx-1 rounded bg-muted px-1 text-xs">
+                      VITE_FISIOHUB_MOTION_CORE_SHADOW=true
+                    </code>
+                    para começar a coletar.
+                  </p>
+                )}
+              </>
+            ) : null}
+          </CardContent>
+        </Card>
+      </section>
+    </div>
+  );
+}
+
+function ShadowStat({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: number | string;
+  hint?: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border/60 p-4">
+      <div className="text-xl font-semibold leading-none tabular-nums">{value}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{label}</div>
+      {hint ? <div className="text-[10px] text-muted-foreground/80">{hint}</div> : null}
     </div>
   );
 }

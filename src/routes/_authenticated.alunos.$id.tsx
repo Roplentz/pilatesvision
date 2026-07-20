@@ -45,7 +45,9 @@ import {
 import { usePatientReports, ASSESSMENT_TYPE_LABEL } from "@/lib/reportsStore";
 import { PatientConsentCard } from "@/components/PatientConsentCard";
 import { toast } from "sonner";
-import { ClipboardPlus, FileText, Plus } from "lucide-react";
+import { ClipboardPlus, FileText, Plus, Download } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { exportPatientData } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/alunos/$id")({
   component: AlunoDetailPage,
@@ -68,6 +70,8 @@ const statusLabel: Record<PatientStatus, string> = {
 };
 
 function AlunoDetailPage() {
+  const exportFn = useServerFn(exportPatientData);
+  const [exporting, setExporting] = useState(false);
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { patient, loading } = usePatient(id);

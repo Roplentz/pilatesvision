@@ -216,6 +216,18 @@ function AlunoDetailPage() {
             <ArrowLeft className="h-4 w-4" /> Pacientes
           </Link>
           <div className="flex items-center gap-2">
+            {!editing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportLgpd}
+                disabled={exporting}
+                title="Exportar todos os dados deste paciente (LGPD)"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? "Exportando…" : "Exportar dados"}
+              </Button>
+            )}
             {!editing && st !== "archived" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>

@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  getShadowEngineComparison,
+  type ShadowComparisonSummary,
+} from "@/lib/admin.functions";
 import { useIsPlatformAdmin } from "@/hooks/useIsPlatformAdmin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +30,7 @@ import {
   Video,
   Activity,
   CalendarRange,
+  GitCompare,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -69,6 +75,10 @@ function AdminPage() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [shadow, setShadow] = useState<ShadowComparisonSummary | null>(null);
+  const [shadowLoading, setShadowLoading] = useState(false);
+  const [shadowError, setShadowError] = useState<string | null>(null);
+  const fetchShadow = useServerFn(getShadowEngineComparison);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -83,10 +93,24 @@ function AdminPage() {
     setLoading(false);
   }, []);
 
+  const loadShadow = useCallback(async () => {
+    setShadowLoading(true);
+    setShadowError(null);
+    try {
+      const result = await fetchShadow();
+      setShadow(result);
+    } catch (err) {
+      setShadowError(err instanceof Error ? err.message : "Erro ao carregar comparação");
+    } finally {
+      setShadowLoading(false);
+    }
+  }, [fetchShadow]);
+
   useEffect(() => {
     if (!isPlatformAdmin) return;
     void load();
-  }, [isPlatformAdmin, load]);
+    void loadShadow();
+  }, [isPlatformAdmin, load, loadShadow]);
 
   if (roleLoading) {
     return (

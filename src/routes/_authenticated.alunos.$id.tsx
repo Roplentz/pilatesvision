@@ -45,7 +45,9 @@ import {
 import { usePatientReports, ASSESSMENT_TYPE_LABEL } from "@/lib/reportsStore";
 import { PatientConsentCard } from "@/components/PatientConsentCard";
 import { toast } from "sonner";
-import { ClipboardPlus, FileText, Plus } from "lucide-react";
+import { ClipboardPlus, FileText, Plus, Download } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { exportPatientData } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/alunos/$id")({
   component: AlunoDetailPage,
@@ -68,6 +70,8 @@ const statusLabel: Record<PatientStatus, string> = {
 };
 
 function AlunoDetailPage() {
+  const exportFn = useServerFn(exportPatientData);
+  const [exporting, setExporting] = useState(false);
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { patient, loading } = usePatient(id);
@@ -173,6 +177,34 @@ function AlunoDetailPage() {
     }
   };
 
+  const exportLgpd = async () => {
+    setExporting(true);
+    try {
+      const result = await exportFn({ data: { patientId: patient.id } });
+      const blob = new Blob([result.json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const stamp = result.generatedAt.replace(/[:.]/g, "-");
+      const safeName = (patient.name || "paciente").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      a.download = `lgpd-${safeName}-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Dados exportados.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao exportar.";
+      toast.error(
+        msg === "Forbidden"
+          ? "Apenas administradores da clínica podem exportar dados do paciente."
+          : msg,
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-card/30 backdrop-blur">
@@ -184,6 +216,18 @@ function AlunoDetailPage() {
             <ArrowLeft className="h-4 w-4" /> Pacientes
           </Link>
           <div className="flex items-center gap-2">
+            {!editing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportLgpd}
+                disabled={exporting}
+                title="Exportar todos os dados deste paciente (LGPD)"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? "Exportando…" : "Exportar dados"}
+              </Button>
+            )}
             {!editing && st !== "archived" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>

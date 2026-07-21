@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { runMotionCoreShadow } from "@/lib/motionCoreShadow";
 import type { RawFrame } from "@/lib/fisiohub-motion-core";
-import { summarizeSamples, sampleFromLandmarks, type Landmark } from "@/lib/poseMetrics";
+import {
+  summarizeSamples,
+  sampleFromLandmarks,
+  type Landmark,
+} from "@/lib/poseMetrics";
 
 function synthLandmarks(hipY: number, kneeAngle: number): Landmark[] {
-  const lms: Landmark[] = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, visibility: 0.9 }));
+  const lms: Landmark[] = Array.from({ length: 33 }, () => ({
+    x: 0.5,
+    y: 0.5,
+    visibility: 0.9,
+  }));
   lms[0] = { x: 0.5, y: 0.15, visibility: 0.95 };
   lms[11] = { x: 0.42, y: 0.3, visibility: 0.9 };
   lms[12] = { x: 0.58, y: 0.3, visibility: 0.9 };
@@ -74,7 +82,11 @@ describe("runMotionCoreShadow", () => {
 
   it("falha de forma segura retornando status='error' sem lançar", () => {
     const bogus = [
-      { frameNumber: 0, timestampSeconds: 0, landmarks: null as unknown as Landmark[] },
+      {
+        frameNumber: 0,
+        timestampSeconds: 0,
+        landmarks: null as unknown as Landmark[],
+      },
     ];
     const result = runMotionCoreShadow(bogus, null, { forceEnabled: true });
     // Ou passa (framesAnalyzed=0) sem lançar, ou reporta erro seguro.

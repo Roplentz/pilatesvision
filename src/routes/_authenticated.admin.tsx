@@ -100,7 +100,9 @@ function AdminPage() {
       const result = await fetchShadow();
       setShadow(result);
     } catch (err) {
-      setShadowError(err instanceof Error ? err.message : "Erro ao carregar comparação");
+      setShadowError(
+        err instanceof Error ? err.message : "Erro ao carregar comparação",
+      );
     } finally {
       setShadowLoading(false);
     }
@@ -126,7 +128,9 @@ function AdminPage() {
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-destructive/15 text-destructive">
           <AlertTriangle className="h-6 w-6" />
         </div>
-        <h1 className="mt-4 font-display text-2xl font-semibold">Acesso restrito</h1>
+        <h1 className="mt-4 font-display text-2xl font-semibold">
+          Acesso restrito
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Área exclusiva do administrador da plataforma.
         </p>
@@ -171,9 +175,21 @@ function AdminPage() {
   ];
 
   const adocao = [
-    { label: "Vídeos de movimento", value: v?.movimento_com_video ?? 0, icon: Video },
-    { label: "Vídeos de exercício", value: v?.exercicio_com_video ?? 0, icon: Video },
-    { label: "Avaliações com análise biomecânica", value: v?.com_analise ?? 0, icon: Activity },
+    {
+      label: "Vídeos de movimento",
+      value: v?.movimento_com_video ?? 0,
+      icon: Video,
+    },
+    {
+      label: "Vídeos de exercício",
+      value: v?.exercicio_com_video ?? 0,
+      icon: Video,
+    },
+    {
+      label: "Avaliações com análise biomecânica",
+      value: v?.com_analise ?? 0,
+      icon: Activity,
+    },
   ];
 
   return (
@@ -190,17 +206,26 @@ function AdminPage() {
             Controle da Plataforma
           </h1>
           <p className="text-sm text-muted-foreground">
-            Visão agregada de todas as clínicas — acesso exclusivo do administrador.
+            Visão agregada de todas as clínicas — acesso exclusivo do
+            administrador.
           </p>
         </div>
         <div className="flex items-center gap-3">
           {overview?.gerado_em ? (
             <span className="text-xs text-muted-foreground">
-              Atualizado em {new Date(overview.gerado_em).toLocaleString("pt-BR")}
+              Atualizado em{" "}
+              {new Date(overview.gerado_em).toLocaleString("pt-BR")}
             </span>
           ) : null}
-          <Button size="sm" variant="outline" onClick={() => void load()} disabled={loading}>
-            <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => void load()}
+            disabled={loading}
+          >
+            <RefreshCw
+              className={`mr-1.5 h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
+            />
             Atualizar
           </Button>
         </div>
@@ -208,7 +233,9 @@ function AdminPage() {
 
       {error ? (
         <Card className="border-destructive/50 bg-destructive/5">
-          <CardContent className="p-4 text-sm text-destructive">{error}</CardContent>
+          <CardContent className="p-4 text-sm text-destructive">
+            {error}
+          </CardContent>
         </Card>
       ) : null}
 
@@ -221,11 +248,19 @@ function AdminPage() {
               </div>
               <div className="min-w-0">
                 <div className="text-2xl font-semibold leading-none">
-                  {loading && !overview ? <Skeleton className="h-7 w-12" /> : s.value}
+                  {loading && !overview ? (
+                    <Skeleton className="h-7 w-12" />
+                  ) : (
+                    s.value
+                  )}
                 </div>
-                <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {s.label}
+                </div>
                 {s.hint ? (
-                  <div className="text-[10px] text-muted-foreground/80">{s.hint}</div>
+                  <div className="text-[10px] text-muted-foreground/80">
+                    {s.hint}
+                  </div>
                 ) : null}
               </div>
             </CardContent>
@@ -249,9 +284,15 @@ function AdminPage() {
                 </div>
                 <div>
                   <div className="text-xl font-semibold leading-none">
-                    {loading && !overview ? <Skeleton className="h-6 w-10" /> : a.value}
+                    {loading && !overview ? (
+                      <Skeleton className="h-6 w-10" />
+                    ) : (
+                      a.value
+                    )}
                   </div>
-                  <div className="mt-1 text-xs text-muted-foreground">{a.label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {a.label}
+                  </div>
                 </div>
               </div>
             ))}
@@ -268,7 +309,9 @@ function AdminPage() {
             {loading && !overview ? (
               <Skeleton className="h-32 w-full" />
             ) : !overview || overview.por_clinica.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma clínica registrada.</p>
+              <p className="text-sm text-muted-foreground">
+                Nenhuma clínica registrada.
+              </p>
             ) : (
               <Table>
                 <TableHeader>
@@ -282,10 +325,18 @@ function AdminPage() {
                 <TableBody>
                   {overview.por_clinica.map((row) => (
                     <TableRow key={row.clinic_id}>
-                      <TableCell className="font-medium">{row.clinica}</TableCell>
-                      <TableCell className="text-right tabular-nums">{row.pacientes}</TableCell>
-                      <TableCell className="text-right tabular-nums">{row.avaliacoes}</TableCell>
-                      <TableCell className="text-right tabular-nums">{row.relatorios}</TableCell>
+                      <TableCell className="font-medium">
+                        {row.clinica}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.pacientes}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.avaliacoes}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.relatorios}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -300,10 +351,12 @@ function AdminPage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2 text-base">
-                <GitCompare className="h-4 w-4 text-primary" /> Motor sombra vs. legado
+                <GitCompare className="h-4 w-4 text-primary" /> Motor sombra vs.
+                legado
               </CardTitle>
               <p className="mt-1 text-xs text-muted-foreground">
-                Comparação entre o motor oficial e o FisioHub Motion Core em modo sombra.
+                Comparação entre o motor oficial e o FisioHub Motion Core em
+                modo sombra.
               </p>
             </div>
             <Button
@@ -312,7 +365,9 @@ function AdminPage() {
               onClick={() => void loadShadow()}
               disabled={shadowLoading}
             >
-              <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${shadowLoading ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`mr-1.5 h-3.5 w-3.5 ${shadowLoading ? "animate-spin" : ""}`}
+              />
               Atualizar
             </Button>
           </CardHeader>
@@ -325,8 +380,14 @@ function AdminPage() {
             ) : shadow ? (
               <>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <ShadowStat label="Movimentos analisados" value={shadow.totalMovementResults} />
-                  <ShadowStat label="Com motor sombra" value={shadow.withShadow} />
+                  <ShadowStat
+                    label="Movimentos analisados"
+                    value={shadow.totalMovementResults}
+                  />
+                  <ShadowStat
+                    label="Com motor sombra"
+                    value={shadow.withShadow}
+                  />
                   <ShadowStat
                     label="Concordância de reps"
                     value={
@@ -353,7 +414,9 @@ function AdminPage() {
                         <TableHead>Data</TableHead>
                         <TableHead className="text-right">Legado</TableHead>
                         <TableHead className="text-right">Sombra</TableHead>
-                        <TableHead className="text-right">Válidas (sombra)</TableHead>
+                        <TableHead className="text-right">
+                          Válidas (sombra)
+                        </TableHead>
                         <TableHead className="text-right">Δ total</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
@@ -378,7 +441,11 @@ function AdminPage() {
                           </TableCell>
                           <TableCell>
                             <Badge
-                              variant={s.shadowStatus === "error" ? "destructive" : "secondary"}
+                              variant={
+                                s.shadowStatus === "error"
+                                  ? "destructive"
+                                  : "secondary"
+                              }
                               className="text-[10px]"
                             >
                               {s.shadowStatus ?? "—"}
@@ -390,7 +457,8 @@ function AdminPage() {
                   </Table>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    Nenhuma captura com motor sombra registrada ainda. Habilite a flag
+                    Nenhuma captura com motor sombra registrada ainda. Habilite
+                    a flag
                     <code className="mx-1 rounded bg-muted px-1 text-xs">
                       VITE_FISIOHUB_MOTION_CORE_SHADOW=true
                     </code>
@@ -417,9 +485,13 @@ function ShadowStat({
 }) {
   return (
     <div className="rounded-lg border border-border/60 p-4">
-      <div className="text-xl font-semibold leading-none tabular-nums">{value}</div>
+      <div className="text-xl font-semibold leading-none tabular-nums">
+        {value}
+      </div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
-      {hint ? <div className="text-[10px] text-muted-foreground/80">{hint}</div> : null}
+      {hint ? (
+        <div className="text-[10px] text-muted-foreground/80">{hint}</div>
+      ) : null}
     </div>
   );
 }

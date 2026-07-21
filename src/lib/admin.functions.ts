@@ -52,8 +52,7 @@ export const getShadowEngineComparison = createServerFn({ method: "GET" })
     const { data: isAdmin } = await context.supabase.rpc("is_platform_admin");
     if (!isAdmin) throw new Error("Forbidden");
 
-    const { supabaseAdmin } =
-      await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("movement_results")
       .select("assessment_id, clinic_id, created_at, metrics")
@@ -144,11 +143,7 @@ export const exportPatientData = createServerFn({ method: "POST" })
     // Autorização: profissional da mesma clínica com role owner/admin
     // ou administrador da plataforma.
     const [{ data: profile }, { data: isPlatformAdmin }] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("clinic_id, role")
-        .eq("id", userId)
-        .maybeSingle(),
+      supabase.from("profiles").select("clinic_id, role").eq("id", userId).maybeSingle(),
       supabase.rpc("is_platform_admin"),
     ]);
 
@@ -172,31 +167,18 @@ export const exportPatientData = createServerFn({ method: "POST" })
         .select("*")
         .eq("patient_id", data.patientId);
 
-    const [
-      clinic,
-      consents,
-      assessments,
-      postural,
-      movement,
-      exercise,
-      poseCaps,
-      reports,
-      fisio,
-    ] = await Promise.all([
-      supabase
-        .from("clinics")
-        .select("*")
-        .eq("id", patient.clinic_id)
-        .maybeSingle(),
-      q("patient_consents"),
-      q("assessments"),
-      q("postural_results"),
-      q("movement_results"),
-      q("exercise_results"),
-      q("pose_captures"),
-      q("reports"),
-      q("fisiovision_analyses"),
-    ]);
+    const [clinic, consents, assessments, postural, movement, exercise, poseCaps, reports, fisio] =
+      await Promise.all([
+        supabase.from("clinics").select("*").eq("id", patient.clinic_id).maybeSingle(),
+        q("patient_consents"),
+        q("assessments"),
+        q("postural_results"),
+        q("movement_results"),
+        q("exercise_results"),
+        q("pose_captures"),
+        q("reports"),
+        q("fisiovision_analyses"),
+      ]);
 
     const generatedAt = new Date().toISOString();
     const payload = {

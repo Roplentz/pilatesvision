@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { runMotionCoreShadow } from "@/lib/motionCoreShadow";
 import type { RawFrame } from "@/lib/fisiohub-motion-core";
-import {
-  summarizeSamples,
-  sampleFromLandmarks,
-  type Landmark,
-} from "@/lib/poseMetrics";
+import { summarizeSamples, sampleFromLandmarks, type Landmark } from "@/lib/poseMetrics";
 
 function synthLandmarks(hipY: number, kneeAngle: number): Landmark[] {
   const lms: Landmark[] = Array.from({ length: 33 }, () => ({
@@ -71,9 +67,7 @@ describe("runMotionCoreShadow", () => {
     expect(result.framesAnalyzed).toBeGreaterThan(10);
     expect(result.repetitionsDetected).toBeGreaterThanOrEqual(1);
     expect(result.comparison.legacyRepsTotal).toBe(legacy.reps_total);
-    expect(result.comparison.repsTotalDelta).toBe(
-      result.repetitionsDetected - legacy.reps_total,
-    );
+    expect(result.comparison.repsTotalDelta).toBe(result.repetitionsDetected - legacy.reps_total);
     // serializável e sem NaN/Infinity
     const json = JSON.stringify(result);
     expect(json.includes("NaN")).toBe(false);

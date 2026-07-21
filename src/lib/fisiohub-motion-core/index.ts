@@ -175,10 +175,7 @@ export function analyzeSquatSeries(series: MotionSeries): SquatAnalysis {
   void _p95;
 
   const phases = detectReps(hipY, times);
-  const reps = phases.map((p, i) => ({
-    ...repFromPhase(p, samples),
-    index: i + 1,
-  }));
+  const reps = phases.map((p, i) => ({ ...repFromPhase(p, samples), index: i + 1 }));
   const validReps = reps.filter((r) => r.valid);
 
   const events: SquatEvent[] = [];

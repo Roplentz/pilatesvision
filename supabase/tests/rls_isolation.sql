@@ -106,7 +106,7 @@ INSERT INTO storage.objects (id,bucket_id,name) VALUES
 SET LOCAL role authenticated;
 SET LOCAL request.jwt.claims TO '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}';
 
-DO $
+DO $rls$
 DECLARE t text; n int;
 BEGIN
  FOREACH t IN ARRAY ARRAY['patients','patient_consents','assessments','postural_results','movement_results','exercise_results','prescribed_exercises','reports','pose_captures'] LOOP
@@ -115,10 +115,10 @@ BEGIN
  END LOOP;
  SELECT count(*) INTO n FROM storage.objects WHERE bucket_id='clinical-media';
  IF n<>1 THEN RAISE EXCEPTION 'RLS FAIL: A sees % storage objects',n; END IF;
-END $;
+END $rls$;
 
 -- Cross-clinic INSERTs must be rejected.
-DO $
+DO $rls$
 BEGIN
  BEGIN
   INSERT INTO public.patient_consents (clinic_id,patient_id) VALUES
@@ -130,10 +130,10 @@ BEGIN
   ('clinical-media','00000000-0000-0000-0000-00000000cb01/a/attack.jpg');
   RAISE EXCEPTION 'RLS FAIL: foreign storage insert succeeded';
  EXCEPTION WHEN insufficient_privilege OR check_violation THEN NULL; END;
-END $;
+END $rls$;
 
 -- Cross-clinic UPDATE/DELETE must affect zero rows in every surface.
-DO $
+DO $rls$
 DECLARE r record; n int;
 BEGIN
  FOR r IN SELECT * FROM (VALUES
@@ -160,11 +160,11 @@ BEGIN
  DELETE FROM storage.objects WHERE id='00000000-0000-0000-0000-00000000bbb2';
  GET DIAGNOSTICS n=ROW_COUNT;
  IF n<>0 THEN RAISE EXCEPTION 'RLS FAIL: A deleted B storage'; END IF;
-END $;
+END $rls$;
 
 -- Mirror SELECT checks as user B to detect asymmetric policies.
 SET LOCAL request.jwt.claims TO '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}';
-DO $
+DO $rls$
 DECLARE t text; n int;
 BEGIN
  FOREACH t IN ARRAY ARRAY['patients','patient_consents','assessments','postural_results','movement_results','exercise_results','prescribed_exercises','reports','pose_captures'] LOOP
@@ -173,7 +173,7 @@ BEGIN
  END LOOP;
  SELECT count(*) INTO n FROM storage.objects WHERE bucket_id='clinical-media';
  IF n<>1 THEN RAISE EXCEPTION 'RLS FAIL: B sees % storage objects',n; END IF;
-END $;
+END $rls$;
 
 RESET role;
 ROLLBACK;

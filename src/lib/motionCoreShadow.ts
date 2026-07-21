@@ -66,9 +66,8 @@ export function isMotionCoreShadowEnabled(): boolean {
   try {
     return (
       typeof import.meta !== "undefined" &&
-      (import.meta as unknown as { env?: Record<string, string | undefined> }).env?.[
-        MOTION_CORE_SHADOW_FLAG
-      ] === "true"
+      (import.meta as unknown as { env?: Record<string, string | undefined> })
+        .env?.[MOTION_CORE_SHADOW_FLAG] === "true"
     );
   } catch {
     return false;
@@ -114,16 +113,24 @@ export function runMotionCoreShadow(
     const series = mediapipeAdapter(Array.isArray(frames) ? frames : []);
     const analysis = analyzeSquatSeries(series);
     const legacyTotal =
-      legacySummary && Number.isFinite(legacySummary.reps_total) ? legacySummary.reps_total : null;
+      legacySummary && Number.isFinite(legacySummary.reps_total)
+        ? legacySummary.reps_total
+        : null;
     const legacyValid =
-      legacySummary && Number.isFinite(legacySummary.reps_valid) ? legacySummary.reps_valid : null;
+      legacySummary && Number.isFinite(legacySummary.reps_valid)
+        ? legacySummary.reps_valid
+        : null;
     const comparison: MotionCoreShadowComparison = {
       legacyRepsTotal: legacyTotal,
       legacyRepsValid: legacyValid,
       shadowRepsTotal: analysis.repetitionsDetected,
       shadowRepsValid: analysis.repetitionsValid,
-      repsTotalDelta: legacyTotal === null ? null : analysis.repetitionsDetected - legacyTotal,
-      repsValidDelta: legacyValid === null ? null : analysis.repetitionsValid - legacyValid,
+      repsTotalDelta:
+        legacyTotal === null
+          ? null
+          : analysis.repetitionsDetected - legacyTotal,
+      repsValidDelta:
+        legacyValid === null ? null : analysis.repetitionsValid - legacyValid,
     };
     return {
       status: "ok",

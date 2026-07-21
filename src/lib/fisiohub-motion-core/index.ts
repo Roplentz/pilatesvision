@@ -114,18 +114,26 @@ function safeMedian(values: number[]): number {
   return Number.isFinite(m) ? round(m, 2) : 0;
 }
 
-function repFromPhase(phase: RepPhase, samples: FrameSample[]): SquatRepetition {
+function repFromPhase(
+  phase: RepPhase,
+  samples: FrameSample[],
+): SquatRepetition {
   const slice = samples.slice(phase.start, phase.end + 1);
   const kneesL = slice.map((s) => s.kneeAngleL).filter(Number.isFinite);
   const kneesR = slice.map((s) => s.kneeAngleR).filter(Number.isFinite);
   const vis = slice.map((s) => s.meanVisibility).filter(Number.isFinite);
   const rangeL = kneesL.length ? Math.max(...kneesL) - Math.min(...kneesL) : 0;
   const rangeR = kneesR.length ? Math.max(...kneesR) - Math.min(...kneesR) : 0;
-  const confidence = vis.length ? vis.reduce((a, b) => a + b, 0) / vis.length : 0;
+  const confidence = vis.length
+    ? vis.reduce((a, b) => a + b, 0) / vis.length
+    : 0;
   const symmetry =
-    rangeL > 0 && rangeR > 0 ? Math.min(rangeL, rangeR) / Math.max(rangeL, rangeR) : 0;
+    rangeL > 0 && rangeR > 0
+      ? Math.min(rangeL, rangeR) / Math.max(rangeL, rangeR)
+      : 0;
   const duration = Math.max(0, phase.tEnd - phase.tStart);
-  const valid = duration >= 0.4 && Math.min(rangeL, rangeR) >= 20 && confidence >= 0.4;
+  const valid =
+    duration >= 0.4 && Math.min(rangeL, rangeR) >= 20 && confidence >= 0.4;
   return {
     index: 0,
     tStart: round(phase.tStart, 3),
@@ -170,12 +178,18 @@ export function analyzeSquatSeries(series: MotionSeries): SquatAnalysis {
   const hipY = samples.map((s) => s.hipMidY);
   const times = samples.map((s) => s.t);
   // pré-suavização apenas para expor o padrão determinístico do core
-  const _smoothed = emaSmoothZeroPhase(interpolateInvalid(hipY), DEFAULT_DETECTOR.ema_alpha);
+  const _smoothed = emaSmoothZeroPhase(
+    interpolateInvalid(hipY),
+    DEFAULT_DETECTOR.ema_alpha,
+  );
   const _p95 = percentile(_smoothed, 95); // guardrail; não usado externamente
   void _p95;
 
   const phases = detectReps(hipY, times);
-  const reps = phases.map((p, i) => ({ ...repFromPhase(p, samples), index: i + 1 }));
+  const reps = phases.map((p, i) => ({
+    ...repFromPhase(p, samples),
+    index: i + 1,
+  }));
   const validReps = reps.filter((r) => r.valid);
 
   const events: SquatEvent[] = [];
@@ -207,12 +221,18 @@ export function analyzeSquatSeries(series: MotionSeries): SquatAnalysis {
   }
 
   const metrics: SquatMetrics = {
-    kneeFlexionRangeLeftMedianDeg: safeMedian(reps.map((r) => r.kneeFlexionRangeLeftDeg)),
-    kneeFlexionRangeRightMedianDeg: safeMedian(reps.map((r) => r.kneeFlexionRangeRightDeg)),
+    kneeFlexionRangeLeftMedianDeg: safeMedian(
+      reps.map((r) => r.kneeFlexionRangeLeftDeg),
+    ),
+    kneeFlexionRangeRightMedianDeg: safeMedian(
+      reps.map((r) => r.kneeFlexionRangeRightDeg),
+    ),
     repDurationMedianSeconds: safeMedian(reps.map((r) => r.durationSeconds)),
     bilateralSymmetryMedian: safeMedian(reps.map((r) => r.bilateralSymmetry)),
     confidenceMean: round(
-      reps.length ? reps.reduce((a, r) => a + r.confidence, 0) / reps.length : 0,
+      reps.length
+        ? reps.reduce((a, r) => a + r.confidence, 0) / reps.length
+        : 0,
       3,
     ),
   };

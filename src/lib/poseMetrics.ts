@@ -660,3 +660,223 @@ export function isAutoMetricsSummary(value: unknown): value is AutoMetricsSummar
 export function toJson(summary: AutoMetricsSummary): Json {
   return summary as unknown as Json;
 }
+
+// ---------------------------------------------------------------------------
+// Módulo Ponte (Pelvic Curl)
+// ---------------------------------------------------------------------------
+// Convenção: em vista lateral supina, o quadril SOBE quando hipMidY diminui
+// (y cresce para baixo no espaço de imagem). A "repetição" da ponte é o ciclo
+// repouso → topo (quadril elevado) → repouso. Para reaproveitar o detector
+// determinístico já validado, invertemos a série de hipMidY: assim o "pico"
+// vira o momento de máxima elevação.
+
+/** Detecta repetições de ponte reutilizando o detector do agachamento sobre -hipMidY. */
+export function detectBridgeReps(
+  hipY: number[],
+  times: number[],
+  params: DetectorParams = DEFAULT_DETECTOR,
+): RepPhase[] {
+  const inverted = hipY.map((v) => (Number.isFinite(v) ? -v : NaN));
+  return detectReps(inverted, times, params);
+}
+
+export interface BridgeRepMetrics {
+  index: number;
+  duration_s: number;
+  ascent_s: number; // repouso → topo (quadril sobe)
+  descent_s: number; // topo → repouso (quadril desce)
+  hip_extension_range_left_deg: number;
+  hip_extension_range_right_deg: number;
+  hip_extension_peak_left_deg: number;
+  hip_extension_peak_right_deg: number;
+  hip_vertical_amplitude: number; // normalizado (coordenada de frame)
+  bilateral_symmetry: number; // 0..1
+  confidence: number; // 0..1
+  valid: boolean;
+}
+
+export interface BridgeMetricsSummary {
+  schema_version: typeof SCHEMA_VERSION;
+  engine: typeof ENGINE;
+  engine_version: string;
+  generated_at: string;
+  context: "bridge";
+  frames_analyzed: number;
+  frames_valid: number;
+  valid_frame_ratio: number;
+  duration_seconds: number;
+  mean_confidence: number;
+  detector: DetectorParams;
+  filter: { type: "ema-zero-phase"; alpha: number };
+  reps_total: number;
+  reps_valid: number;
+  reps: BridgeRepMetrics[];
+  summary_stats: {
+    hip_extension_range_left_deg: { median: number; p5: number; p95: number };
+    hip_extension_range_right_deg: { median: number; p5: number; p95: number };
+    hip_extension_peak_left_deg: { median: number };
+    hip_extension_peak_right_deg: { median: number };
+    hip_vertical_amplitude: { median: number };
+    rep_duration_s: { median: number; p5: number; p95: number };
+    bilateral_symmetry: { median: number };
+    confidence: { best: number; worst: number };
+    consistency: number;
+  };
+  suggestions: string[];
+  disclaimer: string;
+}
+
+function bridgeRepMetricsFor(
+  rep: RepPhase,
+  samples: FrameSample[],
+  index: number,
+): BridgeRepMetrics {
+  const slice = samples.slice(rep.start, rep.end + 1);
+  const extL = slice.map((s) => s.hipExtensionAngleL);
+  const extR = slice.map((s) => s.hipExtensionAngleR);
+  const hipYs = slice.map((s) => s.hipMidY);
+  // Amplitude = pico (topo) − vale (repouso). No topo o ângulo é MAIOR (mais estendido).
+  const rangeL = safeNum(percentile(extL, 95) - percentile(extL, 5), 0);
+  const rangeR = safeNum(percentile(extR, 95) - percentile(extR, 5), 0);
+  const peakL = safeNum(percentile(extL, 95), 0);
+  const peakR = safeNum(percentile(extR, 95), 0);
+  const hipAmp = safeNum(percentile(hipYs, 95) - percentile(hipYs, 5), 0);
+  const conf = safeNum(mean(slice.map((s) => s.meanVisibility)), 0);
+  const denom = Math.max(rangeL, rangeR, 1e-6);
+  const symmetry = safeNum(1 - Math.abs(rangeL - rangeR) / denom, 0);
+  const duration = safeNum(rep.tEnd - rep.tStart, 0);
+  const ascent = safeNum(rep.tBottom - rep.tStart, 0);
+  const descent = safeNum(rep.tEnd - rep.tBottom, 0);
+  const valid = conf >= 0.4 && rangeL + rangeR > 10 && duration >= 0.4;
+  return {
+    index,
+    duration_s: round(duration, 2),
+    ascent_s: round(ascent, 2),
+    descent_s: round(descent, 2),
+    hip_extension_range_left_deg: round(rangeL, 1),
+    hip_extension_range_right_deg: round(rangeR, 1),
+    hip_extension_peak_left_deg: round(peakL, 1),
+    hip_extension_peak_right_deg: round(peakR, 1),
+    hip_vertical_amplitude: round(hipAmp, 3),
+    bilateral_symmetry: round(Math.max(0, Math.min(1, symmetry)), 2),
+    confidence: round(Math.max(0, Math.min(1, conf)), 2),
+    valid,
+  };
+}
+
+/**
+ * Resumo do módulo Ponte: detecção de repetições e amplitude de extensão
+ * de quadril (ângulo ombro–quadril–joelho) por lado, com estatísticas por rep
+ * e agregadas. Determinístico; nenhuma inferência clínica é emitida — todos
+ * os valores são indicadores de APOIO sujeitos a confirmação profissional.
+ */
+export function summarizeBridgeSamples(
+  samplesIn: FrameSample[],
+  durationSeconds: number,
+): BridgeMetricsSummary {
+  const samples = prepareSamples(samplesIn);
+  const framesTotal = samples.length;
+  const validSamples = samples.filter((s) => s.valid);
+  const framesValid = validSamples.length;
+  const validRatio = framesTotal > 0 ? framesValid / framesTotal : 0;
+  const confMean = safeNum(mean(samples.map((s) => s.meanVisibility)), 0);
+
+  const times = samples.map((s) => s.t);
+  const hipY = samples.map((s) => (s.valid ? s.hipMidY : NaN));
+  const reps = detectBridgeReps(hipY, times);
+  const repMetrics = reps.map((r, i) => bridgeRepMetricsFor(r, samples, i + 1));
+  const validReps = repMetrics.filter((r) => r.valid);
+
+  const rangeLs = validReps.map((r) => r.hip_extension_range_left_deg);
+  const rangeRs = validReps.map((r) => r.hip_extension_range_right_deg);
+  const peakLs = validReps.map((r) => r.hip_extension_peak_left_deg);
+  const peakRs = validReps.map((r) => r.hip_extension_peak_right_deg);
+  const hipAmps = validReps.map((r) => r.hip_vertical_amplitude);
+  const durs = validReps.map((r) => r.duration_s);
+  const syms = validReps.map((r) => r.bilateral_symmetry);
+  const confs = validReps.map((r) => r.confidence);
+
+  const consistencyBase = rangeRs.length >= 2 ? rangeRs : rangeLs;
+  const cv =
+    consistencyBase.length >= 2
+      ? stdev(consistencyBase) / Math.max(1e-6, mean(consistencyBase))
+      : 0;
+  const consistency = round(Math.max(0, Math.min(1, 1 - cv)), 2);
+
+  const suggestions: string[] = [];
+  const canSuggest = framesValid >= 6 && confMean >= 0.4 && validReps.length >= 1;
+  if (canSuggest) {
+    const medRangeL = median(rangeLs);
+    const medRangeR = median(rangeRs);
+    const medSym = median(syms);
+    if (
+      Number.isFinite(medRangeL) &&
+      Number.isFinite(medRangeR) &&
+      Math.abs(medRangeL - medRangeR) > 10
+    )
+      suggestions.push(
+        "Possível diferença bilateral na amplitude de extensão do quadril durante a ponte — sugere-se avaliação segmentar.",
+      );
+    if (Number.isFinite(medSym) && medSym < 0.7)
+      suggestions.push(
+        "Baixa simetria bilateral média entre repetições da ponte — sugere-se observação clínica adicional.",
+      );
+  } else {
+    suggestions.push(
+      "Qualidade insuficiente para gerar sugestões — recomenda-se nova captura com melhor enquadramento e iluminação.",
+    );
+  }
+
+  return {
+    schema_version: SCHEMA_VERSION,
+    engine: ENGINE,
+    engine_version: ENGINE_VERSION,
+    generated_at: new Date().toISOString(),
+    context: "bridge",
+    frames_analyzed: framesTotal,
+    frames_valid: framesValid,
+    valid_frame_ratio: round(validRatio, 2),
+    duration_seconds: round(durationSeconds, 2),
+    mean_confidence: round(confMean, 2),
+    detector: DEFAULT_DETECTOR,
+    filter: { type: "ema-zero-phase", alpha: DEFAULT_DETECTOR.ema_alpha },
+    reps_total: repMetrics.length,
+    reps_valid: validReps.length,
+    reps: repMetrics,
+    summary_stats: {
+      hip_extension_range_left_deg: {
+        median: round(safeNum(median(rangeLs)), 1),
+        p5: round(safeNum(percentile(rangeLs, 5)), 1),
+        p95: round(safeNum(percentile(rangeLs, 95)), 1),
+      },
+      hip_extension_range_right_deg: {
+        median: round(safeNum(median(rangeRs)), 1),
+        p5: round(safeNum(percentile(rangeRs, 5)), 1),
+        p95: round(safeNum(percentile(rangeRs, 95)), 1),
+      },
+      hip_extension_peak_left_deg: { median: round(safeNum(median(peakLs)), 1) },
+      hip_extension_peak_right_deg: { median: round(safeNum(median(peakRs)), 1) },
+      hip_vertical_amplitude: { median: round(safeNum(median(hipAmps)), 3) },
+      rep_duration_s: {
+        median: round(safeNum(median(durs)), 2),
+        p5: round(safeNum(percentile(durs, 5)), 2),
+        p95: round(safeNum(percentile(durs, 95)), 2),
+      },
+      bilateral_symmetry: { median: round(safeNum(median(syms)), 2) },
+      confidence: {
+        best: round(confs.length ? Math.max(...confs) : 0, 2),
+        worst: round(confs.length ? Math.min(...confs) : 0, 2),
+      },
+      consistency,
+    },
+    suggestions,
+    disclaimer:
+      "Estimativa automática 2D — apoio à decisão. Requer confirmação profissional. Não é diagnóstico.",
+  };
+}
+
+export function isBridgeMetricsSummary(value: unknown): value is BridgeMetricsSummary {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return v.engine === ENGINE && v.context === "bridge" && typeof v.frames_analyzed === "number";
+}

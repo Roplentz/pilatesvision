@@ -62,7 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
-  }, []);
+    queryClient.cancelQueries();
+    queryClient.clear();
+  }, [queryClient]);
 
   return (
     <AuthContext.Provider value={{ user, session, loading, signOut }}>

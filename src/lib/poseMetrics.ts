@@ -211,6 +211,13 @@ export interface FrameSample {
   hipMidY: number;
   meanVisibility: number;
   valid: boolean;
+  /**
+   * Ângulo ombro–quadril–joelho (graus). Referência de extensão do quadril
+   * para o módulo de Ponte: próximo de 180° = quadril estendido (topo da ponte);
+   * valores menores = quadril flexionado (posição de repouso supina).
+   */
+  hipExtensionAngleL: number;
+  hipExtensionAngleR: number;
 }
 
 export function sampleFromLandmarks(lms: Landmark[], t = 0): FrameSample | null {
@@ -242,6 +249,8 @@ export function sampleFromLandmarks(lms: Landmark[], t = 0): FrameSample | null 
     hipMidY: hipsMid.y,
     meanVisibility: vis,
     valid: vis >= 0.3,
+    hipExtensionAngleL: angleDeg(ls, lh, lk),
+    hipExtensionAngleR: angleDeg(rs, rh, rk),
   };
 }
 

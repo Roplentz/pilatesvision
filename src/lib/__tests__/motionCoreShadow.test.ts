@@ -63,9 +63,7 @@ describe("runMotionCoreShadow", () => {
     expect(result.framesAnalyzed).toBeGreaterThan(10);
     expect(result.repetitionsDetected).toBeGreaterThanOrEqual(1);
     expect(result.comparison.legacyRepsTotal).toBe(legacy.reps_total);
-    expect(result.comparison.repsTotalDelta).toBe(
-      result.repetitionsDetected - legacy.reps_total,
-    );
+    expect(result.comparison.repsTotalDelta).toBe(result.repetitionsDetected - legacy.reps_total);
     // serializável e sem NaN/Infinity
     const json = JSON.stringify(result);
     expect(json.includes("NaN")).toBe(false);

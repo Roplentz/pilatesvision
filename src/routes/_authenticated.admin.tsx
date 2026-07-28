@@ -2,10 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  getShadowEngineComparison,
-  type ShadowComparisonSummary,
-} from "@/lib/admin.functions";
+import { getShadowEngineComparison, type ShadowComparisonSummary } from "@/lib/admin.functions";
 import { useIsPlatformAdmin } from "@/hooks/useIsPlatformAdmin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -317,9 +314,7 @@ function AdminPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            {shadowError ? (
-              <p className="text-sm text-destructive">{shadowError}</p>
-            ) : null}
+            {shadowError ? <p className="text-sm text-destructive">{shadowError}</p> : null}
             {shadowLoading && !shadow ? (
               <Skeleton className="h-32 w-full" />
             ) : shadow ? (
@@ -339,9 +334,7 @@ function AdminPage() {
                   <ShadowStat
                     label="MAE reps totais"
                     value={
-                      shadow.meanAbsDiffTotal == null
-                        ? "—"
-                        : shadow.meanAbsDiffTotal.toFixed(2)
+                      shadow.meanAbsDiffTotal == null ? "—" : shadow.meanAbsDiffTotal.toFixed(2)
                     }
                     hint={`Erros do motor: ${shadow.errors}`}
                   />

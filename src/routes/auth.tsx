@@ -150,7 +150,9 @@ function AuthPage() {
           ? "Confirme seu e-mail antes de entrar."
           : /user already registered/i.test(raw)
             ? "Já existe uma conta com este e-mail. Entre com sua senha."
-            : raw;
+            : /failed to fetch|networkerror|network request failed|load failed/i.test(raw)
+              ? "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente em instantes."
+              : raw;
       toast.error(friendly);
     } finally {
       setLoading(false);

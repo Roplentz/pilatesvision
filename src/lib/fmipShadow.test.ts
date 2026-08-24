@@ -11,14 +11,14 @@ function landmarksForHipY(hipY: number): Landmark[] {
   }));
   const depth = Math.max(0, Math.min(1, (hipY - 0.4) / 0.2));
   const offset = depth * 0.12;
-  landmarks[11] = { x: 0.4, y: 0.2, visibility: 0.95 };
-  landmarks[12] = { x: 0.6, y: 0.2, visibility: 0.95 };
-  landmarks[23] = { x: 0.42 - offset, y: hipY, visibility: 0.95 };
-  landmarks[24] = { x: 0.58 + offset, y: hipY, visibility: 0.95 };
-  landmarks[25] = { x: 0.42, y: 0.68, visibility: 0.95 };
-  landmarks[26] = { x: 0.58, y: 0.68, visibility: 0.95 };
-  landmarks[27] = { x: 0.42, y: 0.9, visibility: 0.95 };
-  landmarks[28] = { x: 0.58, y: 0.9, visibility: 0.95 };
+  landmarks[11] = { x: 0.4, y: 0.2, z: 0, visibility: 0.95 };
+  landmarks[12] = { x: 0.6, y: 0.2, z: 0, visibility: 0.95 };
+  landmarks[23] = { x: 0.42 - offset, y: hipY, z: 0, visibility: 0.95 };
+  landmarks[24] = { x: 0.58 + offset, y: hipY, z: 0, visibility: 0.95 };
+  landmarks[25] = { x: 0.42, y: 0.68, z: 0, visibility: 0.95 };
+  landmarks[26] = { x: 0.58, y: 0.68, z: 0, visibility: 0.95 };
+  landmarks[27] = { x: 0.42, y: 0.9, z: 0, visibility: 0.95 };
+  landmarks[28] = { x: 0.58, y: 0.9, z: 0, visibility: 0.95 };
   return landmarks;
 }
 

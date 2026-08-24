@@ -1,5 +1,6 @@
 import {
   analyzeSquatSeries,
+  jointAngleDeg,
   mediaPipeSeriesToMotionSeries,
   type MediaPipeSeriesInput,
   type MotionFrame,
@@ -125,19 +126,8 @@ function kneeFlexionDeg(frame: MotionFrame): number | undefined {
     return undefined;
   }
 
-  const angle = (a: MotionLandmark, b: MotionLandmark, c: MotionLandmark): number => {
-    const abx = a.x - b.x;
-    const aby = a.y - b.y;
-    const cbx = c.x - b.x;
-    const cby = c.y - b.y;
-    const denominator = Math.hypot(abx, aby) * Math.hypot(cbx, cby);
-    if (denominator <= 1e-9) return Number.NaN;
-    const cosine = Math.max(-1, Math.min(1, (abx * cbx + aby * cby) / denominator));
-    return (Math.acos(cosine) * 180) / Math.PI;
-  };
-
-  const leftFlexion = 180 - angle(leftHip, leftKnee, leftAnkle);
-  const rightFlexion = 180 - angle(rightHip, rightKnee, rightAnkle);
+  const leftFlexion = 180 - jointAngleDeg(leftHip, leftKnee, leftAnkle);
+  const rightFlexion = 180 - jointAngleDeg(rightHip, rightKnee, rightAnkle);
   const value = finiteMean([leftFlexion, rightFlexion]);
   return Number.isFinite(value) ? value : undefined;
 }
@@ -233,10 +223,7 @@ export function runExperimentalSquatLiveAdapter(
   }
 
   const analysis = analyzeSquatSeries(motionSeries);
-  const observations = observationsFromAnalysis(
-    analysis,
-    input.perceptionByRepetitionId,
-  );
+  const observations = observationsFromAnalysis(analysis, input.perceptionByRepetitionId);
   const assessment = assessSquatV1(observations, input.assessmentProtocol);
   const warnings = [...readiness.warnings];
 

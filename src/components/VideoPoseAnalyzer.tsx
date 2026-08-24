@@ -6,6 +6,12 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedMediaUrl } from "@/lib/mediaStorage";
 import {
+  compareLegacyWithFmipShadow,
+  emitFmipShadowReport,
+  isFmipShadowEnabled,
+  type FmipShadowFrame,
+} from "@/lib/fmipShadow";
+import {
   POSE_CONNECTIONS,
   sampleFromLandmarks,
   summarizeSamples,
@@ -96,6 +102,8 @@ export function VideoPoseAnalyzer({
 
       const step = 1 / TARGET_FPS;
       const collected: FrameSample[] = [];
+      const shadowEnabled = isFmipShadowEnabled() && context === "squat";
+      const shadowFrames: FmipShadowFrame[] = [];
       let t = 0;
 
       while (t <= duration) {
@@ -110,6 +118,13 @@ export function VideoPoseAnalyzer({
           drawSkeleton(ctx, first, canvas.width, canvas.height);
           const sample = sampleFromLandmarks(first, video.currentTime);
           if (sample) collected.push(sample);
+          if (shadowEnabled && first.length === 33) {
+            shadowFrames.push({
+              frameNumber: shadowFrames.length,
+              timestampSeconds: video.currentTime,
+              landmarks: first,
+            });
+          }
         }
         t += step;
         setProgress(Math.min(100, Math.round((t / duration) * 100)));
@@ -130,6 +145,15 @@ export function VideoPoseAnalyzer({
         .update({ metrics: toJson(built), analysis_status: "done" })
         .eq("id", resultId);
       if (error) throw new Error(error.message);
+
+      if (shadowEnabled) {
+        try {
+          const report = compareLegacyWithFmipShadow(shadowFrames, TARGET_FPS, built);
+          emitFmipShadowReport(report);
+        } catch (shadowError) {
+          console.debug("[FMIP shadow] comparison unavailable", shadowError);
+        }
+      }
 
       setSamples(collected);
       setSummary(built);

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { calculateCalibrationGap } from "./perception";
 import { compareToBaseline } from "./longitudinal";
+import { suggestProgression } from "./progression";
 import { SQUAT_ASSESSMENT_V1, assessSquatV1, type SquatAssessmentV1Protocol } from "./squat-assessment-v1";
 
 const protocol: SquatAssessmentV1Protocol = {
@@ -102,5 +103,28 @@ describe("Perception and longitudinal contracts", () => {
     expect(changes[0].absoluteChange).toBe(12);
     expect(changes[0].percentChange).toBe(15);
     expect(changes[0].confidence).toBe(0.8);
+  });
+});
+
+describe("Progression suggestions", () => {
+  it("never auto-progresses and always requires professional review", () => {
+    const suggestion = suggestProgression(
+      [
+        { assessmentId: "a1", measuredQuality: 90, captureConfidence: 0.95, pain: 1, perceivedDifficulty: 2, validRepetitions: 5, totalRepetitions: 5 },
+        { assessmentId: "a2", measuredQuality: 92, captureConfidence: 0.94, pain: 1, perceivedDifficulty: 2, validRepetitions: 5, totalRepetitions: 5 },
+        { assessmentId: "a3", measuredQuality: 93, captureConfidence: 0.96, pain: 0, perceivedDifficulty: 2, validRepetitions: 5, totalRepetitions: 5 },
+      ],
+      {
+        minimumSessions: 3,
+        minimumQuality: 85,
+        minimumCaptureConfidence: 0.8,
+        maximumPainForProgression: 2,
+        maximumPerceivedDifficultyForProgression: 3,
+        minimumValidRepetitionRatio: 0.8,
+      },
+    );
+
+    expect(suggestion.suggestion).toBe("consider-progress");
+    expect(suggestion.requiresProfessionalReview).toBe(true);
   });
 });

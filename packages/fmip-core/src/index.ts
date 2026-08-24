@@ -2,3 +2,8 @@ export * from "./schema";
 export * from "./registry";
 export * from "./pipeline";
 export * from "./products";
+export * from "./movement-quality";
+export * from "./perception";
+export * from "./longitudinal";
+export * from "./squat-assessment-v1";
+export * from "./progression";

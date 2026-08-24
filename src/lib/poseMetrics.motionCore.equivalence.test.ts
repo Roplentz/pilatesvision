@@ -31,14 +31,14 @@ function makePose(): LegacyLandmark[] {
     visibility: 0.95,
   }));
 
-  landmarks[11] = { x: 0.4, y: 0.2, visibility: 0.95 }; // left shoulder
-  landmarks[12] = { x: 0.6, y: 0.2, visibility: 0.95 }; // right shoulder
-  landmarks[23] = { x: 0.42, y: 0.5, visibility: 0.95 }; // left hip
-  landmarks[24] = { x: 0.58, y: 0.5, visibility: 0.95 }; // right hip
-  landmarks[25] = { x: 0.4, y: 0.7, visibility: 0.95 }; // left knee
-  landmarks[26] = { x: 0.6, y: 0.7, visibility: 0.95 }; // right knee
-  landmarks[27] = { x: 0.44, y: 0.9, visibility: 0.95 }; // left ankle
-  landmarks[28] = { x: 0.56, y: 0.9, visibility: 0.95 }; // right ankle
+  landmarks[11] = { x: 0.4, y: 0.2, z: 0, visibility: 0.95 }; // left shoulder
+  landmarks[12] = { x: 0.6, y: 0.2, z: 0, visibility: 0.95 }; // right shoulder
+  landmarks[23] = { x: 0.42, y: 0.5, z: 0, visibility: 0.95 }; // left hip
+  landmarks[24] = { x: 0.58, y: 0.5, z: 0, visibility: 0.95 }; // right hip
+  landmarks[25] = { x: 0.4, y: 0.7, z: 0, visibility: 0.95 }; // left knee
+  landmarks[26] = { x: 0.6, y: 0.7, z: 0, visibility: 0.95 }; // right knee
+  landmarks[27] = { x: 0.44, y: 0.9, z: 0, visibility: 0.95 }; // left ankle
+  landmarks[28] = { x: 0.56, y: 0.9, z: 0, visibility: 0.95 }; // right ankle
 
   return landmarks;
 }

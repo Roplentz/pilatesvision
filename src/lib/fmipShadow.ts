@@ -79,9 +79,7 @@ export function compareLegacyWithFmipShadow(
         validRepetitions: -legacy.reps_valid,
         matchedRepetitions: [],
       },
-      reasons: [
-        legacy.context !== "squat" ? "unsupported_context" : "insufficient_shadow_input",
-      ],
+      reasons: [legacy.context !== "squat" ? "unsupported_context" : "insufficient_shadow_input"],
     };
   }
 
@@ -115,8 +113,7 @@ export function compareLegacyWithFmipShadow(
       reasons.push(`rep_${index + 1}_left_knee_delta`);
     if (delta.rightKneeRangeDegrees > tolerance.angleDegrees)
       reasons.push(`rep_${index + 1}_right_knee_delta`);
-    if (delta.confidence > tolerance.confidence)
-      reasons.push(`rep_${index + 1}_confidence_delta`);
+    if (delta.confidence > tolerance.confidence) reasons.push(`rep_${index + 1}_confidence_delta`);
   }
 
   const repetitionDelta = fmip.repetitionsDetected - legacy.reps_total;
@@ -147,8 +144,6 @@ export function compareLegacyWithFmipShadow(
 
 export function emitFmipShadowReport(report: FmipShadowReport): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new CustomEvent<FmipShadowReport>("fmip:shadow-report", { detail: report }),
-  );
+  window.dispatchEvent(new CustomEvent<FmipShadowReport>("fmip:shadow-report", { detail: report }));
   console.debug("[FMIP shadow]", report);
 }

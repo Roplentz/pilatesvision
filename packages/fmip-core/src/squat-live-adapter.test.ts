@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type {
-  MediaPipeFrameInput,
-  MediaPipeLandmarkLike,
-} from "../../motion-core/src";
-import {
-  SQUAT_ASSESSMENT_V1,
-  type SquatAssessmentV1Protocol,
-} from "./squat-assessment-v1";
+import type { MediaPipeFrameInput, MediaPipeLandmarkLike } from "../../motion-core/src";
+import { SQUAT_ASSESSMENT_V1, type SquatAssessmentV1Protocol } from "./squat-assessment-v1";
 import { runExperimentalSquatLiveAdapter } from "./squat-live-adapter";
 import type { SquatStateMachineConfig } from "./squat-state-machine";
 

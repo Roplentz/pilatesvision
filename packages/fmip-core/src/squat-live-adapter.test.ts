@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { MediaPipeFrameInput, MediaPipeLandmarkLike } from "../../motion-core/src";
-import { SQUAT_ASSESSMENT_V1, type SquatAssessmentV1Protocol } from "./squat-assessment-v1";
+import type {
+  MediaPipeFrameInput,
+  MediaPipeLandmarkLike,
+} from "../../motion-core/src";
+import {
+  SQUAT_ASSESSMENT_V1,
+  type SquatAssessmentV1Protocol,
+} from "./squat-assessment-v1";
 import { runExperimentalSquatLiveAdapter } from "./squat-live-adapter";
 import type { SquatStateMachineConfig } from "./squat-state-machine";
 
@@ -55,8 +61,27 @@ function landmarksForSquat(hipY: number, visibility = 0.95): MediaPipeLandmarkLi
 
 function squatFrames(visibility = 0.95): MediaPipeFrameInput[] {
   const hipTrajectory = [
-    0.4, 0.4, 0.4, 0.42, 0.45, 0.49, 0.53, 0.57, 0.59, 0.6, 0.59, 0.57, 0.53, 0.49,
-    0.45, 0.42, 0.4, 0.4, 0.4, 0.4, 0.4,
+    0.4,
+    0.4,
+    0.4,
+    0.42,
+    0.45,
+    0.49,
+    0.53,
+    0.57,
+    0.59,
+    0.6,
+    0.59,
+    0.57,
+    0.53,
+    0.49,
+    0.45,
+    0.42,
+    0.4,
+    0.4,
+    0.4,
+    0.4,
+    0.4,
   ];
 
   return hipTrajectory.map((hipY, frameNumber) => ({

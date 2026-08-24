@@ -79,7 +79,9 @@ export function compareLegacyWithFmipShadow(
         validRepetitions: -legacy.reps_valid,
         matchedRepetitions: [],
       },
-      reasons: [legacy.context !== "squat" ? "unsupported_context" : "insufficient_shadow_input"],
+      reasons: [
+        legacy.context !== "squat" ? "unsupported_context" : "insufficient_shadow_input",
+      ],
     };
   }
 
@@ -145,6 +147,8 @@ export function compareLegacyWithFmipShadow(
 
 export function emitFmipShadowReport(report: FmipShadowReport): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent<FmipShadowReport>("fmip:shadow-report", { detail: report }));
+  window.dispatchEvent(
+    new CustomEvent<FmipShadowReport>("fmip:shadow-report", { detail: report }),
+  );
   console.debug("[FMIP shadow]", report);
 }

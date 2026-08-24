@@ -1,0 +1,77 @@
+name: FMIP format once
+
+on:
+  push:
+    branches:
+      - feat/fmip-foundation
+    paths:
+      - ".github/workflows/fmip-format-once.yml"
+      - "packages/fmip-core/**"
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/fmip-foundation
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.22
+      - run: bun install --frozen-lockfile
+      - name: Format only CI-reported files
+        run: |
+          bunx prettier --write \
+            packages/fmip-core/src/capture-and-state.test.ts \
+            packages/fmip-core/src/capture-readiness.ts \
+            packages/fmip-core/src/fmip-core.test.ts \
+            packages/fmip-core/src/longitudinal.ts \
+            packages/fmip-core/src/metric-confidence.ts \
+            packages/fmip-core/src/movement-quality.ts \
+            packages/fmip-core/src/perception.ts \
+            packages/fmip-core/src/products.ts \
+            packages/fmip-core/src/professional-review.ts \
+            packages/fmip-core/src/progression.ts \
+            packages/fmip-core/src/squat-assessment-v1.test.ts \
+            packages/fmip-core/src/squat-assessment-v1.ts \
+            packages/fmip-core/src/squat-state-machine.ts \
+            packages/motion-core/src/adapters/mediapipe.ts \
+            packages/motion-core/src/analysis/squat-analysis.test.ts \
+            packages/motion-core/src/analysis/squat-analysis.ts \
+            packages/motion-core/src/biomechanics/squat.test.ts \
+            packages/motion-core/src/quality.ts \
+            src/lib/poseMetrics.motionCore.equivalence.test.ts
+      - name: Commit format-only changes
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            packages/fmip-core/src/capture-and-state.test.ts \
+            packages/fmip-core/src/capture-readiness.ts \
+            packages/fmip-core/src/fmip-core.test.ts \
+            packages/fmip-core/src/longitudinal.ts \
+            packages/fmip-core/src/metric-confidence.ts \
+            packages/fmip-core/src/movement-quality.ts \
+            packages/fmip-core/src/perception.ts \
+            packages/fmip-core/src/products.ts \
+            packages/fmip-core/src/professional-review.ts \
+            packages/fmip-core/src/progression.ts \
+            packages/fmip-core/src/squat-assessment-v1.test.ts \
+            packages/fmip-core/src/squat-assessment-v1.ts \
+            packages/fmip-core/src/squat-state-machine.ts \
+            packages/motion-core/src/adapters/mediapipe.ts \
+            packages/motion-core/src/analysis/squat-analysis.test.ts \
+            packages/motion-core/src/analysis/squat-analysis.ts \
+            packages/motion-core/src/biomechanics/squat.test.ts \
+            packages/motion-core/src/quality.ts \
+            src/lib/poseMetrics.motionCore.equivalence.test.ts
+          git commit -m "style: format FMIP and motion core files"
+          git push origin HEAD:feat/fmip-foundation

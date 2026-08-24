@@ -1,24 +1,13 @@
-name: FMIP format diagnostic
+name: FMIP format diagnostic disabled
 
 on:
-  pull_request:
-    branches:
-      - feat/fmip-foundation
-    paths:
-      - ".github/workflows/fmip-format-debug.yml"
-      - "packages/fmip-core/src/squat-live-adapter.test.ts"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  print-format:
+  noop:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.2.22"
-      - run: bun install --frozen-lockfile
-      - name: Print exact Prettier output
-        run: bunx prettier packages/fmip-core/src/squat-live-adapter.test.ts
+      - run: echo "temporary diagnostic disabled"

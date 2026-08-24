@@ -36,6 +36,67 @@ jobs:
       - name: Build
         run: bun run build
 
+  format-artifact:
+    name: FMIP Prettier artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.2.22"
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Apply Prettier to CI-reported files
+        run: |
+          bunx prettier --write \
+            packages/fmip-core/src/capture-and-state.test.ts \
+            packages/fmip-core/src/capture-readiness.ts \
+            packages/fmip-core/src/fmip-core.test.ts \
+            packages/fmip-core/src/longitudinal.ts \
+            packages/fmip-core/src/metric-confidence.ts \
+            packages/fmip-core/src/movement-quality.ts \
+            packages/fmip-core/src/perception.ts \
+            packages/fmip-core/src/products.ts \
+            packages/fmip-core/src/professional-review.ts \
+            packages/fmip-core/src/progression.ts \
+            packages/fmip-core/src/squat-assessment-v1.test.ts \
+            packages/fmip-core/src/squat-assessment-v1.ts \
+            packages/fmip-core/src/squat-state-machine.ts \
+            packages/motion-core/src/adapters/mediapipe.ts \
+            packages/motion-core/src/analysis/squat-analysis.test.ts \
+            packages/motion-core/src/analysis/squat-analysis.ts \
+            packages/motion-core/src/biomechanics/squat.test.ts \
+            packages/motion-core/src/quality.ts \
+            src/lib/poseMetrics.motionCore.equivalence.test.ts
+      - name: Upload formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: fmip-prettier-output
+          path: |
+            packages/fmip-core/src/capture-and-state.test.ts
+            packages/fmip-core/src/capture-readiness.ts
+            packages/fmip-core/src/fmip-core.test.ts
+            packages/fmip-core/src/longitudinal.ts
+            packages/fmip-core/src/metric-confidence.ts
+            packages/fmip-core/src/movement-quality.ts
+            packages/fmip-core/src/perception.ts
+            packages/fmip-core/src/products.ts
+            packages/fmip-core/src/professional-review.ts
+            packages/fmip-core/src/progression.ts
+            packages/fmip-core/src/squat-assessment-v1.test.ts
+            packages/fmip-core/src/squat-assessment-v1.ts
+            packages/fmip-core/src/squat-state-machine.ts
+            packages/motion-core/src/adapters/mediapipe.ts
+            packages/motion-core/src/analysis/squat-analysis.test.ts
+            packages/motion-core/src/analysis/squat-analysis.ts
+            packages/motion-core/src/biomechanics/squat.test.ts
+            packages/motion-core/src/quality.ts
+            src/lib/poseMetrics.motionCore.equivalence.test.ts
+          retention-days: 1
+
   clinical-journey:
     name: Supabase, RLS and clinical journey
     runs-on: ubuntu-latest

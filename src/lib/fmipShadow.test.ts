@@ -24,8 +24,8 @@ function landmarksForHipY(hipY: number): Landmark[] {
 
 function buildFixture() {
   const trajectory = [
-    0.4, 0.4, 0.4, 0.42, 0.45, 0.49, 0.53, 0.57, 0.59, 0.6, 0.59, 0.57, 0.53, 0.49,
-    0.45, 0.42, 0.4, 0.4, 0.4, 0.4, 0.4,
+    0.4, 0.4, 0.4, 0.42, 0.45, 0.49, 0.53, 0.57, 0.59, 0.6, 0.59, 0.57, 0.53, 0.49, 0.45, 0.42, 0.4,
+    0.4, 0.4, 0.4, 0.4,
   ];
   const frames: FmipShadowFrame[] = trajectory.map((hipY, frameNumber) => ({
     frameNumber,

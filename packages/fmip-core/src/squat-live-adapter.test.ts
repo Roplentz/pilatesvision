@@ -55,27 +55,8 @@ function landmarksForSquat(hipY: number, visibility = 0.95): MediaPipeLandmarkLi
 
 function squatFrames(visibility = 0.95): MediaPipeFrameInput[] {
   const hipTrajectory = [
-    0.4,
-    0.4,
-    0.4,
-    0.42,
-    0.45,
-    0.49,
-    0.53,
-    0.57,
-    0.59,
-    0.6,
-    0.59,
-    0.57,
-    0.53,
-    0.49,
-    0.45,
-    0.42,
-    0.4,
-    0.4,
-    0.4,
-    0.4,
-    0.4,
+    0.4, 0.4, 0.4, 0.42, 0.45, 0.49, 0.53, 0.57, 0.59, 0.6, 0.59, 0.57, 0.53, 0.49, 0.45, 0.42, 0.4,
+    0.4, 0.4, 0.4, 0.4,
   ];
 
   return hipTrajectory.map((hipY, frameNumber) => ({

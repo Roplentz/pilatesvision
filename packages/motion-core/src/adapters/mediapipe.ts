@@ -124,7 +124,9 @@ export function mediaPipeFrameToMotionFrame(
     .map((landmark) => landmark.visibility)
     .filter((value): value is number => value !== undefined && value >= config.minimumVisibility);
   const meanConfidence =
-    visible.length > 0 ? visible.reduce((sum, value) => sum + value, 0) / visible.length : undefined;
+    visible.length > 0
+      ? visible.reduce((sum, value) => sum + value, 0) / visible.length
+      : undefined;
 
   return {
     frameNumber: input.frameNumber,

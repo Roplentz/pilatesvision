@@ -37,7 +37,8 @@ export function calculateMovementQuality(
 ): MovementQualityScore {
   const reasons: string[] = [];
   const dimensions = inputs.map<QualityDimensionResult>((input) => {
-    const unavailable = input.score === undefined || !Number.isFinite(input.score) || input.weight <= 0;
+    const unavailable =
+      input.score === undefined || !Number.isFinite(input.score) || input.weight <= 0;
     const confidence = clamp01(input.confidence);
     return {
       ...input,
@@ -47,24 +48,36 @@ export function calculateMovementQuality(
         ? "unavailable"
         : confidence < minimumConfidence
           ? "low-confidence"
-          : input.status ?? "valid",
+          : (input.status ?? "valid"),
     };
   });
 
   const declaredWeight = inputs.reduce((sum, input) => sum + Math.max(0, input.weight), 0);
-  const usable = dimensions.filter((item) => item.status !== "unavailable" && item.score !== undefined);
+  const usable = dimensions.filter(
+    (item) => item.status !== "unavailable" && item.score !== undefined,
+  );
   const usableWeight = usable.reduce((sum, item) => sum + Math.max(0, item.weight), 0);
   const coverage = declaredWeight > 0 ? clamp01(usableWeight / declaredWeight) : 0;
 
   if (!usable.length || usableWeight <= 0) {
-    return { overall: undefined, confidence: 0, coverage, dimensions, status: "unavailable", reasons: ["no_usable_dimensions"] };
+    return {
+      overall: undefined,
+      confidence: 0,
+      coverage,
+      dimensions,
+      status: "unavailable",
+      reasons: ["no_usable_dimensions"],
+    };
   }
 
-  const weightedScore = usable.reduce((sum, item) => sum + item.score! * item.weight, 0) / usableWeight;
-  const confidence = usable.reduce((sum, item) => sum + item.confidence * item.weight, 0) / usableWeight;
+  const weightedScore =
+    usable.reduce((sum, item) => sum + item.score! * item.weight, 0) / usableWeight;
+  const confidence =
+    usable.reduce((sum, item) => sum + item.confidence * item.weight, 0) / usableWeight;
 
   if (coverage < 1) reasons.push("partial_dimension_coverage");
-  if (usable.some((item) => item.status === "low-confidence")) reasons.push("low_confidence_dimension");
+  if (usable.some((item) => item.status === "low-confidence"))
+    reasons.push("low_confidence_dimension");
 
   return {
     overall: clamp100(weightedScore),

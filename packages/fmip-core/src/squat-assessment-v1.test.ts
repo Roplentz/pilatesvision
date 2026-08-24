@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { calculateCalibrationGap } from "./perception";
 import { compareToBaseline } from "./longitudinal";
 import { suggestProgression } from "./progression";
-import { SQUAT_ASSESSMENT_V1, assessSquatV1, type SquatAssessmentV1Protocol } from "./squat-assessment-v1";
+import {
+  SQUAT_ASSESSMENT_V1,
+  assessSquatV1,
+  type SquatAssessmentV1Protocol,
+} from "./squat-assessment-v1";
 
 const protocol: SquatAssessmentV1Protocol = {
   id: SQUAT_ASSESSMENT_V1,
@@ -25,20 +29,23 @@ const protocol: SquatAssessmentV1Protocol = {
 
 describe("Squat Assessment v1", () => {
   it("scores explicit protocol targets without hidden normative defaults", () => {
-    const result = assessSquatV1([
-      {
-        repetitionId: "rep-1",
-        valid: true,
-        confidence: 0.92,
-        kneeFlexionRangeLeftDeg: 92,
-        kneeFlexionRangeRightDeg: 95,
-        durationSeconds: 2.4,
-        trunkInclinationP95Deg: 30,
-        bilateralDifferenceDeg: 3,
-        smoothnessScore: 88,
-        compensationScore: 90,
-      },
-    ], protocol);
+    const result = assessSquatV1(
+      [
+        {
+          repetitionId: "rep-1",
+          valid: true,
+          confidence: 0.92,
+          kneeFlexionRangeLeftDeg: 92,
+          kneeFlexionRangeRightDeg: 95,
+          durationSeconds: 2.4,
+          trunkInclinationP95Deg: 30,
+          bilateralDifferenceDeg: 3,
+          smoothnessScore: 88,
+          compensationScore: 90,
+        },
+      ],
+      protocol,
+    );
 
     expect(result.status).toBe("valid");
     expect(result.validRepetitions).toBe(1);
@@ -47,16 +54,19 @@ describe("Squat Assessment v1", () => {
   });
 
   it("degrades gracefully when optional dimensions are unavailable", () => {
-    const result = assessSquatV1([
-      {
-        repetitionId: "rep-1",
-        valid: true,
-        confidence: 0.9,
-        kneeFlexionRangeLeftDeg: 90,
-        kneeFlexionRangeRightDeg: 91,
-        durationSeconds: 2,
-      },
-    ], protocol);
+    const result = assessSquatV1(
+      [
+        {
+          repetitionId: "rep-1",
+          valid: true,
+          confidence: 0.9,
+          kneeFlexionRangeLeftDeg: 90,
+          kneeFlexionRangeRightDeg: 91,
+          durationSeconds: 2,
+        },
+      ],
+      protocol,
+    );
 
     expect(result.status).toBe("partial");
     expect(result.repetitions[0].quality.coverage).toBeLessThan(1);
@@ -64,21 +74,24 @@ describe("Squat Assessment v1", () => {
   });
 
   it("attaches patient perception calibration without turning it into diagnosis", () => {
-    const result = assessSquatV1([
-      {
-        repetitionId: "rep-1",
-        valid: true,
-        confidence: 0.95,
-        kneeFlexionRangeLeftDeg: 90,
-        kneeFlexionRangeRightDeg: 90,
-        durationSeconds: 2,
-        trunkInclinationP95Deg: 25,
-        bilateralDifferenceDeg: 2,
-        smoothnessScore: 95,
-        compensationScore: 95,
-        perception: { perceivedQuality: 60, confidence: 0.8 },
-      },
-    ], protocol);
+    const result = assessSquatV1(
+      [
+        {
+          repetitionId: "rep-1",
+          valid: true,
+          confidence: 0.95,
+          kneeFlexionRangeLeftDeg: 90,
+          kneeFlexionRangeRightDeg: 90,
+          durationSeconds: 2,
+          trunkInclinationP95Deg: 25,
+          bilateralDifferenceDeg: 2,
+          smoothnessScore: 95,
+          compensationScore: 95,
+          perception: { perceivedQuality: 60, confidence: 0.8 },
+        },
+      ],
+      protocol,
+    );
 
     expect(result.repetitions[0].calibration?.status).toBe("underconfident");
   });
@@ -86,7 +99,9 @@ describe("Squat Assessment v1", () => {
 
 describe("Perception and longitudinal contracts", () => {
   it("classifies overconfidence descriptively", () => {
-    expect(calculateCalibrationGap(60, { perceivedQuality: 90, confidence: 0.9 }).status).toBe("overconfident");
+    expect(calculateCalibrationGap(60, { perceivedQuality: 90, confidence: 0.9 }).status).toBe(
+      "overconfident",
+    );
   });
 
   it("compares current metrics with a versioned baseline", () => {
@@ -110,9 +125,33 @@ describe("Progression suggestions", () => {
   it("never auto-progresses and always requires professional review", () => {
     const suggestion = suggestProgression(
       [
-        { assessmentId: "a1", measuredQuality: 90, captureConfidence: 0.95, pain: 1, perceivedDifficulty: 2, validRepetitions: 5, totalRepetitions: 5 },
-        { assessmentId: "a2", measuredQuality: 92, captureConfidence: 0.94, pain: 1, perceivedDifficulty: 2, validRepetitions: 5, totalRepetitions: 5 },
-        { assessmentId: "a3", measuredQuality: 93, captureConfidence: 0.96, pain: 0, perceivedDifficulty: 2, validRepetitions: 5, totalRepetitions: 5 },
+        {
+          assessmentId: "a1",
+          measuredQuality: 90,
+          captureConfidence: 0.95,
+          pain: 1,
+          perceivedDifficulty: 2,
+          validRepetitions: 5,
+          totalRepetitions: 5,
+        },
+        {
+          assessmentId: "a2",
+          measuredQuality: 92,
+          captureConfidence: 0.94,
+          pain: 1,
+          perceivedDifficulty: 2,
+          validRepetitions: 5,
+          totalRepetitions: 5,
+        },
+        {
+          assessmentId: "a3",
+          measuredQuality: 93,
+          captureConfidence: 0.96,
+          pain: 0,
+          perceivedDifficulty: 2,
+          validRepetitions: 5,
+          totalRepetitions: 5,
+        },
       ],
       {
         minimumSessions: 3,

@@ -68,7 +68,9 @@ describe("SquatAnalysisEngine", () => {
     expect(repetition.durationSeconds).toBeGreaterThanOrEqual(0.4);
     expect(repetition.confidence).toBeCloseTo(0.95);
     expect(repetition.bilateralSymmetry).toBeCloseTo(1);
-    expect(result.metrics.some((metric) => metric.name === "squat.repetitions.detected")).toBe(true);
+    expect(result.metrics.some((metric) => metric.name === "squat.repetitions.detected")).toBe(
+      true,
+    );
     expect(result.metrics.some((metric) => metric.name === "squat.confidence.mean")).toBe(true);
     expect(result.metrics.every((metric) => Number.isFinite(metric.value))).toBe(true);
   });

@@ -49,7 +49,11 @@ describe("FMIP foundation", () => {
 
     const result = await runAssessmentPipeline(envelope, [
       { stage: "quality", module: module("optional-quality", null, true), required: false },
-      { stage: "motion", module: { ...module("motion", { reps: 3 }), stage: "motion" }, required: true },
+      {
+        stage: "motion",
+        module: { ...module("motion", { reps: 3 }), stage: "motion" },
+        required: true,
+      },
     ]);
 
     expect(result.payload).toEqual({ reps: 3 });

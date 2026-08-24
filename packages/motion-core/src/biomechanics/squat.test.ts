@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mediaPipeFrameToMotionFrame } from "../adapters/mediapipe";
-import {
-  DEFAULT_SQUAT_DETECTOR,
-  detectSquatRepetitions,
-  sampleSquatFrame,
-} from "./squat";
+import { DEFAULT_SQUAT_DETECTOR, detectSquatRepetitions, sampleSquatFrame } from "./squat";
 import {
   DEFAULT_DETECTOR,
   detectReps,

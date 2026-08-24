@@ -7,7 +7,11 @@ export interface MovementPerception {
   capturedAt?: string;
 }
 
-export type CalibrationStatus = "aligned" | "underconfident" | "overconfident" | "insufficient-data";
+export type CalibrationStatus =
+  | "aligned"
+  | "underconfident"
+  | "overconfident"
+  | "insufficient-data";
 
 export interface MovementCalibration {
   measuredQuality?: number;
@@ -49,7 +53,8 @@ export function calculateCalibrationGap(
     perceivedQuality: perceived,
     confidence,
     gap,
-    status: Math.abs(gap) <= alignedTolerance ? "aligned" : gap < 0 ? "underconfident" : "overconfident",
+    status:
+      Math.abs(gap) <= alignedTolerance ? "aligned" : gap < 0 ? "underconfident" : "overconfident",
     reasons,
   };
 }

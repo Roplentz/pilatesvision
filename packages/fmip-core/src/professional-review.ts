@@ -14,7 +14,11 @@ export interface ProfessionalReview<TSuggestion = unknown, TFinal = unknown> {
 }
 
 export function isClinicallyFinalized(review: ProfessionalReview): boolean {
-  return review.decision === "accepted" || review.decision === "modified" || review.decision === "rejected";
+  return (
+    review.decision === "accepted" ||
+    review.decision === "modified" ||
+    review.decision === "rejected"
+  );
 }
 
 export function validateProfessionalReview(review: ProfessionalReview): string[] {
@@ -23,6 +27,7 @@ export function validateProfessionalReview(review: ProfessionalReview): string[]
   if (!review.assessmentId.trim()) errors.push("assessment_id_required");
   if (!review.reviewerId.trim()) errors.push("reviewer_id_required");
   if (!review.reviewedAt.trim()) errors.push("reviewed_at_required");
-  if (review.decision === "modified" && review.finalDecision === undefined) errors.push("modified_review_requires_final_decision");
+  if (review.decision === "modified" && review.finalDecision === undefined)
+    errors.push("modified_review_requires_final_decision");
   return errors;
 }

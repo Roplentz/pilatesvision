@@ -41,13 +41,18 @@ export function assessMetricConfidence(input: MetricConfidenceInput): MetricConf
     };
   }
 
-  const confidences = [input.sourceConfidence, input.captureConfidence, ...requirements.map((item) => item.confidence)]
+  const confidences = [
+    input.sourceConfidence,
+    input.captureConfidence,
+    ...requirements.map((item) => item.confidence),
+  ]
     .filter((value): value is number => value !== undefined)
     .map(clamp01);
 
-  const confidence = confidences.length === 0
-    ? 1
-    : confidences.reduce((product, value) => product * value, 1) ** (1 / confidences.length);
+  const confidence =
+    confidences.length === 0
+      ? 1
+      : confidences.reduce((product, value) => product * value, 1) ** (1 / confidences.length);
 
   return {
     metricId: input.metricId,

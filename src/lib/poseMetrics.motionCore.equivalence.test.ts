@@ -51,11 +51,7 @@ function findLandmark(landmarks: MotionLandmark[], name: string): MotionLandmark
 
 describe("poseMetrics ↔ FisioHub Motion Core equivalence", () => {
   it("preserves the legacy mean behavior for finite and invalid values", () => {
-    const cases = [
-      [1, 2, 3, 4],
-      [1, Number.NaN, 3, Number.POSITIVE_INFINITY],
-      [],
-    ];
+    const cases = [[1, 2, 3, 4], [1, Number.NaN, 3, Number.POSITIVE_INFINITY], []];
 
     for (const values of cases) {
       const legacy = legacyMean(values);
@@ -80,12 +76,7 @@ describe("poseMetrics ↔ FisioHub Motion Core equivalence", () => {
   });
 
   it("produces the same zero-phase EMA used by the MVP", () => {
-    const signals = [
-      [0, 1, 2, 3, 4, 3, 2, 1, 0],
-      [1, Number.NaN, 2, 5, Number.NaN, 3],
-      [4],
-      [],
-    ];
+    const signals = [[0, 1, 2, 3, 4, 3, 2, 1, 0], [1, Number.NaN, 2, 5, Number.NaN, 3], [4], []];
 
     for (const signal of signals) {
       for (const alpha of [0.1, 0.3, 0.7, 1]) {

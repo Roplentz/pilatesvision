@@ -132,7 +132,8 @@ export function assessCaptureReadiness(
     .filter((check) => !check.passed && check.severity === "attention")
     .map((check) => check.id);
 
-  const passedRatio = checks.length === 0 ? 1 : checks.filter((check) => check.passed).length / checks.length;
+  const passedRatio =
+    checks.length === 0 ? 1 : checks.filter((check) => check.passed).length / checks.length;
   const score = Math.round(clamp01(passedRatio) * 100);
 
   return {

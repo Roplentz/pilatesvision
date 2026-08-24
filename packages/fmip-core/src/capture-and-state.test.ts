@@ -56,16 +56,52 @@ describe("squat state machine", () => {
     };
 
     let state = initialSquatState();
-    state = nextSquatState(state, { timestampSeconds: 0.2, kneeFlexionDeg: 35, angularVelocityDegPerSecond: 20, confidence: 0.95 }, config);
+    state = nextSquatState(
+      state,
+      {
+        timestampSeconds: 0.2,
+        kneeFlexionDeg: 35,
+        angularVelocityDegPerSecond: 20,
+        confidence: 0.95,
+      },
+      config,
+    );
     expect(state.state).toBe("descending");
 
-    state = nextSquatState(state, { timestampSeconds: 0.4, kneeFlexionDeg: 90, angularVelocityDegPerSecond: 10, confidence: 0.95 }, config);
+    state = nextSquatState(
+      state,
+      {
+        timestampSeconds: 0.4,
+        kneeFlexionDeg: 90,
+        angularVelocityDegPerSecond: 10,
+        confidence: 0.95,
+      },
+      config,
+    );
     expect(state.state).toBe("bottom");
 
-    state = nextSquatState(state, { timestampSeconds: 0.6, kneeFlexionDeg: 80, angularVelocityDegPerSecond: -20, confidence: 0.95 }, config);
+    state = nextSquatState(
+      state,
+      {
+        timestampSeconds: 0.6,
+        kneeFlexionDeg: 80,
+        angularVelocityDegPerSecond: -20,
+        confidence: 0.95,
+      },
+      config,
+    );
     expect(state.state).toBe("ascending");
 
-    state = nextSquatState(state, { timestampSeconds: 0.8, kneeFlexionDeg: 20, angularVelocityDegPerSecond: -10, confidence: 0.95 }, config);
+    state = nextSquatState(
+      state,
+      {
+        timestampSeconds: 0.8,
+        kneeFlexionDeg: 20,
+        angularVelocityDegPerSecond: -10,
+        confidence: 0.95,
+      },
+      config,
+    );
     expect(state.state).toBe("standing");
     expect(state.repetitionCount).toBe(1);
   });

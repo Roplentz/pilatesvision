@@ -56,7 +56,8 @@ export function compareToBaseline(
     }
 
     const absoluteChange = now.value - base.value;
-    const percentChange = base.value === 0 ? undefined : (absoluteChange / Math.abs(base.value)) * 100;
+    const percentChange =
+      base.value === 0 ? undefined : (absoluteChange / Math.abs(base.value)) * 100;
     const confidence = Math.min(base.confidence ?? 1, now.confidence ?? 1);
 
     return {

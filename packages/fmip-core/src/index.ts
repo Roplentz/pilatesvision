@@ -7,3 +7,4 @@ export * from "./perception";
 export * from "./longitudinal";
 export * from "./squat-assessment-v1";
 export * from "./progression";
+export * from "./professional-review";

@@ -1,9 +1,9 @@
 name: FMIP format diagnostic
 
 on:
-  push:
+  pull_request:
     branches:
-      - feat/fmip-squat-live-adapter
+      - feat/fmip-foundation
     paths:
       - ".github/workflows/fmip-format-debug.yml"
       - "packages/fmip-core/src/squat-live-adapter.test.ts"

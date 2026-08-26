@@ -162,29 +162,23 @@ export const exportPatientData = createServerFn({ method: "POST" })
     if (!allowed) throw new Error("Forbidden");
 
     const q = (table: string) =>
-      supabase.from(table as never).select("*").eq("patient_id", data.patientId);
+      supabase
+        .from(table as never)
+        .select("*")
+        .eq("patient_id", data.patientId);
 
-    const [
-      clinic,
-      consents,
-      assessments,
-      postural,
-      movement,
-      exercise,
-      poseCaps,
-      reports,
-      fisio,
-    ] = await Promise.all([
-      supabase.from("clinics").select("*").eq("id", patient.clinic_id).maybeSingle(),
-      q("patient_consents"),
-      q("assessments"),
-      q("postural_results"),
-      q("movement_results"),
-      q("exercise_results"),
-      q("pose_captures"),
-      q("reports"),
-      q("fisiovision_analyses"),
-    ]);
+    const [clinic, consents, assessments, postural, movement, exercise, poseCaps, reports, fisio] =
+      await Promise.all([
+        supabase.from("clinics").select("*").eq("id", patient.clinic_id).maybeSingle(),
+        q("patient_consents"),
+        q("assessments"),
+        q("postural_results"),
+        q("movement_results"),
+        q("exercise_results"),
+        q("pose_captures"),
+        q("reports"),
+        q("fisiovision_analyses"),
+      ]);
 
     const generatedAt = new Date().toISOString();
     const payload = {

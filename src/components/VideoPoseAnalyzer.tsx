@@ -6,6 +6,12 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedMediaUrl } from "@/lib/mediaStorage";
 import {
+  compareLegacyWithFmipShadow,
+  emitFmipShadowReport,
+  isFmipShadowEnabled,
+  type FmipShadowFrame,
+} from "@/lib/fmipShadow";
+import {
   POSE_CONNECTIONS,
   sampleFromLandmarks,
   summarizeSamples,
@@ -16,8 +22,6 @@ import {
   type Landmark,
   type RepMetrics,
 } from "@/lib/poseMetrics";
-import { runMotionCoreShadow } from "@/lib/motionCoreShadow";
-import type { RawFrame } from "@/lib/fisiohub-motion-core";
 
 interface Props {
   resultId: string;
@@ -98,7 +102,8 @@ export function VideoPoseAnalyzer({
 
       const step = 1 / TARGET_FPS;
       const collected: FrameSample[] = [];
-      const rawFrames: RawFrame[] = [];
+      const shadowEnabled = isFmipShadowEnabled() && context === "squat";
+      const shadowFrames: FmipShadowFrame[] = [];
       let t = 0;
 
       while (t <= duration) {
@@ -113,11 +118,13 @@ export function VideoPoseAnalyzer({
           drawSkeleton(ctx, first, canvas.width, canvas.height);
           const sample = sampleFromLandmarks(first, video.currentTime);
           if (sample) collected.push(sample);
-          rawFrames.push({
-            frameNumber: rawFrames.length,
-            timestampSeconds: video.currentTime,
-            landmarks: first,
-          });
+          if (shadowEnabled && first.length === 33) {
+            shadowFrames.push({
+              frameNumber: shadowFrames.length,
+              timestampSeconds: video.currentTime,
+              landmarks: first,
+            });
+          }
         }
         t += step;
         setProgress(Math.min(100, Math.round((t / duration) * 100)));
@@ -133,39 +140,20 @@ export function VideoPoseAnalyzer({
       }
 
       const built = summarizeSamples(collected, duration, context);
-
-      // MODO SOMBRA — não altera o resultado oficial. Só roda para agachamento.
-      let metricsPayload: unknown = toJson(built);
-      if (context === "squat") {
-        const shadow = runMotionCoreShadow(rawFrames, built);
-        if (shadow.status !== "disabled") {
-          metricsPayload = {
-            ...(toJson(built) as Record<string, unknown>),
-            fisiohub_motion_core_shadow: shadow,
-          };
-          if (import.meta.env.DEV && shadow.status === "ok") {
-            // eslint-disable-next-line no-console
-            console.info("[motion-core:shadow]", {
-              engine: shadow.engine,
-              version: shadow.engineVersion,
-              framesAnalyzed: shadow.framesAnalyzed,
-              validFrameRatio: shadow.validFrameRatio,
-              repsShadow: shadow.repetitionsDetected,
-              repsLegacy: shadow.comparison.legacyRepsTotal,
-              repsValidDelta: shadow.comparison.repsValidDelta,
-            });
-          } else if (import.meta.env.DEV && shadow.status === "error") {
-            // eslint-disable-next-line no-console
-            console.info("[motion-core:shadow] error", shadow.message);
-          }
-        }
-      }
-
       const { error } = await supabase
         .from(table)
-        .update({ metrics: metricsPayload as never, analysis_status: "done" })
+        .update({ metrics: toJson(built), analysis_status: "done" })
         .eq("id", resultId);
       if (error) throw new Error(error.message);
+
+      if (shadowEnabled) {
+        try {
+          const report = compareLegacyWithFmipShadow(shadowFrames, TARGET_FPS, built);
+          emitFmipShadowReport(report);
+        } catch (shadowError) {
+          console.debug("[FMIP shadow] comparison unavailable", shadowError);
+        }
+      }
 
       setSamples(collected);
       setSummary(built);

@@ -162,7 +162,12 @@ function aggregateMetrics(repetitions: SquatRepetitionSummary[]): MotionMetric[]
   });
 
   return [
-    metric("squat.repetitions.detected", repetitions.length, "count", "adaptive-trajectory-hysteresis"),
+    metric(
+      "squat.repetitions.detected",
+      repetitions.length,
+      "count",
+      "adaptive-trajectory-hysteresis",
+    ),
     metric("squat.repetitions.valid", valid.length, "count", "quality-and-amplitude-gate"),
     metric(
       "squat.duration.mean",

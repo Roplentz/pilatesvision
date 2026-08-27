@@ -44,20 +44,22 @@ export function interpolateInvalid(values: number[]): number[] {
 
 export function emaZeroPhase(values: number[], alpha = 0.3): number[] {
   if (!values.length) return [];
-  const clean = interpolateInvalid(values);
-  const forward: number[] = [];
-  let previous = clean[0];
-  for (const value of clean) {
+
+  const forward = new Array<number>(values.length);
+  let previous = values[0];
+  for (let index = 0; index < values.length; index += 1) {
+    const value = Number.isFinite(values[index]) ? values[index] : previous;
     previous = alpha * value + (1 - alpha) * previous;
-    forward.push(previous);
+    forward[index] = previous;
   }
 
   const output = new Array<number>(forward.length);
-  previous = forward.at(-1) ?? Number.NaN;
+  previous = forward[forward.length - 1];
   for (let index = forward.length - 1; index >= 0; index -= 1) {
     previous = alpha * forward[index] + (1 - alpha) * previous;
     output[index] = previous;
   }
+
   return output;
 }
 

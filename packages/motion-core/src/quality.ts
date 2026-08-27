@@ -31,7 +31,9 @@ export function evaluateMotionQuality(
   const meanVisibility = visibilityValues.length
     ? visibilityValues.reduce((sum, value) => sum + value, 0) / visibilityValues.length
     : 0;
-  const lostFrames = frames.filter((frame) => !frame.landmarks.length || (frame.meanConfidence ?? 0) <= 0).length;
+  const lostFrames = frames.filter(
+    (frame) => !frame.landmarks.length || (frame.meanConfidence ?? 0) <= 0,
+  ).length;
   const trackingLossRatio = frames.length ? lostFrames / frames.length : 1;
 
   if (frames.length < options.minimumFrames) reasons.push("insufficient_frames");
@@ -41,10 +43,16 @@ export function evaluateMotionQuality(
   const frameScore = Math.min(1, frames.length / options.minimumFrames);
   const visibilityScore = Math.min(1, meanVisibility / options.minimumMeanVisibility);
   const trackingScore = Math.max(0, 1 - trackingLossRatio);
-  const score = Math.max(0, Math.min(1, frameScore * 0.2 + visibilityScore * 0.5 + trackingScore * 0.3));
-  const level = reasons.includes("insufficient_frames") || reasons.includes("tracking_loss")
-    ? score < 0.6 ? "invalid" : levelFromScore(score)
-    : levelFromScore(score);
+  const score = Math.max(
+    0,
+    Math.min(1, frameScore * 0.2 + visibilityScore * 0.5 + trackingScore * 0.3),
+  );
+  const level =
+    reasons.includes("insufficient_frames") || reasons.includes("tracking_loss")
+      ? score < 0.6
+        ? "invalid"
+        : levelFromScore(score)
+      : levelFromScore(score);
 
   return { level, score, meanVisibility, trackingLossRatio, reasons };
 }

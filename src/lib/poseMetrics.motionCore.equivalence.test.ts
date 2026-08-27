@@ -31,14 +31,14 @@ function makePose(): LegacyLandmark[] {
     visibility: 0.95,
   }));
 
-  landmarks[11] = { x: 0.4, y: 0.2, visibility: 0.95 }; // left shoulder
-  landmarks[12] = { x: 0.6, y: 0.2, visibility: 0.95 }; // right shoulder
-  landmarks[23] = { x: 0.42, y: 0.5, visibility: 0.95 }; // left hip
-  landmarks[24] = { x: 0.58, y: 0.5, visibility: 0.95 }; // right hip
-  landmarks[25] = { x: 0.4, y: 0.7, visibility: 0.95 }; // left knee
-  landmarks[26] = { x: 0.6, y: 0.7, visibility: 0.95 }; // right knee
-  landmarks[27] = { x: 0.44, y: 0.9, visibility: 0.95 }; // left ankle
-  landmarks[28] = { x: 0.56, y: 0.9, visibility: 0.95 }; // right ankle
+  landmarks[11] = { x: 0.4, y: 0.2, z: 0, visibility: 0.95 }; // left shoulder
+  landmarks[12] = { x: 0.6, y: 0.2, z: 0, visibility: 0.95 }; // right shoulder
+  landmarks[23] = { x: 0.42, y: 0.5, z: 0, visibility: 0.95 }; // left hip
+  landmarks[24] = { x: 0.58, y: 0.5, z: 0, visibility: 0.95 }; // right hip
+  landmarks[25] = { x: 0.4, y: 0.7, z: 0, visibility: 0.95 }; // left knee
+  landmarks[26] = { x: 0.6, y: 0.7, z: 0, visibility: 0.95 }; // right knee
+  landmarks[27] = { x: 0.44, y: 0.9, z: 0, visibility: 0.95 }; // left ankle
+  landmarks[28] = { x: 0.56, y: 0.9, z: 0, visibility: 0.95 }; // right ankle
 
   return landmarks;
 }
@@ -51,11 +51,7 @@ function findLandmark(landmarks: MotionLandmark[], name: string): MotionLandmark
 
 describe("poseMetrics ↔ FisioHub Motion Core equivalence", () => {
   it("preserves the legacy mean behavior for finite and invalid values", () => {
-    const cases = [
-      [1, 2, 3, 4],
-      [1, Number.NaN, 3, Number.POSITIVE_INFINITY],
-      [],
-    ];
+    const cases = [[1, 2, 3, 4], [1, Number.NaN, 3, Number.POSITIVE_INFINITY], []];
 
     for (const values of cases) {
       const legacy = legacyMean(values);
@@ -80,12 +76,7 @@ describe("poseMetrics ↔ FisioHub Motion Core equivalence", () => {
   });
 
   it("produces the same zero-phase EMA used by the MVP", () => {
-    const signals = [
-      [0, 1, 2, 3, 4, 3, 2, 1, 0],
-      [1, Number.NaN, 2, 5, Number.NaN, 3],
-      [4],
-      [],
-    ];
+    const signals = [[0, 1, 2, 3, 4, 3, 2, 1, 0], [1, Number.NaN, 2, 5, Number.NaN, 3], [4], []];
 
     for (const signal of signals) {
       for (const alpha of [0.1, 0.3, 0.7, 1]) {

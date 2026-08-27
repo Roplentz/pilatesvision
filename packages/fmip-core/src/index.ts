@@ -11,3 +11,4 @@ export * from "./professional-review";
 export * from "./capture-readiness";
 export * from "./squat-state-machine";
 export * from "./metric-confidence";
+export * from "./squat-live-adapter";
